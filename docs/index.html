@@ -80,6 +80,42 @@
   .close .btn { margin-top:38px; }
   .close .mono { display:block; margin-top:22px; text-transform:none; letter-spacing:.02em; }
   .note { color:var(--mute); font-size:14px; max-width:430px; margin:44px auto 0; text-wrap:pretty; }
+  .alt a { color:var(--fg); text-decoration:none; border-bottom:1px solid #3a3a36; }
+
+  .req { max-width:520px; margin:44px auto 0; text-align:left; }
+  .drop { position:relative; display:flex; align-items:center; justify-content:center; min-height:190px; border-radius:18px; cursor:pointer;
+          border:1px dashed #3a3a36; background:rgba(255,255,255,.02); overflow:hidden; transition:border-color .3s, background .3s; }
+  .drop:hover, .drop.over { border-color:var(--ink); background:rgba(159,208,255,.05); }
+  .drop.has { border-style:solid; border-color:#2a2a27; }
+  .drop input { position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .drop img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#fff; opacity:0; pointer-events:none; }
+  .drop.has img[src] { opacity:1; }
+  .dz { position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; padding:24px; text-align:center; pointer-events:none; }
+  .dz svg { width:26px; height:26px; color:var(--ink); }
+  .dz b { font-weight:600; font-size:16px; }
+  .dz .mono { margin:0; font-size:11px; text-transform:none; letter-spacing:.03em; }
+  .drop.has.pic .dz { position:absolute; left:10px; right:10px; bottom:10px; flex-direction:row; justify-content:center; padding:7px 12px;
+                      border-radius:999px; background:rgba(0,0,0,.78); backdrop-filter:blur(8px); }
+  .drop.has.pic .dz svg { display:none; }
+  .drop.has.pic .dz b { font-size:13px; font-weight:500; max-width:60%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .row { display:grid; grid-template-columns:1.3fr 1fr; gap:10px; margin-top:10px; }
+  .row input { width:100%; background:#0b0b0a; color:var(--fg); border:1px solid #2a2a27; border-radius:12px; padding:14px 16px;
+               font:inherit; font-size:15px; outline:none; transition:border-color .25s, box-shadow .25s; }
+  .row input::placeholder { color:#5d5d58; }
+  .row input:focus { border-color:var(--ink); box-shadow:0 0 0 4px rgba(159,208,255,.12); }
+  .row input.bad, .drop.bad { border-color:#ff6b6b; }
+  .hp { position:absolute; left:-9999px; width:1px; height:1px; opacity:0; }
+  .close .send { display:block; width:100%; margin-top:14px; border:0; cursor:pointer; font:inherit; font-weight:600; font-size:15px; padding:15px 24px; position:relative; overflow:hidden; }
+  .send[disabled] { cursor:progress; }
+  .send::after { content:""; position:absolute; left:0; bottom:0; height:2px; width:100%; background:var(--ink); transform:scaleX(var(--p, 0)); transform-origin:0 50%; }
+  .msg { min-height:20px; margin-top:12px; text-align:center; text-transform:none; letter-spacing:.02em; }
+  .msg.err { color:#ff8a8a; }
+  .done { margin:48px auto 0; max-width:480px; }
+  .done svg { width:58px; height:58px; color:var(--ink); }
+  .done #tick { stroke-dasharray:1; stroke-dashoffset:0; }
+  .dt { font-size:clamp(28px,4vw,44px); font-weight:700; letter-spacing:-.03em; margin-top:14px; }
+  .done .sub { margin-top:10px; } .done b { color:var(--fg); font-weight:500; }
+  @media (max-width:520px) { .row { grid-template-columns:1fr; } .drop { min-height:160px; } }
 
   footer { position:relative; z-index:1; border-top:1px solid var(--line); padding:26px 28px 34px; font-size:13px; color:var(--mute);
            display:flex; flex-wrap:wrap; gap:10px 24px; justify-content:space-between; }
@@ -194,9 +230,31 @@
 <section class="close rv" id="request">
   <div class="wrap">
     <h2 class="sp">Zero mouse clicks.<br><em>One plan set.</em></h2>
-    <a class="btn fade" href="mailto:zeromouseclicks@agentmail.to?subject=Plan%20set%20request&body=Attach%20the%20floor%20plan%20image%20and%20tell%20us%20the%20private%20area%20(m%C2%B2%20or%20sq%20ft).">Request a plan set</a>
-    <span class="mono fade">zeromouseclicks@agentmail.to</span>
-    <p class="note fade">An early prototype, starting with one thing. Drawn from marketing plans: verify dimensions on site.</p>
+    <form class="req fade" id="req" novalidate>
+      <label class="drop" id="drop">
+        <input type="file" name="file" id="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf">
+        <img id="thumb" alt="">
+        <span class="dz">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6M4 20h16" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+          <b id="dzt">Drop the brochure image here</b>
+          <span class="mono" id="dzs">or choose a file &middot; JPG, PNG, PDF &middot; up to 15 MB</span>
+        </span>
+      </label>
+      <div class="row">
+        <input type="email" name="email" id="email" placeholder="Your email" required autocomplete="email" maxlength="254" aria-label="Your email">
+        <input type="text" name="area" id="area" placeholder="Area, m&sup2; or sq ft (optional)" maxlength="40" aria-label="Private area, optional">
+      </div>
+      <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button class="btn send" id="send" type="submit"><span id="sendt">Send for a plan set</span></button>
+      <p class="msg mono" id="msg" role="status" aria-live="polite"></p>
+    </form>
+    <div class="done" id="done" hidden>
+      <svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" stroke-width="1.5"/><path id="tick" d="M15 27l7 7 15-16" fill="none" stroke="currentColor" stroke-width="2" pathLength="1"/></svg>
+      <p class="dt">Received.</p>
+      <p class="sub">We'll write to <b id="who"></b> with your plan set.</p>
+    </div>
+    <span class="mono fade alt">Or write to <a href="mailto:zeromouseclicks@agentmail.to">zeromouseclicks@agentmail.to</a></span>
+    <p class="note fade">An early prototype, starting with one thing. Drawn from marketing plans: verify dimensions on site. Your image and email are used only to prepare and send your plan set.</p>
   </div>
 </section>
 
@@ -274,6 +332,83 @@
   window.addEventListener('click', function () {
     cn.textContent = ++n;
     if (on) M.animate(box, { scale: [1.3, 1], borderColor: ['#ff6b6b', '#1f1f1d'] }, { type: 'spring', stiffness: 420, damping: 11 });
+  });
+
+  // request form: brochure image + email, sent to the zmc-request function
+  var FN = 'https://ebqxcaelgmxofwtofrdc.supabase.co/functions/v1/zmc-request';
+  var MAXB = 15 * 1024 * 1024, SENDT = 'Send for a plan set';
+  var form = document.getElementById('req'), drop = document.getElementById('drop'), input = document.getElementById('file');
+  var thumb = document.getElementById('thumb'), dzt = document.getElementById('dzt'), dzs = document.getElementById('dzs');
+  var mail = document.getElementById('email'), msg = document.getElementById('msg'), send = document.getElementById('send'), sendt = document.getElementById('sendt');
+  var picked = null, url = null;
+  function say(t, bad) { msg.textContent = t; msg.className = 'msg mono' + (bad ? ' err' : ''); }
+  function pick(f) {
+    if (!f) return;
+    if (f.size > MAXB) { say('That file is over 15 MB. Try a smaller image.', true); return; }
+    picked = f; drop.classList.remove('bad'); drop.classList.add('has'); say('');
+    if (url) URL.revokeObjectURL(url);
+    url = null;
+    var pic = /^image.(jpeg|png|webp)$/.test(f.type);
+    drop.classList.toggle('pic', pic);
+    if (pic) { url = URL.createObjectURL(f); thumb.src = url; } else { thumb.removeAttribute('src'); }
+    dzt.textContent = f.name || 'brochure';
+    dzs.textContent = (f.size / 1048576).toFixed(1) + ' MB · change';
+    if (on) M.animate(drop, { scale: [0.96, 1] }, { type: 'spring', stiffness: 380, damping: 16 });
+  }
+  if (window.matchMedia('(hover: none)').matches) dzt.textContent = 'Add the brochure image';
+  input.addEventListener('change', function () { pick(input.files[0]); });
+  ['dragenter', 'dragover'].forEach(function (n) {
+    drop.addEventListener(n, function (e) { e.preventDefault(); drop.classList.add('over'); });
+  });
+  ['dragleave', 'drop'].forEach(function (n) {
+    drop.addEventListener(n, function () { drop.classList.remove('over'); });
+  });
+  drop.addEventListener('drop', function (e) { e.preventDefault(); if (e.dataTransfer && e.dataTransfer.files.length) pick(e.dataTransfer.files[0]); });
+  window.addEventListener('dragover', function (e) { e.preventDefault(); });
+  window.addEventListener('drop', function (e) { e.preventDefault(); });
+  mail.addEventListener('input', function () { mail.classList.remove('bad'); });
+
+  function fail(code) {
+    send.disabled = false; sendt.textContent = SENDT; send.style.setProperty('--p', 0);
+    var t = { email: 'Check your email address.', size: 'That file is over 15 MB.', type: 'Use a JPG, PNG, WEBP, HEIC or PDF file.',
+              busy: 'Too many requests right now. Please try again later.' }[code];
+    say(t || 'Something went wrong. Please write to zeromouseclicks@agentmail.to instead.', true);
+  }
+  function done() {
+    document.getElementById('who').textContent = mail.value.trim();
+    var d = document.getElementById('done'), tick = document.getElementById('tick');
+    function show() {
+      form.hidden = true; d.hidden = false;
+      if (!on) return;
+      tick.style.strokeDashoffset = 1;
+      M.animate(d, { opacity: [0, 1], y: [24, 0] }, { duration: 0.7, ease: ease });
+      M.animate(0, 1, { duration: 0.8, delay: 0.25, ease: 'easeOut', onUpdate: function (v) { tick.style.strokeDashoffset = 1 - v; } });
+    }
+    if (on) M.animate(form, { opacity: 0, y: -16, filter: 'blur(8px)' }, { duration: 0.4 }).then(show); else show();
+  }
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var noFile = !picked, noMail = !mail.value.trim() || !mail.checkValidity();
+    if (noFile) drop.classList.add('bad');
+    if (noMail) mail.classList.add('bad');
+    if (noFile || noMail) {
+      say(noFile ? 'Add the brochure image first.' : 'Check your email address.', true);
+      if (on) M.animate(form, { x: [0, -8, 8, -5, 5, 0] }, { duration: 0.42 });
+      return;
+    }
+    var fd = new FormData(form);
+    fd.set('file', picked, picked.name || 'brochure');
+    send.disabled = true; sendt.textContent = 'Sending…'; say('');
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', FN);
+    xhr.upload.onprogress = function (ev) { if (ev.lengthComputable) send.style.setProperty('--p', (ev.loaded / ev.total).toFixed(3)); };
+    xhr.onload = function () {
+      var r = {};
+      try { r = JSON.parse(xhr.responseText); } catch (x) { r = {}; }
+      if (xhr.status === 200 && r.ok) done(); else fail(r.error || xhr.status);
+    };
+    xhr.onerror = function () { fail('net'); };
+    xhr.send(fd);
   });
 
   if (!on) { started = true; return; }
