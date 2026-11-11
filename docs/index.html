@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zero Mouse Clicks — a brochure in, a plan set out</title>
+<meta name="description" content="Send the floor plan from a developer's brochure. Get back an architectural plan set: dimensions, schedules, finishes and sections.">
+<meta name="theme-color" content="#000000">
+<meta property="og:title" content="Zero Mouse Clicks">
+<meta property="og:description" content="A brochure in. A plan set out.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://zeromouseclicks.com/">
+<meta property="og:image" content="https://zeromouseclicks.com/img/A-101_floor_plan.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Cpath d='M8 8h16v16H8zM8 17h9M17 8v9' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#000; --fg:#f5f5f3; --mute:#8d8d89; --line:#232321; --card:#0d0d0c; --paper:#fbfbf8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--bg); color:var(--fg); font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+         line-height:1.5; -webkit-font-smoothing:antialiased; }
+  a { color:inherit; }
+  .wrap { max-width:1080px; margin:0 auto; padding:0 24px; }
+  .skip { position:absolute; left:-999px; } .skip:focus { left:16px; top:16px; background:#fff; color:#000; padding:8px 12px; border-radius:8px; z-index:9; }
+
+  header { position:sticky; top:0; z-index:5; background:rgba(0,0,0,.72); backdrop-filter:blur(12px); border-bottom:1px solid var(--line); }
+  header .wrap { display:flex; align-items:center; justify-content:space-between; height:60px; }
+  .brand { display:flex; align-items:center; gap:10px; font-weight:600; letter-spacing:-.01em; text-decoration:none; }
+  .brand svg { width:22px; height:22px; }
+  nav { display:flex; align-items:center; gap:22px; font-size:14px; }
+  nav a { text-decoration:none; color:var(--mute); } nav a:hover { color:var(--fg); }
+  .btn { display:inline-block; background:var(--fg); color:#000 !important; font-weight:600; text-decoration:none;
+         padding:11px 22px; border-radius:999px; font-size:15px; transition:transform .15s, opacity .15s; }
+  .btn:hover { transform:translateY(-1px); opacity:.9; }
+  .btn.small { padding:8px 16px; font-size:14px; }
+
+  h1, h2 { font-weight:700; letter-spacing:-.035em; line-height:1.02; text-wrap:balance; }
+  h1 { font-size:clamp(46px, 8.4vw, 104px); }
+  h2 { font-size:clamp(36px, 5.6vw, 68px); }
+  .lede { color:var(--mute); font-size:clamp(17px, 1.7vw, 21px); max-width:560px; margin:24px auto 0; text-wrap:pretty; }
+  section { padding:clamp(80px, 12vw, 150px) 0; border-bottom:1px solid var(--line); }
+  .center { text-align:center; }
+  .eyebrow { font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--mute); margin-bottom:22px; }
+
+  .hero { padding-top:clamp(72px, 10vw, 130px); }
+  .hero .btn { margin-top:34px; }
+  .pair { display:grid; grid-template-columns:minmax(0,.62fr) auto minmax(0,1fr); gap:clamp(12px,2.4vw,28px); align-items:center; margin-top:clamp(56px,8vw,96px); }
+  .pair figure { margin:0; }
+  .pair img, .sheets img { display:block; width:100%; height:auto; border-radius:14px; background:var(--paper); }
+  .pair .arrow { color:var(--mute); font-size:clamp(22px,3vw,36px); }
+  figcaption { font-size:13px; color:var(--mute); margin-top:12px; text-align:center; }
+
+  .split { display:grid; grid-template-columns:1fr 1fr; gap:clamp(32px,6vw,88px); align-items:start; }
+  .split p { color:var(--mute); font-size:18px; margin-top:22px; max-width:440px; text-wrap:pretty; }
+  .steps { list-style:none; counter-reset:s; border-top:1px solid var(--line); }
+  .steps li { counter-increment:s; display:grid; grid-template-columns:44px 1fr; padding:20px 0; border-bottom:1px solid var(--line); font-size:18px; }
+  .steps li::before { content:counter(s, decimal-leading-zero); color:var(--mute); font-size:13px; padding-top:5px; font-variant-numeric:tabular-nums; }
+  .steps span { display:block; color:var(--mute); font-size:15px; margin-top:2px; }
+
+  .sheets { margin-top:clamp(44px,6vw,72px); }
+  .list { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:16px; overflow:hidden; margin-top:28px; text-align:left; }
+  .list div { background:var(--card); padding:22px; }
+  .list b { display:block; font-size:12px; letter-spacing:.1em; color:var(--mute); font-weight:500; margin-bottom:6px; }
+  .list span { font-size:17px; font-weight:500; }
+
+  .facts { display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(24px,4vw,56px); margin-top:clamp(44px,6vw,72px); text-align:left; }
+  .facts h3 { font-size:20px; font-weight:600; letter-spacing:-.015em; margin-bottom:8px; }
+  .facts p { color:var(--mute); font-size:16px; text-wrap:pretty; }
+  .facts a { color:var(--fg); }
+
+  .note { max-width:680px; margin:0 auto; }
+  .note p { color:var(--mute); font-size:19px; margin-top:22px; text-wrap:pretty; }
+  .stamp { display:inline-block; margin-top:30px; border:1px solid #3a3a37; border-radius:8px; padding:10px 16px; font-size:14px; letter-spacing:.02em; color:var(--fg); font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+
+  .close { border-bottom:0; }
+  .close em { font-family:"Instrument Serif",Georgia,serif; font-style:italic; font-weight:400; letter-spacing:-.01em; }
+  .close .btn { margin-top:36px; }
+  .close small { display:block; color:var(--mute); font-size:14px; margin-top:18px; }
+
+  footer { border-top:1px solid var(--line); padding:32px 0 44px; font-size:14px; color:var(--mute); }
+  footer .wrap { display:flex; flex-wrap:wrap; gap:12px 28px; justify-content:space-between; }
+  footer a { text-decoration:none; } footer a:hover { color:var(--fg); }
+  footer nav { gap:22px; }
+
+  @media (max-width:760px) {
+    nav .hide { display:none; }
+    .pair { grid-template-columns:1fr; } .pair .arrow { transform:rotate(90deg); justify-self:center; }
+    .pair figure:first-child { max-width:300px; margin:0 auto; }
+    .split, .facts { grid-template-columns:1fr; }
+    .list { grid-template-columns:1fr 1fr; }
+  }
+  @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .btn { transition:none; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#request">Skip to contact</a>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Zero Mouse Clicks, home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 5h22v22H5zM5 17h12M17 5v12" fill="none" stroke="currentColor" stroke-width="2.6"/></svg>
+      Zero Mouse Clicks
+    </a>
+    <nav aria-label="Main">
+      <a class="hide" href="#how">How it works</a>
+      <a class="hide" href="#set">The set</a>
+      <a class="hide" href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>
+      <a class="btn small" href="#request">Request a plan set</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero center">
+  <div class="wrap">
+    <h1>A brochure in.<br>A plan set out.</h1>
+    <p class="lede">Send the floor plan from a developer's brochure or a listing. Get back the drawings an architect would make from it.</p>
+    <a class="btn" href="#request">Request a plan set</a>
+
+    <div class="pair">
+      <figure>
+        <img src="https://raw.githubusercontent.com/zeromouseclicks/zero-mouse-clicks/main/examples/synthetic_54m2.png" width="900" height="900" alt="A colorful marketing floor plan of a small apartment, with furniture and wood floors">
+        <figcaption>What you have</figcaption>
+      </figure>
+      <div class="arrow" aria-hidden="true">→</div>
+      <figure>
+        <img src="img/A-101_floor_plan.png" width="1819" height="1286" alt="The same apartment as an architectural floor plan sheet with axes, dimensions, room areas and a title block">
+        <figcaption>What you get &middot; sheet 1 of 6</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap split">
+    <div>
+      <p class="eyebrow">How it works</p>
+      <h2>Send the picture.</h2>
+      <p>No CAD file, no survey, no software to learn. The image you already have is the starting point.</p>
+    </div>
+    <ol class="steps">
+      <li><div>Email the floor plan<span>A JPG, PNG or the brochure PDF.</span></div></li>
+      <li><div>Tell us the area<span>The private area printed on the brochure, in m² or sq ft.</span></div></li>
+      <li><div>Get the PDF back<span>Six A3 sheets, ready to print, quote or file.</span></div></li>
+    </ol>
+  </div>
+</section>
+
+<section id="set" class="center">
+  <div class="wrap">
+    <p class="eyebrow">The set</p>
+    <h2>Six sheets. One PDF.</h2>
+    <p class="lede">Walls, doors and windows drawn to scale, with the dimensions, areas and schedules a contractor asks for.</p>
+    <div class="sheets">
+      <img src="img/plan_set_6_sheets.jpg" width="1696" height="806" loading="lazy" alt="Six architectural sheets: floor plan, schedules, floor finishes, electrical layout, kitchen section and bathroom section">
+    </div>
+    <div class="list">
+      <div><b>A-101</b><span>Floor plan</span></div>
+      <div><b>A-102</b><span>Areas, doors &amp; windows</span></div>
+      <div><b>A-103</b><span>Floor finishes</span></div>
+      <div><b>A-104</b><span>Electrical, schematic</span></div>
+      <div><b>A-201</b><span>Section, kitchen</span></div>
+      <div><b>A-202</b><span>Section, bathroom</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="center">
+  <div class="wrap">
+    <p class="eyebrow">Under the hood</p>
+    <h2>Small models.<br>Plain rules.</h2>
+    <div class="facts">
+      <div>
+        <h3>No cloud AI</h3>
+        <p>Three models of about one megabyte each read the image. They run on an ordinary computer, so your plan is not sent to a chatbot.</p>
+      </div>
+      <div>
+        <h3>Trained on synthetic plans</h3>
+        <p>The models learned from apartments generated by code, not from anyone's copyrighted drawings.</p>
+      </div>
+      <div>
+        <h3>Open source</h3>
+        <p>The engine and the models are on <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a> under Apache 2.0. Read it, run it, improve it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="center">
+  <div class="wrap note">
+    <p class="eyebrow">Honest by default</p>
+    <h2>A first draft, not a survey.</h2>
+    <p>Marketing plans are not drawn to scale, and this is an early prototype: it reads some plans well and gets others wrong. Heights and electrical points are standard assumptions. Every sheet carries the same note.</p>
+    <span class="stamp">Drawn from marketing plan — verify dimensions on site</span>
+  </div>
+</section>
+
+<section id="request" class="close center">
+  <div class="wrap">
+    <h2>Zero mouse clicks.<br><em>One plan set.</em></h2>
+    <a class="btn" href="mailto:zeromouseclicks@agentmail.to?subject=Plan%20set%20request&body=Attach%20the%20floor%20plan%20image%20and%20tell%20us%20the%20private%20area%20(m%C2%B2%20or%20sq%20ft).">Request a plan set</a>
+    <small>zeromouseclicks@agentmail.to &middot; attach the floor plan and its area</small>
+    <p class="lede">We are starting with one thing: plan sets from brochures. What comes next depends on what you need, so tell us.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>&copy; 2026 Zero Mouse Clicks &middot; by <a href="https://www.linkedin.com/in/julian-holmes-paez-martinez-47a36a208/">Julián Páez</a></span>
+    <nav aria-label="Footer">
+      <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>
+      <a href="https://www.linkedin.com/in/julian-holmes-paez-martinez-47a36a208/">LinkedIn</a>
+      <a href="mailto:zeromouseclicks@agentmail.to">Contact</a>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>
