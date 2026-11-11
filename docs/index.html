@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Zero Mouse Clicks — a brochure in, a plan set out</title>
-<meta name="description" content="Send the floor plan from a developer's brochure. Get back an architectural plan set: dimensions, schedules, finishes and sections.">
+<meta name="description" content="Send the floor plan from a developer's brochure. Get back an architectural plan set.">
 <meta name="theme-color" content="#000000">
 <meta property="og:title" content="Zero Mouse Clicks">
 <meta property="og:description" content="A brochure in. A plan set out.">
@@ -14,210 +14,338 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Cpath d='M8 8h16v16H8zM8 17h9M17 8v9' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#000; --fg:#f5f5f3; --mute:#8d8d89; --line:#232321; --card:#0d0d0c; --paper:#fbfbf8; }
+  :root { --bg:#000; --fg:#f5f5f3; --mute:#85857f; --line:#1f1f1d; --ink:#9fd0ff; --mx:50vw; --my:30vh; }
   * { box-sizing:border-box; margin:0; padding:0; }
-  html { scroll-behavior:smooth; }
   body { background:var(--bg); color:var(--fg); font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
-         line-height:1.5; -webkit-font-smoothing:antialiased; }
+         line-height:1.5; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  body::before { content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+         background:radial-gradient(520px circle at var(--mx) var(--my), rgba(159,208,255,.09), transparent 62%); }
   a { color:inherit; }
-  .wrap { max-width:1080px; margin:0 auto; padding:0 24px; }
-  .skip { position:absolute; left:-999px; } .skip:focus { left:16px; top:16px; background:#fff; color:#000; padding:8px 12px; border-radius:8px; z-index:9; }
+  .wrap { position:relative; z-index:1; max-width:1040px; margin:0 auto; padding:0 24px; }
+  .mono { font-family:"JetBrains Mono",ui-monospace,Menlo,monospace; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--mute); }
+  #bar { position:fixed; inset:0 0 auto 0; height:2px; background:var(--ink); transform-origin:0 50%; transform:scaleX(0); z-index:8; }
 
-  header { position:sticky; top:0; z-index:5; background:rgba(0,0,0,.72); backdrop-filter:blur(12px); border-bottom:1px solid var(--line); }
-  header .wrap { display:flex; align-items:center; justify-content:space-between; height:60px; }
-  .brand { display:flex; align-items:center; gap:10px; font-weight:600; letter-spacing:-.01em; text-decoration:none; }
-  .brand svg { width:22px; height:22px; }
-  nav { display:flex; align-items:center; gap:22px; font-size:14px; }
-  nav a { text-decoration:none; color:var(--mute); } nav a:hover { color:var(--fg); }
-  .btn { display:inline-block; background:var(--fg); color:#000 !important; font-weight:600; text-decoration:none;
-         padding:11px 22px; border-radius:999px; font-size:15px; transition:transform .15s, opacity .15s; }
-  .btn:hover { transform:translateY(-1px); opacity:.9; }
-  .btn.small { padding:8px 16px; font-size:14px; }
+  header { position:fixed; inset:0 0 auto 0; z-index:6; display:flex; align-items:center; justify-content:space-between; height:64px; padding:0 28px; }
+  .brand { display:flex; align-items:center; gap:10px; font-weight:600; letter-spacing:-.01em; text-decoration:none; font-size:15px; }
+  .brand svg { width:20px; height:20px; }
+  .btn { display:inline-block; background:var(--fg); color:#000; font-weight:600; text-decoration:none; padding:12px 24px;
+         border-radius:999px; font-size:15px; transition:box-shadow .3s; will-change:transform; }
+  .btn:hover { box-shadow:0 0 0 6px rgba(245,245,243,.08), 0 0 40px rgba(159,208,255,.35); }
+  .btn.small { padding:8px 16px; font-size:13px; }
 
-  h1, h2 { font-weight:700; letter-spacing:-.035em; line-height:1.02; text-wrap:balance; }
-  h1 { font-size:clamp(46px, 8.4vw, 104px); }
-  h2 { font-size:clamp(36px, 5.6vw, 68px); }
-  .lede { color:var(--mute); font-size:clamp(17px, 1.7vw, 21px); max-width:560px; margin:24px auto 0; text-wrap:pretty; }
-  section { padding:clamp(80px, 12vw, 150px) 0; border-bottom:1px solid var(--line); }
-  .center { text-align:center; }
-  .eyebrow { font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--mute); margin-bottom:22px; }
+  h1, h2 { font-weight:700; letter-spacing:-.04em; line-height:1; text-wrap:balance; }
+  h1 { font-size:clamp(44px, 7.4vw, 92px); }
+  h2 { font-size:clamp(34px, 6vw, 76px); }
+  .wd { display:inline-block; will-change:transform, filter; }
+  .sub { color:var(--mute); font-size:clamp(16px, 1.6vw, 20px); max-width:470px; margin:22px auto 0; text-wrap:pretty; }
+  section { position:relative; padding:clamp(90px, 13vw, 170px) 0; text-align:center; }
+  .m .wd, .m .fade { opacity:0; }
 
-  .hero { padding-top:clamp(72px, 10vw, 130px); }
-  .hero .btn { margin-top:34px; }
-  .pair { display:grid; grid-template-columns:minmax(0,.62fr) auto minmax(0,1fr); gap:clamp(12px,2.4vw,28px); align-items:center; margin-top:clamp(56px,8vw,96px); }
-  .pair figure { margin:0; }
-  .pair img, .sheets img { display:block; width:100%; height:auto; border-radius:14px; background:var(--paper); }
-  .pair .arrow { color:var(--mute); font-size:clamp(22px,3vw,36px); }
-  figcaption { font-size:13px; color:var(--mute); margin-top:12px; text-align:center; }
+  .hero { padding-top:clamp(100px, 9vw, 124px); padding-bottom:clamp(70px, 9vw, 120px); }
+  .persp { perspective:1400px; }
+  .stage { position:relative; max-width:min(600px, 60vh); min-width:min(100%, 300px); margin:clamp(30px,4vw,44px) auto 0; border-radius:22px; overflow:hidden;
+           border:1px solid #2a2a27; background:#05070a; cursor:ew-resize; touch-action:pan-y; will-change:transform;
+           box-shadow:0 0 0 1px rgba(159,208,255,.05), 0 40px 120px -30px rgba(159,208,255,.28); }
+  .stage svg { display:block; width:100%; height:auto; }
+  .bp { fill:#05070a; } .grid { stroke:#101820; stroke-width:1; }
+  .w { fill:rgba(159,208,255,.07); stroke:var(--ink); stroke-width:1.6; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:0; }
+  .o { fill:none; stroke:#4f6f8c; stroke-width:1; stroke-dasharray:4 3; }
+  .g { fill:none; stroke:var(--ink); stroke-width:1; }
+  .d { fill:none; stroke:var(--ink); stroke-width:1.4; } .da { fill:none; stroke:#6f93b4; stroke-width:1; stroke-dasharray:3 3; }
+  .c { fill:none; stroke:#6f93b4; stroke-width:1; }
+  .t, .ct { fill:#cfe6ff; font-family:"JetBrains Mono",ui-monospace,monospace; font-size:13px; text-anchor:middle; dominant-baseline:middle; }
+  .ct { fill:#8fb3d4; font-size:12px; }
+  .m .w { stroke-dashoffset:1; } .m .o, .m .g, .m .d, .m .da, .m .c, .m .t, .m .ct { opacity:0; }
+  #scan { stroke:#fff; stroke-width:1.6; filter:drop-shadow(0 0 6px #9fd0ff) drop-shadow(0 0 18px #9fd0ff); }
+  #knob { fill:#fff; filter:drop-shadow(0 0 10px #9fd0ff); }
+  .tag { position:absolute; bottom:14px; padding:5px 10px; border-radius:999px; backdrop-filter:blur(8px); }
+  .tag.l { left:14px; background:rgba(5,7,10,.7); color:#cfe6ff; border:1px solid #1d2a36; }
+  .tag.r { right:14px; background:rgba(255,255,255,.82); color:#333; }
+  .hint { margin-top:18px; }
 
-  .split { display:grid; grid-template-columns:1fr 1fr; gap:clamp(32px,6vw,88px); align-items:start; }
-  .split p { color:var(--mute); font-size:18px; margin-top:22px; max-width:440px; text-wrap:pretty; }
-  .steps { list-style:none; counter-reset:s; border-top:1px solid var(--line); }
-  .steps li { counter-increment:s; display:grid; grid-template-columns:44px 1fr; padding:20px 0; border-bottom:1px solid var(--line); font-size:18px; }
-  .steps li::before { content:counter(s, decimal-leading-zero); color:var(--mute); font-size:13px; padding-top:5px; font-variant-numeric:tabular-nums; }
-  .steps span { display:block; color:var(--mute); font-size:15px; margin-top:2px; }
+  .deck { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:clamp(44px,6vw,72px); perspective:1400px; }
+  .card { position:relative; aspect-ratio:560/399; will-change:transform; }
+  .face { position:absolute; inset:0; border-radius:12px; background:#fbfbf8 url(img/plan_set_6_sheets.jpg) no-repeat;
+          background-size:302.857% auto; background-position:calc(var(--c) * 50%) calc(var(--r) * 100%);
+          box-shadow:0 20px 50px -20px rgba(0,0,0,.9); transition:box-shadow .4s; }
+  .card:hover { z-index:2; } .card:hover .face { box-shadow:0 30px 80px -20px rgba(159,208,255,.5); }
+  .face span { position:absolute; left:10px; bottom:9px; background:#000; color:var(--fg); padding:3px 8px; border-radius:999px; font-size:10px; }
 
-  .sheets { margin-top:clamp(44px,6vw,72px); }
-  .list { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:16px; overflow:hidden; margin-top:28px; text-align:left; }
-  .list div { background:var(--card); padding:22px; }
-  .list b { display:block; font-size:12px; letter-spacing:.1em; color:var(--mute); font-weight:500; margin-bottom:6px; }
-  .list span { font-size:17px; font-weight:500; }
+  .facts { font-size:clamp(28px, 4.6vw, 58px); font-weight:700; letter-spacing:-.035em; line-height:1.08; }
+  .m .facts span { color:#33332f; }
 
-  .facts { display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(24px,4vw,56px); margin-top:clamp(44px,6vw,72px); text-align:left; }
-  .facts h3 { font-size:20px; font-weight:600; letter-spacing:-.015em; margin-bottom:8px; }
-  .facts p { color:var(--mute); font-size:16px; text-wrap:pretty; }
-  .facts a { color:var(--fg); }
-
-  .note { max-width:680px; margin:0 auto; }
-  .note p { color:var(--mute); font-size:19px; margin-top:22px; text-wrap:pretty; }
-  .stamp { display:inline-block; margin-top:30px; border:1px solid #3a3a37; border-radius:8px; padding:10px 16px; font-size:14px; letter-spacing:.02em; color:var(--fg); font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
-
-  .close { border-bottom:0; }
   .close em { font-family:"Instrument Serif",Georgia,serif; font-style:italic; font-weight:400; letter-spacing:-.01em; }
-  .close .btn { margin-top:36px; }
-  .close small { display:block; color:var(--mute); font-size:14px; margin-top:18px; }
+  .close .btn { margin-top:38px; }
+  .close .mono { display:block; margin-top:22px; text-transform:none; letter-spacing:.02em; }
+  .note { color:var(--mute); font-size:14px; max-width:430px; margin:44px auto 0; text-wrap:pretty; }
 
-  footer { border-top:1px solid var(--line); padding:32px 0 44px; font-size:14px; color:var(--mute); }
-  footer .wrap { display:flex; flex-wrap:wrap; gap:12px 28px; justify-content:space-between; }
-  footer a { text-decoration:none; } footer a:hover { color:var(--fg); }
-  footer nav { gap:22px; }
+  footer { position:relative; z-index:1; border-top:1px solid var(--line); padding:26px 28px 34px; font-size:13px; color:var(--mute);
+           display:flex; flex-wrap:wrap; gap:10px 24px; justify-content:space-between; }
+  footer a { text-decoration:none; } footer a:hover { color:var(--fg); } footer nav { display:flex; gap:22px; }
+  #clicks { position:fixed; left:20px; bottom:18px; z-index:7; padding:6px 11px; border:1px solid var(--line); border-radius:999px;
+            background:rgba(0,0,0,.7); backdrop-filter:blur(8px); } #clicks b { color:var(--fg); font-weight:500; }
 
-  @media (max-width:760px) {
-    nav .hide { display:none; }
-    .pair { grid-template-columns:1fr; } .pair .arrow { transform:rotate(90deg); justify-self:center; }
-    .pair figure:first-child { max-width:300px; margin:0 auto; }
-    .split, .facts { grid-template-columns:1fr; }
-    .list { grid-template-columns:1fr 1fr; }
-  }
-  @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .btn { transition:none; } }
+  @media (max-width:700px) { .deck { grid-template-columns:repeat(2,1fr); gap:10px; } header { padding:0 18px; } }
+  @media (hover:none), (max-width:700px) { #clicks { display:none; } }
 </style>
 </head>
 <body>
-<a class="skip" href="#request">Skip to contact</a>
+<div id="bar"></div>
 
 <header>
-  <div class="wrap">
-    <a class="brand" href="#top" aria-label="Zero Mouse Clicks, home">
-      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 5h22v22H5zM5 17h12M17 5v12" fill="none" stroke="currentColor" stroke-width="2.6"/></svg>
-      Zero Mouse Clicks
-    </a>
-    <nav aria-label="Main">
-      <a class="hide" href="#how">How it works</a>
-      <a class="hide" href="#set">The set</a>
-      <a class="hide" href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>
-      <a class="btn small" href="#request">Request a plan set</a>
-    </nav>
-  </div>
+  <a class="brand" href="#top" aria-label="Zero Mouse Clicks, home">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 5h22v22H5zM5 17h12M17 5v12" fill="none" stroke="currentColor" stroke-width="2.6"/></svg>
+    Zero Mouse Clicks
+  </a>
+  <a class="btn small" href="#request">Request a plan set</a>
 </header>
 
 <main id="top">
 
-<section class="hero center">
+<section class="hero rv">
   <div class="wrap">
-    <h1>A brochure in.<br>A plan set out.</h1>
-    <p class="lede">Send the floor plan from a developer's brochure or a listing. Get back the drawings an architect would make from it.</p>
-    <a class="btn" href="#request">Request a plan set</a>
+    <h1 class="sp">A brochure in.<br>A plan set out.</h1>
+    <p class="sub fade">Send the floor plan from a developer's brochure. Get back the drawings an architect would make from it.</p>
 
-    <div class="pair">
-      <figure>
-        <img src="https://raw.githubusercontent.com/zeromouseclicks/zero-mouse-clicks/main/examples/synthetic_54m2.png" width="900" height="900" alt="A colorful marketing floor plan of a small apartment, with furniture and wood floors">
-        <figcaption>What you have</figcaption>
-      </figure>
-      <div class="arrow" aria-hidden="true">→</div>
-      <figure>
-        <img src="img/A-101_floor_plan.png" width="1819" height="1286" alt="The same apartment as an architectural floor plan sheet with axes, dimensions, room areas and a title block">
-        <figcaption>What you get &middot; sheet 1 of 6</figcaption>
-      </figure>
+    <div class="persp fade">
+    <div class="stage" id="stage" aria-label="A marketing floor plan turning into an architectural drawing as a scan line moves across it">
+      <svg id="svg" viewBox="140 100 700 650" role="img">
+        <defs>
+          <pattern id="gr" width="32.9" height="32.9" patternUnits="userSpaceOnUse"><path class="grid" d="M32.9 0H0V32.9" fill="none"/></pattern>
+          <clipPath id="cut"><rect id="cutr" x="140" y="100" width="700" height="650"/></clipPath>
+        </defs>
+        <rect class="bp" x="140" y="100" width="700" height="650"/>
+        <rect x="140" y="100" width="700" height="650" fill="url(#gr)"/>
+        <g id="plan">
+      <path class="w" pathLength="1" d="M764.4,658.4 L751.2,658.4 L750.0,671.6 L675.6,671.6 L675.6,683.6 L764.4,683.6Z"/>
+      <path class="w" pathLength="1" d="M411.6,628.4 L411.6,670.4 L385.2,671.6 L385.2,683.6 L441.6,683.6 L441.6,671.6 L420.0,670.4 L420.0,628.4Z"/>
+      <path class="w" pathLength="1" d="M583.2,599.6 L574.8,599.6 L574.8,670.4 L519.6,671.6 L519.6,683.6 L606.0,683.6 L606.0,671.6 L583.2,670.4Z"/>
+      <path class="w" pathLength="1" d="M420.0,488.0 L411.6,488.0 L410.4,527.6 L232.8,527.6 L231.6,510.8 L219.6,510.8 L218.4,683.6 L279.6,683.6 L279.6,671.6 L231.6,670.4 L232.8,536.0 L410.4,536.0 L411.6,572.0 L420.0,572.0Z"/>
+      <path class="w" pathLength="1" d="M574.8,346.4 L574.8,531.2 L583.2,531.2 L584.4,526.4 L751.2,526.4 L752.4,542.0 L764.4,542.0 L764.4,392.0 L752.4,392.0 L751.2,518.0 L583.2,516.8 L583.2,346.4Z"/>
+      <path class="w" pathLength="1" d="M420.0,248.0 L411.6,248.0 L410.4,368.0 L232.8,368.0 L231.6,346.4 L218.4,346.4 L218.4,390.8 L231.6,390.8 L232.8,376.4 L410.4,376.4 L411.6,417.2 L420.0,417.2Z"/>
+      <path class="w" pathLength="1" d="M544.8,165.2 L544.8,178.4 L574.8,179.6 L574.8,286.4 L583.2,286.4 L584.4,178.4 L750.0,178.4 L751.2,306.8 L764.4,306.8 L764.4,165.2Z"/>
+      <path class="w" pathLength="1" d="M363.6,165.2 L363.6,178.4 L410.4,178.4 L411.6,196.4 L420.0,196.4 L421.2,178.4 L441.6,178.4 L441.6,165.2Z"/>
+      <path class="w" pathLength="1" d="M218.4,196.4 L231.6,196.4 L232.8,178.4 L256.8,178.4 L256.8,165.2 L218.4,165.2Z"/>
+      <rect class="o" x="236.4" y="195.2" width="42.0" height="138.0" rx="3"/>
+      <rect class="o" x="424.8" y="380.0" width="48.0" height="76.8" rx="3"/>
+      <rect class="o" x="354.0" y="557.6" width="37.2" height="26.4" rx="3"/>
+      <rect class="o" x="285.6" y="617.6" width="110.4" height="52.8" rx="3"/>
+      <path class="d" d="M411.6,248.0H361.2"/><path class="da" d="M361.2,248.0A50.4,50.4 0 0 1 411.6,197.6"/>
+      <path class="d" d="M411.6,628.4H356.4"/><path class="da" d="M356.4,628.4A55.2,55.2 0 0 1 411.6,573.2"/>
+      <path class="d" d="M584.4,287.6H643.2"/><path class="da" d="M643.2,287.6A58.8,58.8 0 0 1 584.4,346.4"/>
+      <path class="d" d="M584.4,599.6H651.6"/><path class="da" d="M651.6,599.6A67.2,67.2 0 0 0 584.4,532.4"/>
+      <path class="d" d="M411.6,488.0H342.0"/><path class="da" d="M342.0,488.0A69.6,69.6 0 0 1 411.6,418.4"/>
+      <path class="g" d="M607.2,671.6H675.6M607.2,678.2H675.6M607.2,684.8H675.6"/>
+      <path class="g" d="M442.8,671.6H519.6M442.8,678.2H519.6M442.8,684.8H519.6"/>
+      <path class="g" d="M752.4,308.0V392.0M759.0,308.0V392.0M765.6,308.0V392.0"/>
+      <path class="g" d="M280.8,671.6H385.2M280.8,678.2H385.2M280.8,684.8H385.2"/>
+      <path class="g" d="M442.8,165.2H544.8M442.8,172.4H544.8M442.8,179.6H544.8"/>
+      <path class="g" d="M258.0,165.2H363.6M258.0,172.4H363.6M258.0,179.6H363.6"/>
+      <path class="g" d="M752.4,543.2V658.4M759.0,543.2V658.4M765.6,543.2V658.4"/>
+      <path class="g" d="M219.6,392.0V510.8M226.2,392.0V510.8M232.8,392.0V510.8"/>
+      <path class="g" d="M218.4,197.6V346.4M225.6,197.6V346.4M232.8,197.6V346.4"/>
+      <text class="t" x="321.6" y="273.2">7.6 m²</text>
+      <text class="t" x="497.4" y="425.0">17.1 m²</text>
+      <text class="t" x="667.6" y="348.5">12.8 m²</text>
+      <text class="t" x="321.6" y="452.0">6.0 m²</text>
+      <text class="t" x="667.7" y="599.0">5.4 m²</text>
+      <text class="t" x="321.6" y="603.8">5.4 m²</text>
+      <path class="c" d="M218.4,135.2H765.6M218.4,128.2v14M765.6,128.2v14M188.4,165.2V684.8M181.4,165.2h14M181.4,684.8h14"/>
+      <text class="ct" x="492.0" y="125.2">8.32 m</text>
+      <text class="ct" transform="translate(178.4,425.0) rotate(-90)">7.90 m</text>
+        </g>
+        <g clip-path="url(#cut)">
+          <rect x="140" y="100" width="700" height="650" fill="#fff"/>
+          <image href="https://raw.githubusercontent.com/zeromouseclicks/zero-mouse-clicks/main/examples/synthetic_54m2.png" x="0" y="0" width="900" height="900"/>
+        </g>
+        <line id="scan" x1="140" x2="140" y1="100" y2="750"/>
+        <circle id="knob" cx="140" cy="425" r="6"/>
+      </svg>
+      <span class="tag l mono">Plan set</span><span class="tag r mono">Brochure</span>
     </div>
+    </div>
+    <p class="hint mono fade">Move across it. No clicks needed.</p>
   </div>
 </section>
 
-<section id="how">
-  <div class="wrap split">
-    <div>
-      <p class="eyebrow">How it works</p>
-      <h2>Send the picture.</h2>
-      <p>No CAD file, no survey, no software to learn. The image you already have is the starting point.</p>
-    </div>
-    <ol class="steps">
-      <li><div>Email the floor plan<span>A JPG, PNG or the brochure PDF.</span></div></li>
-      <li><div>Tell us the area<span>The private area printed on the brochure, in m² or sq ft.</span></div></li>
-      <li><div>Get the PDF back<span>Six A3 sheets, ready to print, quote or file.</span></div></li>
-    </ol>
-  </div>
-</section>
-
-<section id="set" class="center">
+<section class="rv" id="set">
   <div class="wrap">
-    <p class="eyebrow">The set</p>
-    <h2>Six sheets. One PDF.</h2>
-    <p class="lede">Walls, doors and windows drawn to scale, with the dimensions, areas and schedules a contractor asks for.</p>
-    <div class="sheets">
-      <img src="img/plan_set_6_sheets.jpg" width="1696" height="806" loading="lazy" alt="Six architectural sheets: floor plan, schedules, floor finishes, electrical layout, kitchen section and bathroom section">
-    </div>
-    <div class="list">
-      <div><b>A-101</b><span>Floor plan</span></div>
-      <div><b>A-102</b><span>Areas, doors &amp; windows</span></div>
-      <div><b>A-103</b><span>Floor finishes</span></div>
-      <div><b>A-104</b><span>Electrical, schematic</span></div>
-      <div><b>A-201</b><span>Section, kitchen</span></div>
-      <div><b>A-202</b><span>Section, bathroom</span></div>
+    <h2 class="sp">Six sheets. One PDF.</h2>
+    <div class="deck" id="deck">
+      <div class="card"><div class="face" style="--c:0;--r:0"><span class="mono">A-101 Floor plan</span></div></div>
+      <div class="card"><div class="face" style="--c:1;--r:0"><span class="mono">A-102 Schedules</span></div></div>
+      <div class="card"><div class="face" style="--c:2;--r:0"><span class="mono">A-103 Finishes</span></div></div>
+      <div class="card"><div class="face" style="--c:0;--r:1"><span class="mono">A-104 Electrical</span></div></div>
+      <div class="card"><div class="face" style="--c:1;--r:1"><span class="mono">A-201 Section</span></div></div>
+      <div class="card"><div class="face" style="--c:2;--r:1"><span class="mono">A-202 Section</span></div></div>
     </div>
   </div>
 </section>
 
-<section class="center">
+<section class="rv">
   <div class="wrap">
-    <p class="eyebrow">Under the hood</p>
-    <h2>Small models.<br>Plain rules.</h2>
-    <div class="facts">
-      <div>
-        <h3>No cloud AI</h3>
-        <p>Three models of about one megabyte each read the image. They run on an ordinary computer, so your plan is not sent to a chatbot.</p>
-      </div>
-      <div>
-        <h3>Trained on synthetic plans</h3>
-        <p>The models learned from apartments generated by code, not from anyone's copyrighted drawings.</p>
-      </div>
-      <div>
-        <h3>Open source</h3>
-        <p>The engine and the models are on <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a> under Apache 2.0. Read it, run it, improve it.</p>
-      </div>
-    </div>
+    <p class="facts" id="facts"><span>No cloud.</span> <span>No tokens.</span> <span>Open source.</span></p>
+    <p class="sub fade">Three tiny models and plain rules, trained only on synthetic plans. The engine is on <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>.</p>
   </div>
 </section>
 
-<section class="center">
-  <div class="wrap note">
-    <p class="eyebrow">Honest by default</p>
-    <h2>A first draft, not a survey.</h2>
-    <p>Marketing plans are not drawn to scale, and this is an early prototype: it reads some plans well and gets others wrong. Heights and electrical points are standard assumptions. Every sheet carries the same note.</p>
-    <span class="stamp">Drawn from marketing plan — verify dimensions on site</span>
-  </div>
-</section>
-
-<section id="request" class="close center">
+<section class="close rv" id="request">
   <div class="wrap">
-    <h2>Zero mouse clicks.<br><em>One plan set.</em></h2>
-    <a class="btn" href="mailto:zeromouseclicks@agentmail.to?subject=Plan%20set%20request&body=Attach%20the%20floor%20plan%20image%20and%20tell%20us%20the%20private%20area%20(m%C2%B2%20or%20sq%20ft).">Request a plan set</a>
-    <small>zeromouseclicks@agentmail.to &middot; attach the floor plan and its area</small>
-    <p class="lede">We are starting with one thing: plan sets from brochures. What comes next depends on what you need, so tell us.</p>
+    <h2 class="sp">Zero mouse clicks.<br><em>One plan set.</em></h2>
+    <a class="btn fade" href="mailto:zeromouseclicks@agentmail.to?subject=Plan%20set%20request&body=Attach%20the%20floor%20plan%20image%20and%20tell%20us%20the%20private%20area%20(m%C2%B2%20or%20sq%20ft).">Request a plan set</a>
+    <span class="mono fade">zeromouseclicks@agentmail.to</span>
+    <p class="note fade">An early prototype, starting with one thing. Drawn from marketing plans: verify dimensions on site.</p>
   </div>
 </section>
 
 </main>
 
 <footer>
-  <div class="wrap">
-    <span>&copy; 2026 Zero Mouse Clicks &middot; by <a href="https://www.linkedin.com/in/julian-holmes-paez-martinez-47a36a208/">Julián Páez</a></span>
-    <nav aria-label="Footer">
-      <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>
-      <a href="https://www.linkedin.com/in/julian-holmes-paez-martinez-47a36a208/">LinkedIn</a>
-      <a href="mailto:zeromouseclicks@agentmail.to">Contact</a>
-    </nav>
-  </div>
+  <span>&copy; 2026 Zero Mouse Clicks &middot; by <a href="https://www.linkedin.com/in/julian-holmes-paez-martinez-47a36a208/">Julián Páez</a></span>
+  <nav aria-label="Footer">
+    <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>
+    <a href="https://www.linkedin.com/in/julian-holmes-paez-martinez-47a36a208/">LinkedIn</a>
+    <a href="mailto:zeromouseclicks@agentmail.to">Contact</a>
+  </nav>
 </footer>
+<div id="clicks" class="mono" aria-live="polite">Mouse clicks: <b id="cn">0</b></div>
+
+<script src="https://cdn.jsdelivr.net/npm/motion@12.23.24/dist/motion.js"></script>
+<script>
+(function () {
+  var M = window.Motion;
+  var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var on = !!(M && M.animate && M.scroll && M.inView) && !calm;   // animations by Motion (motion.dev); without it the page is static
+  var root = document.documentElement;
+  var ease = [0.2, 0.8, 0.2, 1];
+  function all(sel, el) { return Array.prototype.slice.call((el || document).querySelectorAll(sel)); }
+
+  // split headlines into words
+  all('.sp').forEach(function (h) {
+    Array.prototype.slice.call(h.childNodes).forEach(function (node) {
+      if (node.nodeType === 3) {
+        var frag = document.createDocumentFragment();
+        node.textContent.split(' ').forEach(function (w, i, a) {
+          if (w) { var s = document.createElement('span'); s.className = 'wd'; s.textContent = w; frag.appendChild(s); }
+          if (i < a.length - 1) frag.appendChild(document.createTextNode(' '));
+        });
+        h.replaceChild(frag, node);
+      } else if (node.nodeName === 'EM') { node.className = 'wd'; }
+    });
+  });
+  if (on) root.classList.add('m');
+
+  // spotlight that follows the pointer
+  window.addEventListener('pointermove', function (e) {
+    root.style.setProperty('--mx', e.clientX + 'px'); root.style.setProperty('--my', e.clientY + 'px');
+  }, { passive: true });
+
+  // scanner: brochure on the right of the line, drawing on the left
+  var X0 = 140, X1 = 840, stage = document.getElementById('stage');
+  var cut = document.getElementById('cutr'), scan = document.getElementById('scan'), knob = document.getElementById('knob');
+  var x = X0, target = X0, hover = false, t0 = null, started = false;
+  function set(v) {
+    cut.setAttribute('x', v); cut.setAttribute('width', Math.max(0, X1 - v));
+    scan.setAttribute('x1', v); scan.setAttribute('x2', v); knob.setAttribute('cx', v);
+  }
+  function point(e) {
+    var r = stage.getBoundingClientRect();
+    target = X0 + (X1 - X0) * Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+  }
+  stage.addEventListener('pointerenter', function (e) { hover = true; point(e); });
+  stage.addEventListener('pointermove', function (e) { hover = true; point(e); }, { passive: true });
+  stage.addEventListener('pointerleave', function () { hover = false; t0 = null; });
+  function frame(now) {
+    if (started && !hover) {
+      if (t0 === null) t0 = now;
+      var t = (now - t0) / 1000;
+      if (t < 3.2) target = X0 + (X1 - X0) * Math.min(1, t / 2.6);
+      else target = X0 + (X1 - X0) * (0.62 + 0.3 * Math.cos((t - 3.2) * 0.7));
+    }
+    x += (target - x) * 0.12; set(x);
+    requestAnimationFrame(frame);
+  }
+  if (calm) { set(X0 + (X1 - X0) * 0.55); } else { set(X0); requestAnimationFrame(frame); }
+
+  // click counter
+  var n = 0, cn = document.getElementById('cn'), box = document.getElementById('clicks');
+  window.addEventListener('click', function () {
+    cn.textContent = ++n;
+    if (on) M.animate(box, { scale: [1.3, 1], borderColor: ['#ff6b6b', '#1f1f1d'] }, { type: 'spring', stiffness: 420, damping: 11 });
+  });
+
+  if (!on) { started = true; return; }
+
+  function words(el, delay) {
+    M.animate(all('.wd', el), { opacity: [0, 1], filter: ['blur(16px)', 'blur(0px)'], y: [34, 0] },
+      { duration: 0.95, ease: ease, delay: M.stagger(0.075, { startDelay: delay || 0 }) });
+  }
+  function fades(el, delay) {
+    M.animate(all('.fade', el), { opacity: [0, 1], y: [22, 0] }, { duration: 0.9, ease: ease, delay: M.stagger(0.12, { startDelay: delay || 0 }) });
+  }
+
+  // hero: words, then the plan draws itself while the scan line passes
+  var hero = document.querySelector('.hero');
+  words(hero, 0.15); fades(hero, 0.7);
+  setTimeout(function () {
+    started = true;
+    var walls = all('#plan .w'), marks = all('#plan .o, #plan .g, #plan .d, #plan .da'), notes = all('#plan .c, #plan .t, #plan .ct');
+    function k(v) { return Math.min(1, Math.max(0, v)); }
+    M.animate(0, 4.2, { duration: 4.2, ease: 'linear', onUpdate: function (t) {
+      walls.forEach(function (w, i) { var p = k((t - i * 0.09) / 2.2); w.style.strokeDashoffset = 1 - p * p * (3 - 2 * p); });
+      marks.forEach(function (e, i) { e.style.opacity = k((t - 1.2 - i * 0.04) / 0.5); });
+      notes.forEach(function (e, i) { e.style.opacity = k((t - 2.2 - i * 0.1) / 0.6); });
+    } });
+  }, 1100);
+
+  // the stage tilts into place and leans away as you scroll past
+  M.scroll(M.animate(stage, { rotateX: [0, -16], scale: [1, 0.9], opacity: [1, 0.35] }, { ease: 'linear' }),
+    { target: stage, offset: ['center 40%', 'end start'] });
+
+  // other sections: words and fades when they enter
+  all('.rv').slice(1).forEach(function (s) {
+    M.inView(s, function () { words(s, 0); fades(s, 0.35); }, { amount: 0.3 });
+  });
+
+  // deck: six sheets fan out from one stack, tied to the scroll position
+  var deck = document.getElementById('deck'), cards = all('.card', deck);
+  function fan() {
+    var d = deck.getBoundingClientRect(), cx = d.left + d.width / 2, cy = d.top + d.height / 2;
+    cards.forEach(function (c, i) {
+      var r = c.getBoundingClientRect();
+      M.scroll(M.animate(c, { x: [cx - (r.left + r.width / 2), 0], y: [cy - (r.top + r.height / 2), 0],
+          rotate: [(i - 2.5) * 5, 0], scale: [0.8, 1] }, { ease: 'easeOut' }),
+        { target: deck, offset: ['start 95%', 'start 38%'] });
+    });
+  }
+  fan();
+  cards.forEach(function (c) {
+    var f = c.firstElementChild;
+    c.addEventListener('pointerenter', function () { M.animate(f, { scale: 1.06, y: -10, rotateX: 5 }, { type: 'spring', stiffness: 320, damping: 16 }); });
+    c.addEventListener('pointerleave', function () { M.animate(f, { scale: 1, y: 0, rotateX: 0 }, { type: 'spring', stiffness: 260, damping: 20 }); });
+  });
+
+  // three facts light up one after another with the scroll
+  var facts = document.getElementById('facts');
+  all('span', facts).forEach(function (s, i) {
+    M.scroll(M.animate(s, { color: ['#33332f', '#f5f5f3'] }, { ease: 'linear' }),
+      { target: facts, offset: ['start ' + (88 - i * 9) + '%', 'start ' + (70 - i * 9) + '%'] });
+  });
+
+  // progress line
+  M.scroll(M.animate('#bar', { scaleX: [0, 1] }, { ease: 'linear' }));
+
+  // magnetic buttons
+  all('.btn').forEach(function (b) {
+    b.addEventListener('pointermove', function (e) {
+      var r = b.getBoundingClientRect();
+      M.animate(b, { x: (e.clientX - r.left - r.width / 2) * 0.28, y: (e.clientY - r.top - r.height / 2) * 0.4 }, { duration: 0.2 });
+    });
+    b.addEventListener('pointerleave', function () { M.animate(b, { x: 0, y: 0 }, { type: 'spring', stiffness: 300, damping: 12 }); });
+  });
+})();
+</script>
 </body>
 </html>
