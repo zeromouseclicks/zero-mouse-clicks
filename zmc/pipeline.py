@@ -95,8 +95,9 @@ def run(path, area, proj, unit, pdf, legacy=False, debug=None, side=None):
     return drive(steps(im0, area, proj, unit, pdf, legacy, debug, side))
 
 def steps(im0, area, proj, unit, pdf, legacy=False, debug=None, side=None, progress=None):
-    """Núcleo de `run` como generador de pasos (ver arriba). progress(etapa) avisa el avance."""
-    say = progress or (lambda *_: None)
+    """Núcleo de `run` como generador de pasos (ver arriba). progress(etapa) avisa el avance; con datos
+    (image, mask, box, mod, fin) entrega resultados intermedios para mostrarlos mientras se trabaja."""
+    say = progress or (lambda *_, **__: None)
     info = {}
     cands = None
     if area is None:             # sin área: se busca en el folleto («Área privada: 47 m²»)
@@ -116,6 +117,7 @@ def steps(im0, area, proj, unit, pdf, legacy=False, debug=None, side=None, progr
         imc = _fit(im0, 448); mc = yield from predict_steps(imc)
         mc, _ = refine.wall_color_filter(imc, mc)
         x0, y0, x1, y1 = refine.plan_bbox(mc)
+        say('found', image=imc, mask=mc, box=(x0, y0, x1, y1))
         k = im0.shape[1] / imc.shape[1]
         crop = im0[int(y0 * k):int(np.ceil(y1 * k)), int(x0 * k):int(np.ceil(x1 * k))]
         fixed = side is not None
@@ -125,6 +127,7 @@ def steps(im0, area, proj, unit, pdf, legacy=False, debug=None, side=None, progr
         if not fixed:
             # resolución normalizada: ~55 px por metro, que es lo que el modelo vio al entrenar
             m1, _ = refine.wall_color_filter(im, m)
+            say('seen', image=im, mask=m1)
             ppm = 1.0 / vectorize5(m1.copy(), area, image=im)['m_per_px']
             if ppm > 64:
                 side = int(np.clip(side * 55 / ppm, 416, 640))
@@ -133,6 +136,7 @@ def steps(im0, area, proj, unit, pdf, legacy=False, debug=None, side=None, progr
             info['ppm'] = round(ppm, 1)
         info['side'] = side
         m, like = refine.wall_color_filter(im, m, info)
+        say('seen', image=im, mask=m)
         say('texts')
         words = yield from texts.read_words_steps(crop, 2800)
         labs, dims = texts.parse(words)
@@ -152,6 +156,7 @@ def steps(im0, area, proj, unit, pdf, legacy=False, debug=None, side=None, progr
                 mod = vectorize5(m.copy(), area, image=im); texts.apply(mod, labs, dims, kk)
         info['area'] = area
         fin = finish.build(im, m, mod)
+        say('drawn', image=im, mod=mod, fin=fin)
         info.update(labels=[(l['name'], l['primary']) for l in labs], dims=[(q['a'], q['b']) for q in dims],
                     scale=dict(used=mod['m_per_px'], declared=mod.get('scale_declared'), dims=mod.get('scale_dims'), src=mod['scale_from']))
     say('draw')

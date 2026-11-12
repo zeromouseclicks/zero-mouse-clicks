@@ -7,7 +7,7 @@ var CDN = {
   ort: 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/'
 };
 var BASE = self.location.href.replace(/[^/]*$/, '');          // .../app/
-var VERSION = 'v1';
+var VERSION = 'v2';
 importScripts(CDN.pyodide + 'pyodide.js', CDN.ort + 'ort.wasm.min.js');
 
 ort.env.wasm.wasmPaths = CDN.ort;
@@ -56,11 +56,19 @@ function boot() {
   return ready;
 }
 
+// avance: fracción al empezar cada etapa y cuántas corridas de modelo se esperan dentro de ella
+var STAGES = { area: 0.17, locate: 0.25, read: 0.38, texts: 0.8, vector: 0.93, draw: 0.96 };
+var NEXT = { locate: 0.38, read: 0.8 }, RUNS = { locate: 3, read: 12 }, cur = { stage: 'boot', frac: 0 };
+
 async function infer(name, u8, n) {
   var s = sessions[name], f = new Float32Array(u8.length);
   for (var i = 0; i < u8.length; i++) f[i] = u8[i];
   var feeds = {}; feeds[s.inputNames[0]] = new ort.Tensor('float32', f, [1, n, n, 3]);
   var out = await s.run(feeds);
+  if (NEXT[cur.stage]) {
+    cur.frac = Math.min(NEXT[cur.stage] - 0.01, cur.frac + (NEXT[cur.stage] - STAGES[cur.stage]) / RUNS[cur.stage]);
+    stage(cur.stage, cur.frac);
+  }
   return out[s.outputNames[0]].data;
 }
 
@@ -72,8 +80,6 @@ function ocr(pngs) {
     post({ type: 'ocr', id: id, pngs: list }, list);
   });
 }
-
-var STAGES = { area: 0.12, locate: 0.2, read: 0.32, texts: 0.62, vector: 0.82, draw: 0.92 };
 
 self.onmessage = async function (e) {
   var m = e.data;
@@ -88,7 +94,8 @@ self.onmessage = async function (e) {
     await boot();
     var js = {
       infer: infer, ocr: ocr,
-      progress: function (s) { stage(s, STAGES[s] || 0.5); }
+      progress: function (s) { cur = { stage: s, frac: STAGES[s] || 0.5 }; stage(s, cur.frac); },
+      preview: function (kind, jpg) { var b = jpg.slice().buffer; post({ type: 'preview', kind: kind, jpg: b }, [b]); }
     };
     var area = (m.area === null || m.area === undefined) ? null : m.area;
     var r = await glue.run(new Uint8Array(m.image), area, m.project || 'Marketing floor plan', m.unit || 'Unit', js);

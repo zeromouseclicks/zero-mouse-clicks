@@ -1,6 +1,8 @@
 /* Zero Mouse Clicks — cliente del motor en el navegador.
    ZMC.warm()                         empieza a descargar el motor (al elegir la imagen)
-   ZMC.generate(file, area, onStage)  -> Promise<{ pdf: Blob, summary }>
+   ZMC.generate(file, area, onStage, onPreview)  -> Promise<{ pdf: Blob, summary }>
+       onStage(stage, fraction)   boot, area, locate, read, texts, vector, draw, done
+       onPreview(kind, blob)      found, seen, drawn: JPG of what the engine has so far
    Errores: err.code = 'no_area' | 'bad_image' | 'boot' | 'failed' */
 (function () {
   var TESS = {
@@ -51,7 +53,7 @@
 
   function engine() {
     if (worker) return worker;
-    worker = new Worker(here + 'engine.js');
+    worker = new Worker(here + 'engine.js?v2');
     worker.onmessage = function (e) {
       var m = e.data;
       if (m.type === 'ocr') {
@@ -61,6 +63,7 @@
       }
       if (!job) return;
       if (m.type === 'progress') job.stage(m.stage, m.frac);
+      else if (m.type === 'preview') job.preview(m.kind, new Blob([m.jpg], { type: 'image/jpeg' }));
       else if (m.type === 'done') { var j = job; job = null; j.res({ pdf: new Blob([m.pdf], { type: 'application/pdf' }), summary: m.summary }); }
       else if (m.type === 'error') {
         var k = job; job = null;
@@ -101,12 +104,12 @@
 
   window.ZMC = {
     warm: function () { engine(); ocrReady(); },
-    generate: async function (file, area, onStage) {
+    generate: async function (file, area, onStage, onPreview) {
       if (job) throw Object.assign(new Error('busy'), { code: 'busy' });
       var buf = await prepare(file);
       var w = engine(); ocrReady();
       return new Promise(function (res, rej) {
-        job = { res: res, rej: rej, stage: onStage || function () {} };
+        job = { res: res, rej: rej, stage: onStage || function () {}, preview: onPreview || function () {} };
         w.postMessage({ type: 'run', image: buf, area: area || null }, [buf]);
       });
     }

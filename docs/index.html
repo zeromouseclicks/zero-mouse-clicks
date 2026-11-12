@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Zero Mouse Clicks — a brochure in, a plan set out</title>
-<meta name="description" content="Upload or photograph the floor plan from a developer's brochure. Get an architectural plan set as one PDF, made in your browser.">
+<meta name="description" content="Drop the floor plan from a developer's brochure, or photograph it. Get an architectural plan set, six A3 sheets in one PDF, made in your browser.">
 <meta name="theme-color" content="#000000">
 <meta property="og:title" content="Zero Mouse Clicks">
 <meta property="og:description" content="A brochure in. A plan set out.">
@@ -16,81 +16,62 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#000; --fg:#f5f5f3; --mute:#85857f; --line:#1f1f1d; --ink:#9fd0ff; --mx:50vw; --my:30vh; }
+  :root { --bg:#000; --fg:#f5f5f3; --mute:#85857f; --line:#1f1f1d; --ink:#9fd0ff; --door:#ffc878; --win:#a0ffc8; --fix:#beaaff; --mx:50vw; --my:30vh; }
   * { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
   body { background:var(--bg); color:var(--fg); font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
          line-height:1.5; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
   body::before { content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
          background:radial-gradient(520px circle at var(--mx) var(--my), rgba(159,208,255,.09), transparent 62%); }
   a { color:inherit; }
-  .wrap { position:relative; z-index:1; max-width:1040px; margin:0 auto; padding:0 24px; }
+  .wrap { position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:0 28px; }
   .mono { font-family:"JetBrains Mono",ui-monospace,Menlo,monospace; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--mute); }
   #bar { position:fixed; inset:0 0 auto 0; height:2px; background:var(--ink); transform-origin:0 50%; transform:scaleX(0); z-index:8; }
 
-  header { position:fixed; inset:0 0 auto 0; z-index:6; display:flex; align-items:center; justify-content:space-between; height:64px; padding:0 28px; }
+  header { position:fixed; inset:0 0 auto 0; z-index:6; display:flex; align-items:center; justify-content:space-between; height:64px; padding:0 28px;
+           background:linear-gradient(#000 20%, transparent); }
   .brand { display:flex; align-items:center; gap:10px; font-weight:600; letter-spacing:-.01em; text-decoration:none; font-size:15px; }
   .brand svg { width:20px; height:20px; }
+  header nav { display:flex; gap:22px; font-size:14px; color:var(--mute); }
+  header nav a { text-decoration:none; transition:color .2s; } header nav a:hover { color:var(--fg); }
   .btn { display:inline-block; background:var(--fg); color:#000; font-weight:600; text-decoration:none; padding:12px 24px;
          border-radius:999px; font-size:15px; transition:box-shadow .3s; will-change:transform; }
   .btn:hover { box-shadow:0 0 0 6px rgba(245,245,243,.08), 0 0 40px rgba(159,208,255,.35); }
-  .btn.small { padding:8px 16px; font-size:13px; }
 
   h1, h2 { font-weight:700; letter-spacing:-.04em; line-height:1; text-wrap:balance; }
-  h1 { font-size:clamp(44px, 7.4vw, 92px); }
-  h2 { font-size:clamp(34px, 6vw, 76px); }
+  h1 { font-size:clamp(42px, 5.6vw, 76px); }
+  h2 { font-size:clamp(34px, 5.4vw, 68px); }
   .wd { display:inline-block; will-change:transform, filter; }
-  .sub { color:var(--mute); font-size:clamp(16px, 1.6vw, 20px); max-width:470px; margin:22px auto 0; text-wrap:pretty; }
-  section { position:relative; padding:clamp(90px, 13vw, 170px) 0; text-align:center; }
+  .sub { color:var(--mute); font-size:clamp(16px, 1.5vw, 19px); max-width:470px; margin-top:20px; text-wrap:pretty; }
+  section { position:relative; padding:clamp(64px, 8.5vw, 120px) 0; text-align:center; }
+  section .sub { margin-left:auto; margin-right:auto; }
   .m .wd, .m .fade { opacity:0; }
 
-  .hero { padding-top:clamp(100px, 9vw, 124px); padding-bottom:clamp(70px, 9vw, 120px); }
-  .persp { perspective:1400px; }
-  .stage { position:relative; max-width:min(600px, 60vh); min-width:min(100%, 300px); margin:clamp(30px,4vw,44px) auto 0; border-radius:22px; overflow:hidden;
-           border:1px solid #2a2a27; background:#05070a; cursor:ew-resize; touch-action:pan-y; will-change:transform;
-           box-shadow:0 0 0 1px rgba(159,208,255,.05), 0 40px 120px -30px rgba(159,208,255,.28); }
-  .stage svg { display:block; width:100%; height:auto; }
-  .bp { fill:#05070a; } .grid { stroke:#101820; stroke-width:1; }
-  .w { fill:rgba(159,208,255,.07); stroke:var(--ink); stroke-width:1.6; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:0; }
-  .o { fill:none; stroke:#4f6f8c; stroke-width:1; stroke-dasharray:4 3; }
-  .g { fill:none; stroke:var(--ink); stroke-width:1; }
-  .d { fill:none; stroke:var(--ink); stroke-width:1.4; } .da { fill:none; stroke:#6f93b4; stroke-width:1; stroke-dasharray:3 3; }
-  .c { fill:none; stroke:#6f93b4; stroke-width:1; }
-  .t, .ct { fill:#cfe6ff; font-family:"JetBrains Mono",ui-monospace,monospace; font-size:13px; text-anchor:middle; dominant-baseline:middle; }
-  .ct { fill:#8fb3d4; font-size:12px; }
-  .m .w { stroke-dashoffset:1; } .m .o, .m .g, .m .d, .m .da, .m .c, .m .t, .m .ct { opacity:0; }
-  #scan { stroke:#fff; stroke-width:1.6; filter:drop-shadow(0 0 6px #9fd0ff) drop-shadow(0 0 18px #9fd0ff); }
-  #knob { fill:#fff; filter:drop-shadow(0 0 10px #9fd0ff); }
-  .tag { position:absolute; bottom:14px; padding:5px 10px; border-radius:999px; backdrop-filter:blur(8px); }
-  .tag.l { left:14px; background:rgba(5,7,10,.7); color:#cfe6ff; border:1px solid #1d2a36; }
-  .tag.r { right:14px; background:rgba(255,255,255,.82); color:#333; }
-  .hint { margin-top:18px; }
+  /* hero: the tool on the left, how it works on the right */
+  .hero { padding-top:clamp(96px, 9vw, 120px); padding-bottom:clamp(60px, 7vw, 96px); text-align:left; min-height:min(100svh, 980px); display:flex; align-items:center; }
+  .hero .wrap { width:100%; display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1.06fr); gap:clamp(36px, 5vw, 76px); align-items:center; }
+  .hero .sub { margin-left:0; }
+  .pill { display:inline-flex; align-items:center; gap:8px; padding:6px 12px 6px 10px; border:1px solid var(--line); border-radius:999px; margin-bottom:22px;
+          font-size:11px; background:rgba(255,255,255,.02); }
+  .pill i { width:6px; height:6px; border-radius:50%; background:var(--win); box-shadow:0 0 10px var(--win); animation:blink 2.4s ease-in-out infinite; }
+  @keyframes blink { 50% { opacity:.35; } }
 
-  .deck { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:clamp(44px,6vw,72px); perspective:1400px; }
-  .card { position:relative; aspect-ratio:560/399; will-change:transform; }
-  .face { position:absolute; inset:0; border-radius:12px; background:#fbfbf8 url(img/plan_set_6_sheets.jpg) no-repeat;
-          background-size:302.857% auto; background-position:calc(var(--c) * 50%) calc(var(--r) * 100%);
-          box-shadow:0 20px 50px -20px rgba(0,0,0,.9); transition:box-shadow .4s; }
-  .card:hover { z-index:2; } .card:hover .face { box-shadow:0 30px 80px -20px rgba(159,208,255,.5); }
-  .face span { position:absolute; left:10px; bottom:9px; background:#000; color:var(--fg); padding:3px 8px; border-radius:999px; font-size:10px; }
-
-  .facts { font-size:clamp(28px, 4.6vw, 58px); font-weight:700; letter-spacing:-.035em; line-height:1.08; }
-  .m .facts span { color:#33332f; }
-
-  .close em { font-family:"Instrument Serif",Georgia,serif; font-style:italic; font-weight:400; letter-spacing:-.01em; }
-  .close .btn { margin-top:38px; }
-  .close .mono { display:block; margin-top:22px; text-transform:none; letter-spacing:.02em; }
-  .note { color:var(--mute); font-size:14px; max-width:430px; margin:44px auto 0; text-wrap:pretty; }
-  .alt a { color:var(--fg); text-decoration:none; border-bottom:1px solid #3a3a36; }
-
-  .req { max-width:520px; margin:44px auto 0; text-align:left; }
-  .drop { position:relative; display:flex; align-items:center; justify-content:center; min-height:190px; border-radius:18px; cursor:pointer;
+  /* the tool */
+  .req { max-width:520px; margin-top:30px; text-align:left; }
+  .drop { position:relative; display:flex; align-items:center; justify-content:center; min-height:168px; border-radius:18px; cursor:pointer;
           border:1px dashed #3a3a36; background:rgba(255,255,255,.02); overflow:hidden; transition:border-color .3s, background .3s; }
   .drop:hover, .drop.over { border-color:var(--ink); background:rgba(159,208,255,.05); }
+  .drop.over { box-shadow:0 0 0 6px rgba(159,208,255,.1); }
   .drop.has { border-style:solid; border-color:#2a2a27; }
   .drop input { position:absolute; inset:0; opacity:0; cursor:pointer; }
   .drop img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#fff; opacity:0; pointer-events:none; }
   .drop.has img[src] { opacity:1; }
-  .dz { position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; padding:24px; text-align:center; pointer-events:none; }
+  .drop::after { content:""; position:absolute; top:0; bottom:0; left:0; width:2px; background:#fff; opacity:0; pointer-events:none;
+                 box-shadow:0 0 10px 2px var(--ink), -60px 0 60px 20px rgba(159,208,255,.25); }
+  .drop.busy { cursor:progress; } .drop.busy input { pointer-events:none; }
+  .drop.busy::after { opacity:1; animation:sweep 2.6s cubic-bezier(.45,0,.55,1) infinite alternate; }
+  @keyframes sweep { from { left:0; } to { left:calc(100% - 2px); } }
+  .dz { position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; padding:22px; text-align:center; pointer-events:none; }
   .dz svg { width:26px; height:26px; color:var(--ink); }
   .dz b { font-weight:600; font-size:16px; }
   .dz .mono { margin:0; font-size:11px; text-transform:none; letter-spacing:.03em; }
@@ -98,33 +79,131 @@
                       border-radius:999px; background:rgba(0,0,0,.78); backdrop-filter:blur(8px); }
   .drop.has.pic .dz svg { display:none; }
   .drop.has.pic .dz b { font-size:13px; font-weight:500; max-width:60%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .row { display:grid; grid-template-columns:1.3fr 1fr; gap:10px; margin-top:10px; }
-  .row input { width:100%; background:#0b0b0a; color:var(--fg); border:1px solid #2a2a27; border-radius:12px; padding:14px 16px;
+  .row { display:grid; grid-template-columns:1fr 1.15fr; gap:10px; margin-top:10px; }
+  .row input { width:100%; background:#0b0b0a; color:var(--fg); border:1px solid #2a2a27; border-radius:999px; padding:14px 20px;
                font:inherit; font-size:15px; outline:none; transition:border-color .25s, box-shadow .25s; }
   .row input::placeholder { color:#5d5d58; }
   .row input:focus { border-color:var(--ink); box-shadow:0 0 0 4px rgba(159,208,255,.12); }
   .row input.bad, .drop.bad { border-color:#ff6b6b; }
-  .row.one { grid-template-columns:1fr; }
-  .hint2 { margin-top:8px; padding-left:4px; font-size:11px; text-transform:none; letter-spacing:.02em; }
-  .send { text-align:center; }
-  .send .st { display:block; font-family:"JetBrains Mono",ui-monospace,monospace; font-size:11px; font-weight:400; color:#55554f; margin-top:3px; letter-spacing:.02em; }
-  .rooms { list-style:none; margin:22px auto 0; max-width:360px; text-transform:none; letter-spacing:.02em; font-size:12px; }
+  .send { display:block; width:100%; border:0; cursor:pointer; font:inherit; font-weight:600; font-size:15px; padding:14px 20px; position:relative; overflow:hidden; text-align:center; }
+  .send[disabled] { cursor:progress; }
+  /* while it works */
+  .req.work .row, .req.work #fine, .req.work .msg { display:none; }
+  .drop { transition:border-color .3s, background .3s, min-height .5s cubic-bezier(.2,.8,.2,1); }
+  .drop.busy { min-height:min(300px, 62vw); border-color:#1d2a36; background:#05070a; }
+  .drop.busy .dz { display:none; }
+  .drop.busy #thumb { opacity:.9; }
+  .drop .lv, .mine .lv { opacity:0; background:#05070a; }
+  .seeing .lv[src] { opacity:1; }
+  .see { position:absolute; left:10px; top:10px; z-index:2; display:none; gap:6px; flex-wrap:wrap; pointer-events:none; }
+  .see.low { top:auto; bottom:10px; right:10px; justify-content:center; }
+  .seeing .see { display:flex; } .drop .see.low { gap:4px; } .drop .see.low .chip { padding:4px 7px; font-size:10px; gap:5px; }
+  .drop { scroll-margin-top:76px; } .mine .see { left:14px; top:14px; } .mine .see.low { top:auto; bottom:14px; right:14px; } .see .chip { opacity:1; } .see .chip b { font-weight:500; color:var(--ink); }
+  .work { margin-top:16px; }
+  .wh { display:flex; justify-content:space-between; align-items:baseline; }
+  .wh b { font-size:17px; font-weight:600; letter-spacing:-.01em; } .wh .mono { color:var(--fg); font-size:13px; letter-spacing:.04em; }
+  .pb { height:3px; border-radius:3px; background:#1f1f1d; margin-top:12px; overflow:hidden; }
+  .pb i { display:block; height:100%; background:var(--ink); transform:scaleX(0); transform-origin:0 50%; transition:transform .8s cubic-bezier(.2,.8,.2,1); box-shadow:0 0 12px var(--ink); }
+  .wl { list-style:none; margin-top:14px; }
+  .wl li { display:grid; grid-template-columns:18px 1fr auto; gap:10px; align-items:start; padding:7px 0; color:#55554f; transition:color .3s; }
+  .wl li > i { width:14px; height:14px; margin-top:3px; border-radius:50%; border:1.5px solid #2f2f2b; }
+  .wl li b { display:block; font-weight:500; font-size:14px; }
+  .wl li span { display:block; font-size:13px; line-height:1.45; color:var(--mute); max-height:0; opacity:0; overflow:hidden; transition:max-height .5s cubic-bezier(.2,.8,.2,1), opacity .4s, margin .4s; }
+  .wl li em { font-style:normal; font-size:11px; letter-spacing:.04em; margin-top:3px; }
+  .wl li.on { color:var(--fg); } .wl li.on span { max-height:90px; opacity:1; margin-top:3px; }
+  .wl li.on > i { border-color:var(--ink); border-right-color:transparent; animation:spin .8s linear infinite; }
+  .wl li.ok { color:#a9a9a3; }
+  .wl li.ok > i { border-color:var(--win); background:var(--win) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M3.5 7.3l2.4 2.3 4.6-5' fill='none' stroke='%23000' stroke-width='1.8'/%3E%3C/svg%3E") center/100% no-repeat; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .work .fine { margin-top:10px; }
+  .msg { min-height:18px; margin-top:12px; text-transform:none; letter-spacing:.02em; font-size:12px; }
+  .msg.err { color:#ff8a8a; }
+  .fine { margin-top:2px; font-size:11px; text-transform:none; letter-spacing:.02em; line-height:1.7; }
+  .fine a { color:var(--fg); text-decoration:none; border-bottom:1px solid #3a3a36; }
+  .done { margin-top:30px; max-width:520px; }
+  .done svg { width:44px; height:44px; color:var(--ink); }
+  .done #tick { stroke-dasharray:1; stroke-dashoffset:0; }
+  .dt { font-size:clamp(26px,3vw,36px); font-weight:700; letter-spacing:-.03em; margin-top:10px; }
+  .done .sub { margin-top:8px; font-size:16px; }
+  .rooms { list-style:none; margin-top:18px; text-transform:none; letter-spacing:.02em; font-size:12px; }
   .rooms li { display:flex; justify-content:space-between; padding:7px 2px; border-bottom:1px solid var(--line); }
   .rooms li b { color:var(--fg); font-weight:400; }
-  .done .dl { max-width:360px; margin:26px auto 0; }
-  .again { display:block; margin:16px auto 0; background:none; border:0; color:var(--mute); cursor:pointer; text-transform:none; letter-spacing:.02em; font-size:13px; border-bottom:1px solid #3a3a36; padding:0 0 2px; }
+  .done .dl { margin-top:22px; }
+  .again { display:block; margin:14px auto 0; background:none; border:0; color:var(--mute); cursor:pointer; text-transform:none; letter-spacing:.02em; font-size:13px; border-bottom:1px solid #3a3a36; padding:0 0 2px; }
   .again:hover { color:var(--fg); }
-  .close .send { display:block; width:100%; margin-top:14px; border:0; cursor:pointer; font:inherit; font-weight:600; font-size:15px; padding:15px 24px; position:relative; overflow:hidden; }
-  .send[disabled] { cursor:progress; }
-  .send::after { content:""; position:absolute; left:0; bottom:0; height:2px; width:100%; background:var(--ink); transform:scaleX(var(--p, 0)); transform-origin:0 50%; }
-  .msg { min-height:20px; margin-top:12px; text-align:center; text-transform:none; letter-spacing:.02em; }
-  .msg.err { color:#ff8a8a; }
-  .done { margin:48px auto 0; max-width:520px; }
-  .done svg { width:58px; height:58px; color:var(--ink); }
-  .done #tick { stroke-dasharray:1; stroke-dashoffset:0; }
-  .dt { font-size:clamp(28px,4vw,44px); font-weight:700; letter-spacing:-.03em; margin-top:14px; }
-  .done .sub { margin-top:10px; } .done b { color:var(--fg); font-weight:500; }
-  @media (max-width:520px) { .row { grid-template-columns:1fr; } .drop { min-height:160px; } }
+
+  /* how it works: one stage, four steps */
+  .demo { min-width:0; }
+  /* while a plan is being drawn, the stage shows the visitor's own plan */
+  .mine { position:absolute; inset:0; z-index:5; display:none; background:#05070a; cursor:progress; }
+  .mine img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
+  #mineSrc { background:#fff; }
+  .mine::after { content:""; position:absolute; top:0; bottom:0; left:0; width:2px; background:#fff; pointer-events:none;
+                 box-shadow:0 0 10px 2px var(--ink), -70px 0 70px 24px rgba(159,208,255,.22); animation:sweep 2.8s cubic-bezier(.45,0,.55,1) infinite alternate; }
+  .working .mine { display:block; } .working .steps { visibility:hidden; }
+  .working .now { display:none; }
+  .stage { position:relative; aspect-ratio:700/650; border-radius:22px; overflow:hidden; border:1px solid #2a2a27; background:#05070a;
+           cursor:ew-resize; touch-action:pan-y; will-change:transform; user-select:none; -webkit-user-select:none;
+           box-shadow:0 0 0 1px rgba(159,208,255,.05), 0 40px 120px -30px rgba(159,208,255,.28); }
+  .sv { position:absolute; inset:0; will-change:transform, opacity; }
+  .sv svg { display:block; width:100%; height:100%; }
+  .bp { fill:#05070a; } .grid { stroke:#101820; stroke-width:1; }
+  .w { fill:rgb(159,208,255); fill-opacity:.12; stroke:var(--ink); stroke-width:1.8; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:0; }
+  .o { fill:none; stroke:#4f6f8c; stroke-width:1; stroke-dasharray:4 3; }
+  .g { fill:none; stroke:var(--ink); stroke-width:1; }
+  .d { fill:none; stroke:var(--ink); stroke-width:1.4; } .da { fill:none; stroke:#6f93b4; stroke-width:1; stroke-dasharray:3 3; }
+  .c { fill:none; stroke:#6f93b4; stroke-width:1; }
+  .t, .ct { fill:#cfe6ff; font-family:"JetBrains Mono",ui-monospace,monospace; font-size:13px; text-anchor:middle; dominant-baseline:middle; }
+  .ct { fill:#8fb3d4; font-size:12px; }
+  #scan { stroke:#fff; stroke-width:1.6; filter:drop-shadow(0 0 6px #9fd0ff) drop-shadow(0 0 18px #9fd0ff); }
+  #knob { fill:#fff; filter:drop-shadow(0 0 10px #9fd0ff); }
+  .now { position:absolute; left:14px; top:14px; z-index:3; padding:6px 11px; border-radius:999px; background:rgba(5,7,10,.72); border:1px solid #1d2a36;
+         backdrop-filter:blur(8px); color:#cfe6ff; font-size:11px; }
+  .now b { color:var(--ink); font-weight:500; margin-right:8px; }
+  .hud { position:absolute; left:10px; right:10px; bottom:14px; z-index:3; display:flex; flex-wrap:wrap; gap:6px; justify-content:center; pointer-events:none; }
+  .chip { display:inline-flex; align-items:center; gap:7px; padding:5px 10px; border-radius:999px; background:rgba(5,7,10,.78); border:1px solid #1d2a36;
+          backdrop-filter:blur(8px); color:#cfe6ff; font-family:"JetBrains Mono",ui-monospace,monospace; font-size:11px; letter-spacing:.02em; opacity:0; will-change:transform, opacity; }
+  .chip i { width:8px; height:8px; border-radius:2px; background:var(--k, var(--ink)); }
+  .chip.lite { background:rgba(255,255,255,.9); color:#222; border-color:transparent; }
+  .chip svg { width:12px; height:12px; }
+  .sheets { position:absolute; inset:0; pointer-events:none; }
+  .sh { position:absolute; left:50%; top:50%; width:29%; aspect-ratio:560/396; margin:-10.25% 0 0 -14.5%; border-radius:5px; opacity:0; will-change:transform, opacity;
+        background:#fbfbf8 center/cover no-repeat; box-shadow:0 14px 40px -12px rgba(0,0,0,.9), 0 0 0 1px rgba(255,255,255,.06); }
+  .sh span { position:absolute; left:5px; bottom:5px; background:#000; color:var(--fg); padding:1px 6px; border-radius:999px; font:500 8px "JetBrains Mono",ui-monospace,monospace; letter-spacing:.04em; }
+  .steps { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-top:16px; }
+  .step { display:block; align-self:start; background:none; border:0; padding:0; text-align:left; cursor:pointer; color:#55554f; font:inherit; transition:color .3s; }
+  .step i { display:block; height:2px; border-radius:2px; background:#1f1f1d; overflow:hidden; }
+  .step i::after { content:""; display:block; height:100%; background:var(--ink); transform:scaleX(var(--f, 0)); transform-origin:0 50%; }
+  .step b { display:block; margin-top:10px; font:500 11px "JetBrains Mono",ui-monospace,monospace; letter-spacing:.06em; color:inherit; }
+  .step span { display:block; margin-top:2px; font-size:13px; line-height:1.35; }
+  .step.on, .step:hover, .step:focus-visible { color:var(--fg); outline:none; } .step.on b { color:var(--ink); }
+
+  /* what you get: the six sheets, zoom on hover */
+  .viewer { position:relative; max-width:min(1040px, calc((100svh - 300px) * 1.414)); margin:clamp(36px,5vw,60px) auto 0; aspect-ratio:2233/1579; border-radius:14px; overflow:hidden; background:#fbfbf8;
+            cursor:zoom-in; will-change:transform; touch-action:pan-y; -webkit-tap-highlight-color:transparent;
+            box-shadow:0 0 0 1px rgba(159,208,255,.08), 0 50px 140px -40px rgba(159,208,255,.35); }
+  .viewer.z { cursor:crosshair; touch-action:none; }
+  .viewer img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform-origin:var(--ox, 50%) var(--oy, 50%); transform:scale(var(--z, 1));
+                transition:transform .32s cubic-bezier(.2,.8,.2,1), opacity .25s; user-select:none; -webkit-user-drag:none; }
+  .viewer .tip { position:absolute; right:12px; top:12px; padding:5px 10px; border-radius:999px; background:rgba(0,0,0,.82); color:var(--fg); font-size:10px; transition:opacity .3s; pointer-events:none; }
+  .viewer.z .tip { opacity:0; }
+  .cap { max-width:1040px; margin:18px auto 0; display:flex; gap:14px; align-items:baseline; justify-content:center; flex-wrap:wrap; min-height:24px; }
+  .cap b { font-weight:600; font-size:15px; } .cap span { color:var(--mute); font-size:14px; }
+  .thumbs { max-width:1040px; margin:18px auto 0; display:grid; grid-template-columns:repeat(6, 1fr); gap:10px; }
+  .th { position:relative; padding:0; border:0; background:none; cursor:pointer; text-align:left; color:#55554f; font:inherit; transition:color .25s; will-change:transform; }
+  .th img { display:block; width:100%; aspect-ratio:560/396; object-fit:cover; border-radius:7px; background:#fbfbf8; opacity:.5; transition:opacity .25s, box-shadow .25s, transform .25s cubic-bezier(.2,.8,.2,1); }
+  .th span { display:block; margin-top:8px; font:500 10px "JetBrains Mono",ui-monospace,monospace; letter-spacing:.06em; }
+  .th i { position:absolute; left:0; right:0; bottom:-8px; height:2px; background:var(--ink); border-radius:2px; transform:scaleX(var(--f, 0)); transform-origin:0 50%; }
+  .th.on, .th:hover { color:var(--fg); } .th.on img, .th:hover img { opacity:1; }
+  .th.on img { box-shadow:0 0 0 2px var(--ink), 0 12px 40px -10px rgba(159,208,255,.6); transform:translateY(-4px); }
+  .th:focus-visible { outline:2px solid var(--ink); outline-offset:4px; border-radius:8px; }
+
+  .facts { font-size:clamp(28px, 4.6vw, 58px); font-weight:700; letter-spacing:-.035em; line-height:1.08; }
+  .m .facts span { color:#33332f; }
+  .close em { font-family:"Instrument Serif",Georgia,serif; font-style:italic; font-weight:400; letter-spacing:-.01em; }
+  .close .btn { margin-top:36px; }
+  .note { color:var(--mute); font-size:14px; max-width:460px; margin:40px auto 0; text-wrap:pretty; }
+  .note a { color:var(--fg); text-decoration:none; border-bottom:1px solid #3a3a36; }
 
   footer { position:relative; z-index:1; border-top:1px solid var(--line); padding:26px 28px 34px; font-size:13px; color:var(--mute);
            display:flex; flex-wrap:wrap; gap:10px 24px; justify-content:space-between; }
@@ -132,8 +211,23 @@
   #clicks { position:fixed; left:20px; bottom:18px; z-index:7; padding:6px 11px; border:1px solid var(--line); border-radius:999px;
             background:rgba(0,0,0,.7); backdrop-filter:blur(8px); } #clicks b { color:var(--fg); font-weight:500; }
 
-  @media (max-width:700px) { .deck { grid-template-columns:repeat(2,1fr); gap:10px; } header { padding:0 18px; } }
-  @media (hover:none), (max-width:700px) { #clicks { display:none; } }
+  @media (min-width:981px) { .req.work .drop { display:none; } .req.work .work { margin-top:0; } }
+  @media (max-width:980px) {
+    .working .demo { display:none; }
+    .hero { text-align:center; min-height:0; }
+    .hero .wrap { grid-template-columns:minmax(0, 1fr); }
+    .hero .sub, .req, .done { margin-left:auto; margin-right:auto; } #fine { text-align:center; }
+    .demo { max-width:560px; width:100%; margin:0 auto; }
+    .step { text-align:left; }
+  }
+  @media (max-width:700px) {
+    header { padding:0 18px; } .wrap { padding:0 18px; }
+    .thumbs { grid-template-columns:repeat(3, 1fr); gap:18px 10px; }
+    .step span { font-size:11px; }
+    .row { grid-template-columns:1fr; }
+  }
+  @media (hover:none), (max-width:980px) { #clicks { display:none; } }
+  @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .pill i, .drop.busy::after, .mine::after, .wl li.on > i { animation:none; } }
 </style>
 </head>
 <body>
@@ -144,26 +238,69 @@
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 5h22v22H5zM5 17h12M17 5v12" fill="none" stroke="currentColor" stroke-width="2.6"/></svg>
     Zero Mouse Clicks
   </a>
-  <a class="btn small" href="#request">Make a plan set</a>
+  <nav aria-label="Main">
+    <a href="#set">What you get</a>
+    <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>
+  </nav>
 </header>
 
 <main id="top">
 
-<section class="hero rv">
+<section class="hero rv" id="request">
   <div class="wrap">
-    <h1 class="sp">A brochure in.<br>A plan set out.</h1>
-    <p class="sub fade">Upload the floor plan from a developer's brochure, or take a photo of it. Get the drawings an architect would make from it.</p>
+    <div class="tool">
+      <span class="pill mono fade"><i></i>Free &middot; runs in your browser</span>
+      <h1 class="sp">A brochure in.<br>A plan set out.</h1>
+      <p class="sub fade">Drop the floor plan from a developer's brochure. Get the drawings an architect would make from it: six A3 sheets in one PDF.</p>
 
-    <div class="persp fade">
-    <div class="stage" id="stage" aria-label="A marketing floor plan turning into an architectural drawing as a scan line moves across it">
-      <svg id="svg" viewBox="140 100 700 650" role="img">
-        <defs>
-          <pattern id="gr" width="32.9" height="32.9" patternUnits="userSpaceOnUse"><path class="grid" d="M32.9 0H0V32.9" fill="none"/></pattern>
-          <clipPath id="cut"><rect id="cutr" x="140" y="100" width="700" height="650"/></clipPath>
-        </defs>
-        <rect class="bp" x="140" y="100" width="700" height="650"/>
-        <rect x="140" y="100" width="700" height="650" fill="url(#gr)"/>
-        <g id="plan">
+      <form class="req fade" id="req" novalidate>
+        <label class="drop" id="drop">
+          <input type="file" name="file" id="file" accept="image/*">
+          <img id="thumb" alt="">
+          <img class="lv" alt="">
+          <span class="see"><span class="chip"><b class="lvT"></b></span></span>
+          <span class="see low lvL"><span class="chip" style="--k:var(--ink)"><i></i>walls</span><span class="chip" style="--k:var(--door)"><i></i>doors</span><span class="chip" style="--k:var(--win)"><i></i>windows</span><span class="chip" style="--k:var(--fix)"><i></i>fixtures</span></span>
+          <span class="dz">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6M4 20h16" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            <b id="dzt">Drop the floor plan here</b>
+            <span class="mono" id="dzs">or choose an image &middot; JPG, PNG, WEBP</span>
+          </span>
+        </label>
+        <div class="row">
+          <input type="text" name="area" id="area" inputmode="decimal" placeholder="Area, m&sup2; or sq ft (optional)" maxlength="24" aria-label="Private area in square meters or square feet, optional. Leave it empty to read it from the plan.">
+          <button class="btn send" id="send" type="submit"><span id="sendt">Get the plan set</span></button>
+        </div>
+        <div class="work" id="work" hidden>
+          <div class="wh"><b>Drawing your plan set</b><span class="mono" id="clock" aria-hidden="true">0:00</span></div>
+          <div class="pb"><i id="pbar"></i></div>
+          <ol class="wl" id="wl" aria-live="polite"></ol>
+          <p class="mono fine" id="wait"></p>
+        </div>
+        <p class="msg mono" id="msg" role="status" aria-live="polite"></p>
+        <p class="mono fine" id="fine">Nothing is uploaded. First run loads the engine, about 35&nbsp;MB.<br>Looks off, or need more? <a id="mailto" href="mailto:zeromouseclicks@agentmail.to?subject=Plan%20set">Write to us</a></p>
+      </form>
+      <div class="done" id="done" hidden>
+        <svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" stroke-width="1.5"/><path id="tick" d="M15 27l7 7 15-16" fill="none" stroke="currentColor" stroke-width="2" pathLength="1"/></svg>
+        <p class="dt">Your plan set is ready.</p>
+        <p class="sub" id="sum"></p>
+        <ul class="rooms mono" id="rooms"></ul>
+        <a class="btn send dl" id="dl" download="plan-set.pdf" href="#">Download PDF</a>
+        <button class="again mono" id="again" type="button">Make another</button>
+      </div>
+    </div>
+
+    <div class="demo fade" aria-label="How it works: drop the plan, three small models read it, rules draw it, you get one PDF with six sheets">
+      <div class="stage" id="stage">
+        <div class="sv" id="sv">
+          <svg viewBox="140 100 700 650" role="img" aria-hidden="true">
+            <defs>
+              <pattern id="gr" width="32.9" height="32.9" patternUnits="userSpaceOnUse"><path class="grid" d="M32.9 0H0V32.9" fill="none"/></pattern>
+              <clipPath id="cutA"><rect id="cutAr" x="140" y="100" width="700" height="650"/></clipPath>
+              <clipPath id="cutB"><rect id="cutBr" x="140" y="100" width="700" height="650"/></clipPath>
+            </defs>
+            <rect class="bp" x="140" y="100" width="700" height="650"/>
+            <rect x="140" y="100" width="700" height="650" fill="url(#gr)"/>
+            <g id="plan">
       <path class="w" pathLength="1" d="M764.4,658.4 L751.2,658.4 L750.0,671.6 L675.6,671.6 L675.6,683.6 L764.4,683.6Z"/>
       <path class="w" pathLength="1" d="M411.6,628.4 L411.6,670.4 L385.2,671.6 L385.2,683.6 L441.6,683.6 L441.6,671.6 L420.0,670.4 L420.0,628.4Z"/>
       <path class="w" pathLength="1" d="M583.2,599.6 L574.8,599.6 L574.8,670.4 L519.6,671.6 L519.6,683.6 L606.0,683.6 L606.0,671.6 L583.2,670.4Z"/>
@@ -200,32 +337,62 @@
       <path class="c" d="M218.4,135.2H765.6M218.4,128.2v14M765.6,128.2v14M188.4,165.2V684.8M181.4,165.2h14M181.4,684.8h14"/>
       <text class="ct" x="492.0" y="125.2">8.32 m</text>
       <text class="ct" transform="translate(178.4,425.0) rotate(-90)">7.90 m</text>
-        </g>
-        <g clip-path="url(#cut)">
-          <rect x="140" y="100" width="700" height="650" fill="#fff"/>
-          <image href="https://raw.githubusercontent.com/zeromouseclicks/zero-mouse-clicks/main/examples/synthetic_54m2.png" x="0" y="0" width="900" height="900"/>
-        </g>
-        <line id="scan" x1="140" x2="140" y1="100" y2="750"/>
-        <circle id="knob" cx="140" cy="425" r="6"/>
-      </svg>
-      <span class="tag l mono">Plan set</span><span class="tag r mono">Brochure</span>
+            </g>
+            <g id="gMask" clip-path="url(#cutB)">
+              <rect x="140" y="100" width="700" height="650" fill="#05070a"/>
+              <image href="img/reads.png" x="0" y="0" width="900" height="900"/>
+            </g>
+            <g clip-path="url(#cutA)">
+              <g id="gBro">
+                <rect x="140" y="100" width="700" height="650" fill="#fff"/>
+                <image href="img/brochure.jpg" x="0" y="0" width="900" height="900"/>
+              </g>
+            </g>
+            <g id="gScan"><line id="scan" x1="140" x2="140" y1="100" y2="750"/><circle id="knob" cx="140" cy="425" r="6"/></g>
+          </svg>
+        </div>
+        <div class="sheets" id="sheets">
+          <div class="sh" style="background-image:url(img/sheets/A-101_s.jpg)"><span>A-101</span></div>
+          <div class="sh" style="background-image:url(img/sheets/A-102_s.jpg)"><span>A-102</span></div>
+          <div class="sh" style="background-image:url(img/sheets/A-103_s.jpg)"><span>A-103</span></div>
+          <div class="sh" style="background-image:url(img/sheets/A-104_s.jpg)"><span>A-104</span></div>
+          <div class="sh" style="background-image:url(img/sheets/A-201_s.jpg)"><span>A-201</span></div>
+          <div class="sh" style="background-image:url(img/sheets/A-202_s.jpg)"><span>A-202</span></div>
+        </div>
+        <div class="mine" id="mine" aria-hidden="true">
+          <img id="mineSrc" alt=""><img class="lv" alt="">
+          <span class="see"><span class="chip"><b class="lvT"></b></span></span>
+          <span class="see low lvL"><span class="chip" style="--k:var(--ink)"><i></i>walls</span><span class="chip" style="--k:var(--door)"><i></i>doors</span><span class="chip" style="--k:var(--win)"><i></i>windows</span><span class="chip" style="--k:var(--fix)"><i></i>fixtures</span></span>
+        </div>
+        <span class="now mono" id="now"><b>01</b><span>Drop the plan</span></span>
+        <div class="hud" id="hud1"><span class="chip lite">brochure.jpg &middot; 0.3 MB</span></div>
+        <div class="hud" id="hud2">
+          <span class="chip" style="--k:var(--ink)"><i></i>walls</span><span class="chip" style="--k:var(--door)"><i></i>doors</span>
+          <span class="chip" style="--k:var(--win)"><i></i>windows</span><span class="chip" style="--k:var(--fix)"><i></i>fixtures</span>
+        </div>
+        <div class="hud" id="hud3"><span class="chip">8.32 &times; 7.90 m</span><span class="chip">54.4 m&sup2;</span><span class="chip">6 rooms</span><span class="chip">scale 1:50</span></div>
+        <div class="hud" id="hud4"><span class="chip lite"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1v7M3 5.5 6 8.5l3-3M1.5 11h9" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>plan-set.pdf &middot; 6 sheets &middot; A3 &middot; 88 KB</span></div>
+      </div>
+      <div class="steps" id="steps">
+        <button class="step" type="button"><i></i><b>01</b><span>Drop the plan</span></button>
+        <button class="step" type="button"><i></i><b>02</b><span>Tiny models read it</span></button>
+        <button class="step" type="button"><i></i><b>03</b><span>Rules draw it</span></button>
+        <button class="step" type="button"><i></i><b>04</b><span>One PDF, six sheets</span></button>
+      </div>
     </div>
-    </div>
-    <p class="hint mono fade">Move across it. No clicks needed.</p>
   </div>
 </section>
 
 <section class="rv" id="set">
   <div class="wrap">
     <h2 class="sp">Six sheets. One PDF.</h2>
-    <div class="deck" id="deck">
-      <div class="card"><div class="face" style="--c:0;--r:0"><span class="mono">A-101 Floor plan</span></div></div>
-      <div class="card"><div class="face" style="--c:1;--r:0"><span class="mono">A-102 Schedules</span></div></div>
-      <div class="card"><div class="face" style="--c:2;--r:0"><span class="mono">A-103 Finishes</span></div></div>
-      <div class="card"><div class="face" style="--c:0;--r:1"><span class="mono">A-104 Electrical</span></div></div>
-      <div class="card"><div class="face" style="--c:1;--r:1"><span class="mono">A-201 Section</span></div></div>
-      <div class="card"><div class="face" style="--c:2;--r:1"><span class="mono">A-202 Section</span></div></div>
+    <p class="sub fade">What an architect would hand you, drawn to scale on A3. <span id="ztip">Move over a sheet to zoom in.</span></p>
+    <div class="viewer fade" id="viewer">
+      <img id="big" src="img/sheets/A-101_s.jpg" alt="Sheet A-101, floor plan" draggable="false">
+      <span class="tip mono" id="tip">Hover to zoom</span>
     </div>
+    <p class="cap fade" id="cap" aria-live="polite"><b></b><span></span></p>
+    <div class="thumbs" id="thumbs"></div>
   </div>
 </section>
 
@@ -236,36 +403,11 @@
   </div>
 </section>
 
-<section class="close rv" id="request">
+<section class="close rv">
   <div class="wrap">
     <h2 class="sp">Zero mouse clicks.<br><em>One plan set.</em></h2>
-    <form class="req fade" id="req" novalidate>
-      <label class="drop" id="drop">
-        <input type="file" name="file" id="file" accept="image/*">
-        <img id="thumb" alt="">
-        <span class="dz">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6M4 20h16" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-          <b id="dzt">Drop the floor plan here</b>
-          <span class="mono" id="dzs">or choose an image &middot; JPG, PNG, WEBP</span>
-        </span>
-      </label>
-      <div class="row one">
-        <input type="text" name="area" id="area" inputmode="decimal" placeholder="Private area, m&sup2; or sq ft (optional)" maxlength="24" aria-label="Private area, optional" aria-describedby="areah">
-      </div>
-      <p class="mono hint2" id="areah">Leave it empty and we'll read it from the plan.</p>
-      <button class="btn send" id="send" type="submit"><span id="sendt">Get the plan set</span></button>
-      <p class="msg mono" id="msg" role="status" aria-live="polite"></p>
-    </form>
-    <div class="done" id="done" hidden>
-      <svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" stroke-width="1.5"/><path id="tick" d="M15 27l7 7 15-16" fill="none" stroke="currentColor" stroke-width="2" pathLength="1"/></svg>
-      <p class="dt">Your plan set is ready.</p>
-      <p class="sub" id="sum"></p>
-      <ul class="rooms mono" id="rooms"></ul>
-      <a class="btn send dl" id="dl" download="plan-set.pdf" href="#">Download PDF</a>
-      <button class="again mono" id="again" type="button">Make another</button>
-    </div>
-    <span class="mono fade alt" id="help">Something looks off, or you need more (CAD file, sections, a quote)? <a id="mailto" href="mailto:zeromouseclicks@agentmail.to?subject=Plan%20set">Write to us</a></span>
-    <p class="note fade">An early prototype. Runs entirely in your browser: nothing is uploaded. The first run downloads the engine (about 35&nbsp;MB) and can take a minute; after that it's faster. Drawn from marketing plans: verify dimensions on site.</p>
+    <a class="btn fade" href="#request">Make a plan set</a>
+    <p class="note fade">An early prototype. Drawn from marketing plans: verify dimensions on site. Need a CAD file, more sections or a quote? <a href="mailto:zeromouseclicks@agentmail.to?subject=Plan%20set">Write to us</a>.</p>
   </div>
 </section>
 
@@ -286,10 +428,12 @@
 (function () {
   var M = window.Motion;
   var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var on = !!(M && M.animate && M.scroll && M.inView) && !calm;   // animations by Motion (motion.dev); without it the page is static
+  var on = !!(M && M.animate && M.scroll && M.inView) && !calm;   // entrances by Motion (motion.dev); without it the page is static
   var root = document.documentElement;
   var ease = [0.2, 0.8, 0.2, 1];
+  var touch = window.matchMedia('(hover: none)').matches;
   function all(sel, el) { return Array.prototype.slice.call((el || document).querySelectorAll(sel)); }
+  function $(id) { return document.getElementById(id); }
 
   // split headlines into words
   all('.sp').forEach(function (h) {
@@ -311,57 +455,191 @@
     root.style.setProperty('--mx', e.clientX + 'px'); root.style.setProperty('--my', e.clientY + 'px');
   }, { passive: true });
 
-  // scanner: brochure on the right of the line, drawing on the left
-  var X0 = 140, X1 = 840, stage = document.getElementById('stage');
-  var cut = document.getElementById('cutr'), scan = document.getElementById('scan'), knob = document.getElementById('knob');
-  var x = X0, target = X0, hover = false, t0 = null, started = false;
-  function set(v) {
-    cut.setAttribute('x', v); cut.setAttribute('width', Math.max(0, X1 - v));
-    scan.setAttribute('x1', v); scan.setAttribute('x2', v); knob.setAttribute('cx', v);
-  }
-  function point(e) {
-    var r = stage.getBoundingClientRect();
-    target = X0 + (X1 - X0) * Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
-  }
-  stage.addEventListener('pointerenter', function (e) { hover = true; point(e); });
-  stage.addEventListener('pointermove', function (e) { hover = true; point(e); }, { passive: true });
-  stage.addEventListener('pointerleave', function () { hover = false; t0 = null; });
-  function frame(now) {
-    if (started && !hover) {
-      if (t0 === null) t0 = now;
-      var t = (now - t0) / 1000;
-      if (t < 3.2) target = X0 + (X1 - X0) * Math.min(1, t / 2.6);
-      else target = X0 + (X1 - X0) * (0.62 + 0.3 * Math.cos((t - 3.2) * 0.7));
-    }
-    x += (target - x) * 0.12; set(x);
-    requestAnimationFrame(frame);
-  }
-  if (calm) { set(X0 + (X1 - X0) * 0.55); } else { set(X0); requestAnimationFrame(frame); }
-
   // click counter
-  var n = 0, cn = document.getElementById('cn'), box = document.getElementById('clicks');
+  var n = 0, cn = $('cn'), box = $('clicks');
   window.addEventListener('click', function () {
     cn.textContent = ++n;
     if (on) M.animate(box, { scale: [1.3, 1], borderColor: ['#ff6b6b', '#1f1f1d'] }, { type: 'spring', stiffness: 420, damping: 11 });
   });
 
-  // plan set generator: everything runs in this browser (app/client.js -> app/engine.js)
-  var MAXB = 40 * 1024 * 1024, SENDT = 'Get the plan set';
-  var form = document.getElementById('req'), drop = document.getElementById('drop'), input = document.getElementById('file');
-  var thumb = document.getElementById('thumb'), dzt = document.getElementById('dzt'), dzs = document.getElementById('dzs');
-  var areaIn = document.getElementById('area'), msg = document.getElementById('msg'), send = document.getElementById('send'), sendt = document.getElementById('sendt');
-  var doneBox = document.getElementById('done'), dl = document.getElementById('dl'), mailto = document.getElementById('mailto');
-  var picked = null, url = null, pdfUrl = null, busy = false, booted = false;
-  var touch = window.matchMedia('(hover: none)').matches;
-  var STAGE = { boot: 'Loading the engine', area: 'Looking for the area', locate: 'Finding the plan', read: 'Reading walls, doors and windows',
-                texts: 'Reading labels and dimensions', vector: 'Squaring the walls', draw: 'Drawing six sheets', done: 'Done' };
+  /* ---------- how it works: one timeline, drawn as a pure function of time ---------- */
+  (function () {
+    var X0 = 140, X1 = 840, T = 12.4, SEG = [0, 1.9, 4.9, 7.9, T];
+    var NAMES = ['Drop the plan', 'Three tiny models read it', 'Plain rules draw it', 'One PDF, six sheets'];
+    var stage = $('stage'), sv = $('sv'), gBro = $('gBro'), gMask = $('gMask'), gScan = $('gScan');
+    var cutA = $('cutAr'), cutB = $('cutBr'), scan = $('scan'), knob = $('knob'), now = $('now');
+    var walls = all('#plan .w'), marks = all('#plan .o, #plan .g, #plan .d, #plan .da'), notes = all('#plan .c, #plan .t, #plan .ct');
+    var sheets = all('.sh', stage), steps = all('.step'), huds = [1, 2, 3, 4].map(function (i) { return all('.chip', $('hud' + i)); });
+    function cx(el) { try { var b = el.getBBox(); return b.x + b.width / 2; } catch (e) { return (X0 + X1) / 2; } }
+    var wx = walls.map(cx), mx = marks.map(cx);
+    function k(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+    function sg(t, a, b) { return k((t - a) / (b - a)); }
+    function sm(p) { return p * p * (3 - 2 * p); }
+    function back(p) { var c = 1.4; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); }
+    function mix(a, b, p) { return a + (b - a) * p; }
+    function chips(list, t, t0, gap, t1) {       // in one by one from t0, all out at t1
+      list.forEach(function (c, i) {
+        var p = sm(sg(t, t0 + i * gap, t0 + i * gap + 0.35)) * (1 - sg(t, t1, t1 + 0.3));
+        c.style.opacity = p; c.style.transform = 'translateY(' + (1 - p) * 10 + 'px)';
+      });
+    }
+    var W = 1, H = 1, last = -1;
+    function size() { var r = stage.getBoundingClientRect(); W = r.width || 1; H = r.height || 1; }
+    function render(t) {
+      var i, s = t < SEG[1] ? 0 : t < SEG[2] ? 1 : t < SEG[3] ? 2 : 3;
+      if (s !== last) {
+        last = s; now.firstChild.textContent = '0' + (s + 1); now.lastChild.textContent = NAMES[s];
+        steps.forEach(function (b, j) { b.classList.toggle('on', j === s); });
+      }
+      steps.forEach(function (b, j) { b.style.setProperty('--f', sg(t, SEG[j], SEG[j + 1]).toFixed(3)); });
+      var fade = sm(sg(t, 0, 0.25)) * (1 - sm(sg(t, T - 0.4, T)));
+      // 01 the brochure drops in like a sheet of paper
+      var d = sg(t, 0.15, 1.15);
+      gBro.setAttribute('transform', 'translate(0 ' + mix(-760, 0, back(d)).toFixed(1) + ') rotate(' + mix(-7, 0, sm(d)).toFixed(2) + ' 490 425)');
+      chips(huds[0], t, 1.0, 0, 2.2);
+      // 02 scan to the right: what the models see
+      var a = sm(sg(t, 2.1, 4.3)), xa = mix(X0, X1, a);
+      cutA.setAttribute('x', xa); cutA.setAttribute('width', Math.max(0, X1 - xa));
+      gMask.style.opacity = t > 1.3 ? 1 : 0;
+      chips(huds[1], t, 2.4, 0.42, 5.2);
+      // 03 scan back to the left: the drawing
+      var b = sm(sg(t, 5.1, 7.0)), xb = mix(X1, X0, b);
+      cutB.setAttribute('width', Math.max(0, xb - X0));
+      for (i = 0; i < walls.length; i++) { var p = sm(k((wx[i] + 130 - xb) / 260)); walls[i].style.strokeDashoffset = 1 - p; walls[i].style.fillOpacity = 0.12 * p; }
+      for (i = 0; i < marks.length; i++) marks[i].style.opacity = k((mx[i] + 20 - xb) / 90);
+      for (i = 0; i < notes.length; i++) notes[i].style.opacity = sg(t, 6.5 + i * 0.07, 7.0 + i * 0.07);
+      chips(huds[2], t, 6.9, 0.12, 8.0);
+      var line = t < 4.6 ? xa : xb;
+      scan.setAttribute('x1', line); scan.setAttribute('x2', line); knob.setAttribute('cx', line);
+      gScan.style.opacity = Math.min(sg(t, 1.9, 2.1), 1 - sg(t, 4.3, 4.6)) + Math.min(sg(t, 4.9, 5.1), 1 - sg(t, 7.0, 7.3));
+      // 04 the drawing becomes a sheet, the set fans out, then stacks into one PDF
+      var q = sm(sg(t, 7.9, 8.7));
+      sv.style.transform = 'scale(' + (1 - 0.5 * q) + ') translateY(' + (-8 * q) + '%)';
+      sv.style.opacity = (1 - sm(sg(t, 8.2, 8.7))) * fade;
+      var st = sm(sg(t, 10.6, 11.3));
+      for (i = 0; i < sheets.length; i++) {
+        var c = i % 3, r = (i / 3) | 0, o = i === 0 ? 0 : 0.06 * i;
+        var f = back(sg(t, 8.8 + o, 9.7 + o));
+        var gx = (c - 1) * 0.32 * W, gy = (r === 0 ? -0.19 : 0.11) * H;
+        var x = mix(gx * f, (i - 2.5) * 0.012 * W, st), y = mix(mix(-0.04 * H, gy, f), -0.03 * H - i * 0.006 * H, st);
+        var sc = mix(mix(i === 0 ? 1.7 : 0.7, 1, f), 1.55, st), ro = mix(0, (i - 2.5) * 2.4, st);
+        var op = (i === 0 ? sm(sg(t, 8.2, 8.7)) : sg(t, 8.8 + o, 9.1 + o)) * fade;
+        sheets[i].style.opacity = op; sheets[i].style.zIndex = 6 - i;
+        sheets[i].style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + ro.toFixed(2) + 'deg) scale(' + sc.toFixed(3) + ')';
+      }
+      chips(huds[3], t, 11.1, 0, T - 0.4);
+    }
+    var t = 0, target = null, hover = false, prev = null, seen = true, started = false;
+    function frame(ms) {
+      var dt = prev === null ? 0 : Math.min(0.05, (ms - prev) / 1000); prev = ms;
+      if (seen && !document.hidden && !root.classList.contains('working')) {
+        if (hover && target !== null) t += (target - t) * Math.min(1, dt * 9);
+        else if (started) { t += dt; if (t >= T) t = 0; }
+        render(t);
+      }
+      requestAnimationFrame(frame);
+    }
+    function point(e) { var r = stage.getBoundingClientRect(); target = k((e.clientX - r.left) / r.width) * (T - 0.5); }
+    stage.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { hover = true; point(e); } });
+    stage.addEventListener('pointermove', function (e) { hover = true; point(e); }, { passive: true });
+    ['pointerleave', 'pointerup', 'pointercancel'].forEach(function (n) { stage.addEventListener(n, function (e) { if (n === 'pointerleave' || e.pointerType !== 'mouse') hover = false; }); });
+    steps.forEach(function (b, j) {
+      function go() { hover = false; t = SEG[j] + (j === 0 ? 0 : 0.05); if (calm) render(j === 3 ? 10.2 : SEG[j + 1] - 0.05); }
+      b.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') go(); });
+      b.addEventListener('click', go); b.addEventListener('focus', go);
+    });
+    size(); window.addEventListener('resize', size);
+    if (window.ResizeObserver) new ResizeObserver(size).observe(stage);
+    if (window.IntersectionObserver) new IntersectionObserver(function (en) { seen = en[0].isIntersecting; }).observe(stage);
+    if (calm) { render(7.6); return; }
+    render(0); requestAnimationFrame(frame);
+    setTimeout(function () { started = true; }, on ? 900 : 0);
+  })();
+
+  /* ---------- what you get: six sheets, zoom where the pointer is ---------- */
+  (function () {
+    var SHEETS = [
+      ['A-101', 'Floor plan', 'Axes, chained dimensions, door swings, windows, room names and areas.'],
+      ['A-102', 'Schedules', 'Areas and finishes, doors and windows, fixtures, stated assumptions.'],
+      ['A-103', 'Floor finishes', 'The finish of each room, read from the textures in the brochure.'],
+      ['A-104', 'Electrical', 'A schematic proposal of light points, outlets and switches.'],
+      ['A-201', 'Section, kitchen', 'A cut through the counter: cabinets, hood, fridge. Heights assumed.'],
+      ['A-202', 'Section, bathroom', 'A cut through the bathroom: fixtures, tiling, mirror. Heights assumed.']
+    ];
+    var viewer = $('viewer'), big = $('big'), cap = $('cap'), thumbs = $('thumbs'), tip = $('tip');
+    var ZOOM = 2.8, cur = -1, auto = true, seen = false, t0 = null, DWELL = 3600, btns = [];
+    if (touch) { tip.textContent = 'Tap to zoom'; $('ztip').textContent = 'Tap a sheet to zoom in.'; }
+    SHEETS.forEach(function (s, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'th fade';
+      b.setAttribute('aria-label', 'Sheet ' + s[0] + ', ' + s[1]);
+      b.innerHTML = '<img src="img/sheets/' + s[0] + '_s.jpg" alt="" loading="lazy"><span>' + s[0] + '</span><i></i>';
+      function pickIt() { stop(); show(i); }
+      b.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') pickIt(); });
+      b.addEventListener('click', pickIt); b.addEventListener('focus', pickIt);
+      thumbs.appendChild(b); btns.push(b);
+    });
+    function show(i) {
+      if (i === cur) return;
+      cur = i; var s = SHEETS[i], full = 'img/sheets/' + s[0] + '.jpg';
+      btns.forEach(function (b, j) { b.classList.toggle('on', j === i); });
+      cap.firstChild.textContent = s[0] + ' ' + s[1]; cap.lastChild.textContent = s[2];
+      big.alt = 'Sheet ' + s[0] + ', ' + s[1];
+      big.src = 'img/sheets/' + s[0] + '_s.jpg';
+      var im = new Image(); im.onload = function () { if (cur === i) big.src = full; }; im.src = full;
+      if (on) { M.animate(big, { opacity: [0.35, 1] }, { duration: 0.35 }); M.animate(cap, { opacity: [0, 1], y: [6, 0] }, { duration: 0.35 }); }
+    }
+    function at(e) {
+      var r = viewer.getBoundingClientRect();
+      viewer.style.setProperty('--ox', (k01((e.clientX - r.left) / r.width) * 100).toFixed(2) + '%');
+      viewer.style.setProperty('--oy', (k01((e.clientY - r.top) / r.height) * 100).toFixed(2) + '%');
+    }
+    function k01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+    function stop() { auto = false; btns.forEach(function (x) { x.style.setProperty('--f', 0); }); }
+    function zoom(z) { viewer.classList.toggle('z', z); viewer.style.setProperty('--z', z ? ZOOM : 1); if (z) stop(); }
+    viewer.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { at(e); zoom(true); } });
+    viewer.addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse' || viewer.classList.contains('z')) at(e); }, { passive: true });
+    viewer.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') zoom(false); });
+    viewer.addEventListener('click', function (e) { if (touch) { at(e); zoom(!viewer.classList.contains('z')); } });
+    show(0);
+    // until someone touches it, the sheets turn by themselves
+    if (window.IntersectionObserver) new IntersectionObserver(function (en) { seen = en[0].isIntersecting; t0 = null; }, { threshold: 0.4 }).observe(viewer);
+    function tick(ms) {
+      if (!auto) return;
+      if (seen && !document.hidden) {
+        if (t0 === null) t0 = ms;
+        var f = (ms - t0) / DWELL;
+        if (f >= 1) { btns[cur].style.setProperty('--f', 0); show((cur + 1) % SHEETS.length); t0 = ms; f = 0; }
+        btns[cur].style.setProperty('--f', f.toFixed(3));
+      }
+      requestAnimationFrame(tick);
+    }
+    if (!calm) requestAnimationFrame(tick);
+  })();
+
+  /* ---------- the tool: everything runs in this browser (app/client.js -> app/engine.js) ---------- */
+  var MAXB = 40 * 1024 * 1024;
+  var form = $('req'), drop = $('drop'), input = $('file'), thumb = $('thumb'), mine = $('mine'), mineSrc = $('mineSrc'), lives = all('.lv'), dzt = $('dzt'), dzs = $('dzs');
+  var areaIn = $('area'), msg = $('msg'), send = $('send'), work = $('work'), wl = $('wl'), clock = $('clock'), pbar = $('pbar'), wait = $('wait');
+  var doneBox = $('done'), dl = $('dl'), mailto = $('mailto');
+  var picked = null, url = null, pdfUrl = null, liveUrl = null, busy = false, t0 = 0, timer = null, lock = null, rows = {}, order = [], at = -1;
+  var STEPS = {
+    boot: ['Loading the engine', 'Python, three small models and fonts, about 35 MB. Only the first time: after this it stays on your device.'],
+    area: ['Looking for the area', 'Reading the text printed on the plan to find the private area, so you do not have to type it.'],
+    locate: ['Finding the plan', 'A quick first pass finds the drawing on the page and crops out logos, text and margins.'],
+    read: ['Reading walls, doors and windows', 'Three small neural networks look at every pixel, at three zoom levels, and vote. This is the slow part.'],
+    texts: ['Reading labels and dimensions', 'Room names and printed measurements are read to name each space and check the scale.'],
+    draw: ['Drawing the sheets', 'Plain rules square the walls, set the scale, add dimensions and draw six A3 sheets.']
+  };
+  var SEE = { found: 'Found the plan', seen: 'What the models see', drawn: 'Walls squared, rooms measured' };
   function say(t, bad) { msg.textContent = t; msg.className = 'msg mono' + (bad ? ' err' : ''); }
   function shake() { if (on) M.animate(form, { x: [0, -8, 8, -5, 5, 0] }, { duration: 0.42 }); }
+  function mmss(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2); }
   var client = null;
   function engine() {
     if (!client) client = new Promise(function (res, rej) {
-      var s = document.createElement('script'); s.src = 'app/client.js?v1';
-      s.onload = function () { res(window.ZMC); }; s.onerror = rej; document.head.appendChild(s);
+      var s = document.createElement('script'); s.src = 'app/client.js?v2';
+      s.onload = function () { res(window.ZMC); }; s.onerror = function () { client = null; rej(Object.assign(new Error('client'), { code: 'boot' })); };
+      document.head.appendChild(s);
     });
     return client;
   }
@@ -376,9 +654,13 @@
     dzt.textContent = f.name || 'floor plan';
     dzs.textContent = (f.size / 1048576).toFixed(1) + ' MB · change';
     if (on) M.animate(drop, { scale: [0.96, 1] }, { type: 'spring', stiffness: 380, damping: 16 });
-    engine().then(function (Z) { Z.warm(); }, function () {});      // start downloading the engine right away
+    engine().then(function (Z) { Z.warm(); }, function () {});      // start loading the engine right away
   }
-  if (touch) { dzt.textContent = 'Take a photo or choose an image'; dzs.innerHTML = 'of the floor plan &middot; JPG, PNG, WEBP'; }
+  function blank() {
+    dzt.textContent = touch ? 'Take a photo or choose an image' : 'Drop the floor plan here';
+    dzs.innerHTML = (touch ? 'of the floor plan' : 'or choose an image') + ' &middot; JPG, PNG, WEBP';
+  }
+  blank();
   input.addEventListener('change', function () { pick(input.files[0]); });
   ['dragenter', 'dragover'].forEach(function (n) {
     drop.addEventListener(n, function (e) { e.preventDefault(); drop.classList.add('over'); });
@@ -404,11 +686,60 @@
     if (/ft|sf|sq|pie|′|'/.test(t.slice(m.index + m[1].length))) v = v * 0.09290304;
     return v >= 12 && v <= 2000 ? Math.round(v * 100) / 100 : NaN;
   }
-  function idle() { busy = false; send.disabled = false; sendt.textContent = SENDT; send.style.setProperty('--p', 0); }
+
+  // while it works: a live view of the plan, the steps with what each one does, and a clock
+  function begin(noArea) {
+    busy = true; send.disabled = true; say(''); t0 = performance.now(); at = -1;
+    order = ['boot'].concat(noArea ? ['area'] : [], ['locate', 'read', 'texts', 'draw']);
+    wl.innerHTML = ''; rows = {};
+    order.forEach(function (key) {
+      var li = document.createElement('li');
+      li.innerHTML = '<i></i><div><b></b><span></span></div><em class="mono"></em>';
+      li.querySelector('b').textContent = STEPS[key][0]; li.querySelector('span').textContent = STEPS[key][1];
+      wl.appendChild(li); rows[key] = { li: li, t: null };
+    });
+    lives.forEach(function (x) { x.removeAttribute('src'); }); mineSrc.src = url; mine.classList.remove('seeing');
+    drop.classList.remove('seeing'); drop.classList.add('busy'); form.classList.add('work'); work.hidden = false; root.classList.add('working');
+    pbar.style.transform = 'scaleX(0)'; clock.textContent = '0:00';
+    wait.textContent = 'This takes a minute or two. It all happens on your device, so nothing is uploaded and the speed depends on it. Keep this tab open.';
+    timer = setInterval(function () {
+      var s = (performance.now() - t0) / 1000; clock.textContent = mmss(s);
+      if (s > 100) wait.textContent = 'Still working, and nothing is stuck. Slower devices and phones need a little longer. Keep this tab open.';
+    }, 250);
+    if (on) M.animate(work, { opacity: [0, 1], y: [14, 0] }, { duration: 0.5, ease: ease });
+    try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function (l) { lock = l; }, function () {}); } catch (e) {}
+    if (window.innerWidth <= 980) drop.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
+    progress('boot', 0);
+  }
+  function idle() {
+    busy = false; send.disabled = false; clearInterval(timer);
+    drop.classList.remove('busy', 'seeing'); mine.classList.remove('seeing'); form.classList.remove('work'); work.hidden = true; root.classList.remove('working');
+    if (lock) { try { lock.release(); } catch (e) {} lock = null; }
+  }
   function progress(s, f) {
-    if (s === 'boot' && f < 1 && !booted) sendt.innerHTML = STAGE.boot + '&hellip;<span class="st">first time only &middot; about 35 MB</span>';
-    else { if (s !== 'boot') booted = true; sendt.innerHTML = (STAGE[s] || 'Working') + '&hellip;<span class="st">on your device &middot; nothing is uploaded</span>'; }
-    send.style.setProperty('--p', (s === 'boot' ? 0.12 * f : f).toFixed(3));
+    var key = s === 'vector' ? 'draw' : s, i = s === 'done' ? order.length : order.indexOf(key), now = (performance.now() - t0) / 1000;
+    if (i > at) {
+      order.forEach(function (kk, j) {
+        var r = rows[kk];
+        if (j < i && !r.li.classList.contains('ok')) {
+          r.li.classList.remove('on'); r.li.classList.add('ok');
+          r.li.querySelector('em').textContent = mmss(now - (r.t === null ? now : r.t));
+        }
+        if (j === i) { r.li.classList.add('on'); r.t = now; }
+      });
+      at = i;
+    }
+    pbar.style.transform = 'scaleX(' + (s === 'boot' ? 0.15 * f : f).toFixed(3) + ')';
+  }
+  function preview(kind, blob) {
+    if (!busy) return;
+    var old = liveUrl; liveUrl = URL.createObjectURL(blob);
+    lives.forEach(function (x) { x.src = liveUrl; });
+    if (old) setTimeout(function () { URL.revokeObjectURL(old); }, 1500);
+    all('.lvT').forEach(function (x) { x.textContent = SEE[kind] || ''; });
+    all('.lvL').forEach(function (x) { x.style.visibility = kind === 'drawn' ? 'hidden' : ''; });
+    drop.classList.add('seeing'); mine.classList.add('seeing');
+    if (on) M.animate(lives, { opacity: [0, 1], scale: [1.04, 1] }, { duration: 0.6, ease: ease });
   }
   function fail(e) {
     idle();
@@ -418,27 +749,28 @@
       say("We couldn't read the area on the plan. Type it (m² or sq ft) and try again.", true);
     } else if (c === 'bad_image') say("This image couldn't be opened. Try a JPG or PNG.", true);
     else if (c === 'boot') say('The engine could not load. Check your connection and try again.', true);
-    else say("We couldn't draw this plan. Try a sharper or straighter image, or write to us below.", true);
+    else say("We couldn't draw this plan. Try a sharper or straighter image, or write to us.", true);
     shake();
     mailto.href = 'mailto:zeromouseclicks@agentmail.to?subject=' + encodeURIComponent('Plan set: it did not work') +
       '&body=' + encodeURIComponent('Hi, the plan set did not work for my floor plan (I will attach the image).\n\nDetails: ' + (c || '') + ' ' + String(e && e.message || '').slice(-300));
   }
   function show(r) {
-    var s = r.summary;
+    var s = r.summary, secs = (performance.now() - t0) / 1000;
+    progress('done', 1);
     if (pdfUrl) URL.revokeObjectURL(pdfUrl);
     pdfUrl = URL.createObjectURL(r.pdf); dl.href = pdfUrl;
     var base = (picked && picked.name || 'floor-plan').replace(/\.[^.]+$/, '').replace(/[^\w-]+/g, '_').slice(0, 40);
     dl.setAttribute('download', base + '_plan-set.pdf');
-    document.getElementById('sum').textContent = (s.sheets > 0 ? s.sheets + ' sheets' : 'Plan set') + ', A3. Footprint ' + s.W.toFixed(2) + ' × ' + s.H.toFixed(2) + ' m, private area ' +
-      Number(s.area).toFixed(1) + ' m²' + (s.area_read ? ' (read from the plan).' : '.');
-    var ul = document.getElementById('rooms'); ul.innerHTML = '';
+    $('sum').textContent = (s.sheets > 0 ? s.sheets + ' sheets' : 'Plan set') + ', A3, drawn in ' + mmss(secs) + '. Footprint ' + s.W.toFixed(2) + ' × ' + s.H.toFixed(2) +
+      ' m, private area ' + Number(s.area).toFixed(1) + ' m²' + (s.area_read ? ' (read from the plan).' : '.');
+    var ul = $('rooms'); ul.innerHTML = '';
     s.rooms.forEach(function (x) {
       var li = document.createElement('li'), a = document.createElement('span'), b = document.createElement('b');
       a.textContent = x.name; b.textContent = x.area.toFixed(2) + ' m²'; li.appendChild(a); li.appendChild(b); ul.appendChild(li);
     });
     mailto.href = 'mailto:zeromouseclicks@agentmail.to?subject=' + encodeURIComponent('Plan set: feedback or more') +
       '&body=' + encodeURIComponent('Hi, I made a plan set (' + s.area + ' m², ' + s.rooms.length + ' spaces).\n\nWhat I need / what looks off:\n');
-    var tick = document.getElementById('tick');
+    var tick = $('tick');
     function reveal() {
       form.hidden = true; doneBox.hidden = false; idle();
       if (!on) return;
@@ -447,14 +779,13 @@
       M.animate(0, 1, { duration: 0.8, delay: 0.25, ease: 'easeOut', onUpdate: function (v) { tick.style.strokeDashoffset = 1 - v; } });
       M.animate(all('li', ul), { opacity: [0, 1], x: [-12, 0] }, { duration: 0.5, delay: M.stagger(0.06, { startDelay: 0.4 }) });
     }
-    if (on) M.animate(form, { opacity: 0, y: -16, filter: 'blur(8px)' }, { duration: 0.4 }).then(reveal); else reveal();
+    if (on) M.animate(form, { opacity: 0, y: -16, filter: 'blur(8px)' }, { duration: 0.4, delay: 0.5 }).then(reveal); else reveal();
     if (!touch) dl.click();                       // desktop: download straight away; phones: tap the button
   }
-  document.getElementById('again').addEventListener('click', function () {
+  $('again').addEventListener('click', function () {
     doneBox.hidden = true; form.hidden = false; form.style.opacity = 1; form.style.filter = 'none'; form.style.transform = 'none';
     picked = null; input.value = ''; areaIn.value = ''; thumb.removeAttribute('src');
-    drop.classList.remove('has', 'pic'); dzt.textContent = touch ? 'Take a photo or choose an image' : 'Drop the floor plan here';
-    dzs.innerHTML = touch ? 'of the floor plan &middot; JPG, PNG, WEBP' : 'or choose an image &middot; JPG, PNG, WEBP'; say('');
+    drop.classList.remove('has', 'pic'); blank(); say('');
   });
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -462,63 +793,37 @@
     var area = parseArea(areaIn.value);
     if (!picked) { drop.classList.add('bad'); say('Add the floor plan image first.', true); shake(); return; }
     if (area !== null && isNaN(area)) { areaIn.classList.add('bad'); say('Write the area as a number, like 54.4 or 585 sq ft.', true); shake(); return; }
-    busy = true; send.disabled = true; say(''); progress('boot', 0);
-    engine().then(function (Z) { return Z.generate(picked, area, progress); }).then(show, fail);
+    begin(area === null);
+    engine().then(function (Z) { return Z.generate(picked, area, progress, preview); }).then(show, fail);
   });
 
-  if (!on) { started = true; return; }
+  if (!on) return;
 
   function words(el, delay) {
     M.animate(all('.wd', el), { opacity: [0, 1], filter: ['blur(16px)', 'blur(0px)'], y: [34, 0] },
       { duration: 0.95, ease: ease, delay: M.stagger(0.075, { startDelay: delay || 0 }) });
   }
   function fades(el, delay) {
-    M.animate(all('.fade', el), { opacity: [0, 1], y: [22, 0] }, { duration: 0.9, ease: ease, delay: M.stagger(0.12, { startDelay: delay || 0 }) });
+    M.animate(all('.fade', el), { opacity: [0, 1], y: [22, 0] }, { duration: 0.9, ease: ease, delay: M.stagger(0.1, { startDelay: delay || 0 }) });
   }
 
-  // hero: words, then the plan draws itself while the scan line passes
+  // hero straight away; the other sections when they enter
   var hero = document.querySelector('.hero');
-  words(hero, 0.15); fades(hero, 0.7);
-  setTimeout(function () {
-    started = true;
-    var walls = all('#plan .w'), marks = all('#plan .o, #plan .g, #plan .d, #plan .da'), notes = all('#plan .c, #plan .t, #plan .ct');
-    function k(v) { return Math.min(1, Math.max(0, v)); }
-    M.animate(0, 4.2, { duration: 4.2, ease: 'linear', onUpdate: function (t) {
-      walls.forEach(function (w, i) { var p = k((t - i * 0.09) / 2.2); w.style.strokeDashoffset = 1 - p * p * (3 - 2 * p); });
-      marks.forEach(function (e, i) { e.style.opacity = k((t - 1.2 - i * 0.04) / 0.5); });
-      notes.forEach(function (e, i) { e.style.opacity = k((t - 2.2 - i * 0.1) / 0.6); });
-    } });
-  }, 1100);
-
-  // the stage tilts into place and leans away as you scroll past
-  M.scroll(M.animate(stage, { rotateX: [0, -16], scale: [1, 0.9], opacity: [1, 0.35] }, { ease: 'linear' }),
-    { target: stage, offset: ['center 40%', 'end start'] });
-
-  // other sections: words and fades when they enter
+  words(hero, 0.1); fades(hero, 0.25);
   all('.rv').slice(1).forEach(function (s) {
-    M.inView(s, function () { words(s, 0); fades(s, 0.35); }, { amount: 0.3 });
+    M.inView(s, function () { words(s, 0); fades(s, 0.3); }, { amount: 0.25 });
   });
 
-  // deck: six sheets fan out from one stack, tied to the scroll position
-  var deck = document.getElementById('deck'), cards = all('.card', deck);
-  function fan() {
-    var d = deck.getBoundingClientRect(), cx = d.left + d.width / 2, cy = d.top + d.height / 2;
-    cards.forEach(function (c, i) {
-      var r = c.getBoundingClientRect();
-      M.scroll(M.animate(c, { x: [cx - (r.left + r.width / 2), 0], y: [cy - (r.top + r.height / 2), 0],
-          rotate: [(i - 2.5) * 5, 0], scale: [0.8, 1] }, { ease: 'easeOut' }),
-        { target: deck, offset: ['start 95%', 'start 38%'] });
-    });
-  }
-  fan();
-  cards.forEach(function (c) {
-    var f = c.firstElementChild;
-    c.addEventListener('pointerenter', function () { M.animate(f, { scale: 1.06, y: -10, rotateX: 5 }, { type: 'spring', stiffness: 320, damping: 16 }); });
-    c.addEventListener('pointerleave', function () { M.animate(f, { scale: 1, y: 0, rotateX: 0 }, { type: 'spring', stiffness: 260, damping: 20 }); });
-  });
+  // the stage leans away as you scroll past; the sheet viewer tilts up into place
+  var stage = $('stage'), viewer = $('viewer');
+  M.scroll(M.animate(stage, { rotateX: [0, -14], scale: [1, 0.92], opacity: [1, 0.4] }, { ease: 'linear' }),
+    { target: stage, offset: ['center 35%', 'end start'] });
+  stage.parentNode.style.perspective = '1400px'; viewer.parentNode.style.perspective = '1600px';
+  M.scroll(M.animate(viewer, { rotateX: [22, 0], scale: [0.86, 1] }, { ease: 'easeOut' }),
+    { target: viewer, offset: ['start end', 'start 45%'] });
 
   // three facts light up one after another with the scroll
-  var facts = document.getElementById('facts');
+  var facts = $('facts');
   all('span', facts).forEach(function (s, i) {
     M.scroll(M.animate(s, { color: ['#33332f', '#f5f5f3'] }, { ease: 'linear' }),
       { target: facts, offset: ['start ' + (88 - i * 9) + '%', 'start ' + (70 - i * 9) + '%'] });
@@ -530,8 +835,9 @@
   // magnetic buttons
   all('.btn').forEach(function (b) {
     b.addEventListener('pointermove', function (e) {
+      if (e.pointerType !== 'mouse' || b.disabled) return;
       var r = b.getBoundingClientRect();
-      M.animate(b, { x: (e.clientX - r.left - r.width / 2) * 0.28, y: (e.clientY - r.top - r.height / 2) * 0.4 }, { duration: 0.2 });
+      M.animate(b, { x: (e.clientX - r.left - r.width / 2) * 0.22, y: (e.clientY - r.top - r.height / 2) * 0.35 }, { duration: 0.2 });
     });
     b.addEventListener('pointerleave', function () { M.animate(b, { x: 0, y: 0 }, { type: 'spring', stiffness: 300, damping: 12 }); });
   });
