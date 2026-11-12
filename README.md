@@ -64,6 +64,10 @@ Generate synthetic training plans with exact labels:
 zmc synth -n 8 -o synthetic/ --style co   # styles: co (color brochure), us (3D top view), line (black & white)
 ```
 
+## In the browser
+
+[zeromouseclicks.com](https://zeromouseclicks.com) runs this same pipeline in the visitor's browser: Pyodide runs the `zmc` package, onnxruntime-web runs the three models and tesseract.js reads the texts. Nothing is uploaded and there is no server. The page loads `docs/app/` (built from `zmc/` and `web/` with `python web/build.py`; run it again after changing the package). The pipeline core (`zmc.pipeline.steps`) asks for model runs and OCR through a small generator protocol, so the CLI and the browser share one implementation.
+
 ## How it works
 
 ```
@@ -95,7 +99,6 @@ Be honest with your users about these:
 
 ## Roadmap
 
-- Browser version: onnxruntime-web + tesseract.js, so the image never leaves the user's device
 - A one-tap correction screen (room type, a wall, an opening)
 - DXF export
 - More training styles (US listings, black-and-white plans) and a `v5` model

@@ -67,7 +67,13 @@ def _tess(img):
 def read_words(image, target=2400):
     """Palabras con caja, en coordenadas de `image`. Une varias pasadas (gris, invertido, trazos oscuros,
     trazos claros, umbral adaptativo): el texto de folleto va sobre pisos con textura."""
-    from concurrent.futures import ThreadPoolExecutor
+    from .pipeline import drive
+    return drive(read_words_steps(image, target))
+
+
+def read_words_steps(image, target=2400):
+    """`read_words` como generador: pide ('ocr', [imágenes]) y recibe una lista de filas por imagen
+    (texto, confianza, x, y, ancho, alto)."""
     g = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     F = max(1.0, min(4.0, target / max(g.shape)))
     up = cv2.resize(g, None, fx=F, fy=F, interpolation=cv2.INTER_CUBIC)
@@ -76,10 +82,9 @@ def read_words(image, target=2400):
     th = cv2.normalize(cv2.morphologyEx(up, cv2.MORPH_TOPHAT, k), None, 0, 255, cv2.NORM_MINMAX)
     ad = cv2.adaptiveThreshold(up, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 51, 12)
     words = []
-    with ThreadPoolExecutor(5) as ex:
-        for rows in ex.map(_tess, (up, 255 - up, 255 - bh, 255 - th, ad)):
-            for t, c, x, y, w, h in rows:
-                words.append(dict(text=t, conf=c, x=x / F, y=y / F, w=w / F, h=h / F))
+    for rows in (yield ('ocr', [up, 255 - up, 255 - bh, 255 - th, ad])):
+        for t, c, x, y, w, h in rows:
+            words.append(dict(text=t, conf=c, x=x / F, y=y / F, w=w / F, h=h / F))
     return words
 
 

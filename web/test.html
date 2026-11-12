@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>zmc engine test</title></head>
+<body>
+<input type="file" id="f"> <input id="a" placeholder="area"> <button id="go">go</button>
+<pre id="log"></pre>
+<script src="client.js"></script>
+<script>
+var t0 = performance.now();
+function log(s) { document.getElementById('log').textContent += ((performance.now() - t0) / 1000).toFixed(1) + 's ' + s + '\n'; }
+window.runTest = async function (area) {
+  var f = document.getElementById('f').files[0];
+  t0 = performance.now();
+  try {
+    var r = await ZMC.generate(f, area, function (s, p) { log('stage ' + s + ' ' + p); });
+    log('done ' + JSON.stringify(r.summary));
+    var b = new Uint8Array(await r.pdf.arrayBuffer());
+    var s = ''; for (var i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
+    return { ok: true, summary: r.summary, pdf: btoa(s), secs: (performance.now() - t0) / 1000 };
+  } catch (e) { log('error ' + e.code + ' ' + e.message); return { ok: false, code: e.code, message: e.message }; }
+};
+</script>
+</body></html>

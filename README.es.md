@@ -28,6 +28,10 @@ Entre 8 y 35 segundos por planta en CPU, según el equipo y el tamaño de la ima
 
 **Opcional, recomendado: [Tesseract OCR](https://tesseract-ocr.github.io/tessdoc/Installation.html).** Con él se leen los nombres de los espacios (en español e inglés), el área privada y las medidas impresas, que sirven para verificar la escala. Sin él, todo funciona igual y el tipo de cada espacio se deduce por reglas.
 
+## En el navegador
+
+[zeromouseclicks.com](https://zeromouseclicks.com) corre este mismo pipeline en el navegador del visitante: Pyodide corre el paquete `zmc`, onnxruntime-web los tres modelos y tesseract.js lee los textos. No se sube nada y no hay servidor. La página carga `docs/app/`, que se arma desde `zmc/` y `web/` con `python web/build.py` (volver a correrlo cuando cambie el paquete).
+
 ## Qué entrega
 
 Un PDF A3 con seis láminas: A-101 planta, A-102 cuadros de áreas y de puertas y ventanas, A-103 acabados de piso, A-104 eléctrico esquemático, A-201 corte por la cocina y A-202 corte por el baño. Las alturas y los puntos eléctricos son supuestos, no información leída de la imagen.

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Zero Mouse Clicks — a brochure in, a plan set out</title>
-<meta name="description" content="Send the floor plan from a developer's brochure. Get back an architectural plan set.">
+<meta name="description" content="Upload or photograph the floor plan from a developer's brochure. Get an architectural plan set as one PDF, made in your browser.">
 <meta name="theme-color" content="#000000">
 <meta property="og:title" content="Zero Mouse Clicks">
 <meta property="og:description" content="A brochure in. A plan set out.">
@@ -104,13 +104,22 @@
   .row input::placeholder { color:#5d5d58; }
   .row input:focus { border-color:var(--ink); box-shadow:0 0 0 4px rgba(159,208,255,.12); }
   .row input.bad, .drop.bad { border-color:#ff6b6b; }
-  .hp { position:absolute; left:-9999px; width:1px; height:1px; opacity:0; }
+  .row.one { grid-template-columns:1fr; }
+  .hint2 { margin-top:8px; padding-left:4px; font-size:11px; text-transform:none; letter-spacing:.02em; }
+  .send { text-align:center; }
+  .send .st { display:block; font-family:"JetBrains Mono",ui-monospace,monospace; font-size:11px; font-weight:400; color:#55554f; margin-top:3px; letter-spacing:.02em; }
+  .rooms { list-style:none; margin:22px auto 0; max-width:360px; text-transform:none; letter-spacing:.02em; font-size:12px; }
+  .rooms li { display:flex; justify-content:space-between; padding:7px 2px; border-bottom:1px solid var(--line); }
+  .rooms li b { color:var(--fg); font-weight:400; }
+  .done .dl { max-width:360px; margin:26px auto 0; }
+  .again { display:block; margin:16px auto 0; background:none; border:0; color:var(--mute); cursor:pointer; text-transform:none; letter-spacing:.02em; font-size:13px; border-bottom:1px solid #3a3a36; padding:0 0 2px; }
+  .again:hover { color:var(--fg); }
   .close .send { display:block; width:100%; margin-top:14px; border:0; cursor:pointer; font:inherit; font-weight:600; font-size:15px; padding:15px 24px; position:relative; overflow:hidden; }
   .send[disabled] { cursor:progress; }
   .send::after { content:""; position:absolute; left:0; bottom:0; height:2px; width:100%; background:var(--ink); transform:scaleX(var(--p, 0)); transform-origin:0 50%; }
   .msg { min-height:20px; margin-top:12px; text-align:center; text-transform:none; letter-spacing:.02em; }
   .msg.err { color:#ff8a8a; }
-  .done { margin:48px auto 0; max-width:480px; }
+  .done { margin:48px auto 0; max-width:520px; }
   .done svg { width:58px; height:58px; color:var(--ink); }
   .done #tick { stroke-dasharray:1; stroke-dashoffset:0; }
   .dt { font-size:clamp(28px,4vw,44px); font-weight:700; letter-spacing:-.03em; margin-top:14px; }
@@ -135,7 +144,7 @@
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 5h22v22H5zM5 17h12M17 5v12" fill="none" stroke="currentColor" stroke-width="2.6"/></svg>
     Zero Mouse Clicks
   </a>
-  <a class="btn small" href="#request">Request a plan set</a>
+  <a class="btn small" href="#request">Make a plan set</a>
 </header>
 
 <main id="top">
@@ -143,7 +152,7 @@
 <section class="hero rv">
   <div class="wrap">
     <h1 class="sp">A brochure in.<br>A plan set out.</h1>
-    <p class="sub fade">Send the floor plan from a developer's brochure. Get back the drawings an architect would make from it.</p>
+    <p class="sub fade">Upload the floor plan from a developer's brochure, or take a photo of it. Get the drawings an architect would make from it.</p>
 
     <div class="persp fade">
     <div class="stage" id="stage" aria-label="A marketing floor plan turning into an architectural drawing as a scan line moves across it">
@@ -223,7 +232,7 @@
 <section class="rv">
   <div class="wrap">
     <p class="facts" id="facts"><span>No cloud.</span> <span>No tokens.</span> <span>Open source.</span></p>
-    <p class="sub fade">Three tiny models and plain rules, trained only on synthetic plans. The engine is on <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>.</p>
+    <p class="sub fade">Three tiny models and plain rules, trained only on synthetic plans. They run in your browser, so your image never leaves your device. The engine is on <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>.</p>
   </div>
 </section>
 
@@ -232,29 +241,31 @@
     <h2 class="sp">Zero mouse clicks.<br><em>One plan set.</em></h2>
     <form class="req fade" id="req" novalidate>
       <label class="drop" id="drop">
-        <input type="file" name="file" id="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf">
+        <input type="file" name="file" id="file" accept="image/*">
         <img id="thumb" alt="">
         <span class="dz">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6M4 20h16" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-          <b id="dzt">Drop the brochure image here</b>
-          <span class="mono" id="dzs">or choose a file &middot; JPG, PNG, PDF &middot; up to 15 MB</span>
+          <b id="dzt">Drop the floor plan here</b>
+          <span class="mono" id="dzs">or choose an image &middot; JPG, PNG, WEBP</span>
         </span>
       </label>
-      <div class="row">
-        <input type="email" name="email" id="email" placeholder="Your email" required autocomplete="email" maxlength="254" aria-label="Your email">
-        <input type="text" name="area" id="area" placeholder="Area, m&sup2; or sq ft (optional)" maxlength="40" aria-label="Private area, optional">
+      <div class="row one">
+        <input type="text" name="area" id="area" inputmode="decimal" placeholder="Private area, m&sup2; or sq ft (optional)" maxlength="24" aria-label="Private area, optional" aria-describedby="areah">
       </div>
-      <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <button class="btn send" id="send" type="submit"><span id="sendt">Send for a plan set</span></button>
+      <p class="mono hint2" id="areah">Leave it empty and we'll read it from the plan.</p>
+      <button class="btn send" id="send" type="submit"><span id="sendt">Get the plan set</span></button>
       <p class="msg mono" id="msg" role="status" aria-live="polite"></p>
     </form>
     <div class="done" id="done" hidden>
       <svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" stroke-width="1.5"/><path id="tick" d="M15 27l7 7 15-16" fill="none" stroke="currentColor" stroke-width="2" pathLength="1"/></svg>
-      <p class="dt">Received.</p>
-      <p class="sub">We'll write to <b id="who"></b> with your plan set.</p>
+      <p class="dt">Your plan set is ready.</p>
+      <p class="sub" id="sum"></p>
+      <ul class="rooms mono" id="rooms"></ul>
+      <a class="btn send dl" id="dl" download="plan-set.pdf" href="#">Download PDF</a>
+      <button class="again mono" id="again" type="button">Make another</button>
     </div>
-    <span class="mono fade alt">Or write to <a href="mailto:zeromouseclicks@agentmail.to">zeromouseclicks@agentmail.to</a></span>
-    <p class="note fade">An early prototype, starting with one thing. Drawn from marketing plans: verify dimensions on site. Your image and email are used only to prepare and send your plan set.</p>
+    <span class="mono fade alt" id="help">Something looks off, or you need more (CAD file, sections, a quote)? <a id="mailto" href="mailto:zeromouseclicks@agentmail.to?subject=Plan%20set">Write to us</a></span>
+    <p class="note fade">An early prototype. Runs entirely in your browser: nothing is uploaded. The first run downloads the engine (about 35&nbsp;MB) and can take a minute; after that it's faster. Drawn from marketing plans: verify dimensions on site.</p>
   </div>
 </section>
 
@@ -334,28 +345,40 @@
     if (on) M.animate(box, { scale: [1.3, 1], borderColor: ['#ff6b6b', '#1f1f1d'] }, { type: 'spring', stiffness: 420, damping: 11 });
   });
 
-  // request form: brochure image + email, sent to the zmc-request function
-  var FN = 'https://ebqxcaelgmxofwtofrdc.supabase.co/functions/v1/zmc-request';
-  var MAXB = 15 * 1024 * 1024, SENDT = 'Send for a plan set';
+  // plan set generator: everything runs in this browser (app/client.js -> app/engine.js)
+  var MAXB = 40 * 1024 * 1024, SENDT = 'Get the plan set';
   var form = document.getElementById('req'), drop = document.getElementById('drop'), input = document.getElementById('file');
   var thumb = document.getElementById('thumb'), dzt = document.getElementById('dzt'), dzs = document.getElementById('dzs');
-  var mail = document.getElementById('email'), msg = document.getElementById('msg'), send = document.getElementById('send'), sendt = document.getElementById('sendt');
-  var picked = null, url = null;
+  var areaIn = document.getElementById('area'), msg = document.getElementById('msg'), send = document.getElementById('send'), sendt = document.getElementById('sendt');
+  var doneBox = document.getElementById('done'), dl = document.getElementById('dl'), mailto = document.getElementById('mailto');
+  var picked = null, url = null, pdfUrl = null, busy = false, booted = false;
+  var touch = window.matchMedia('(hover: none)').matches;
+  var STAGE = { boot: 'Loading the engine', area: 'Looking for the area', locate: 'Finding the plan', read: 'Reading walls, doors and windows',
+                texts: 'Reading labels and dimensions', vector: 'Squaring the walls', draw: 'Drawing six sheets', done: 'Done' };
   function say(t, bad) { msg.textContent = t; msg.className = 'msg mono' + (bad ? ' err' : ''); }
+  function shake() { if (on) M.animate(form, { x: [0, -8, 8, -5, 5, 0] }, { duration: 0.42 }); }
+  var client = null;
+  function engine() {
+    if (!client) client = new Promise(function (res, rej) {
+      var s = document.createElement('script'); s.src = 'app/client.js?v1';
+      s.onload = function () { res(window.ZMC); }; s.onerror = rej; document.head.appendChild(s);
+    });
+    return client;
+  }
   function pick(f) {
-    if (!f) return;
-    if (f.size > MAXB) { say('That file is over 15 MB. Try a smaller image.', true); return; }
+    if (!f || busy) return;
+    if (f.type && !/^image\//.test(f.type)) { say('Use an image: JPG, PNG or WEBP. For a PDF brochure, take a screenshot of the plan.', true); drop.classList.add('bad'); return; }
+    if (f.size > MAXB) { say('That image is over 40 MB. Try a smaller one.', true); return; }
     picked = f; drop.classList.remove('bad'); drop.classList.add('has'); say('');
     if (url) URL.revokeObjectURL(url);
-    url = null;
-    var pic = /^image.(jpeg|png|webp)$/.test(f.type);
-    drop.classList.toggle('pic', pic);
-    if (pic) { url = URL.createObjectURL(f); thumb.src = url; } else { thumb.removeAttribute('src'); }
-    dzt.textContent = f.name || 'brochure';
+    url = URL.createObjectURL(f); thumb.src = url; drop.classList.add('pic');
+    thumb.onerror = function () { drop.classList.remove('pic'); };
+    dzt.textContent = f.name || 'floor plan';
     dzs.textContent = (f.size / 1048576).toFixed(1) + ' MB · change';
     if (on) M.animate(drop, { scale: [0.96, 1] }, { type: 'spring', stiffness: 380, damping: 16 });
+    engine().then(function (Z) { Z.warm(); }, function () {});      // start downloading the engine right away
   }
-  if (window.matchMedia('(hover: none)').matches) dzt.textContent = 'Add the brochure image';
+  if (touch) { dzt.textContent = 'Take a photo or choose an image'; dzs.innerHTML = 'of the floor plan &middot; JPG, PNG, WEBP'; }
   input.addEventListener('change', function () { pick(input.files[0]); });
   ['dragenter', 'dragover'].forEach(function (n) {
     drop.addEventListener(n, function (e) { e.preventDefault(); drop.classList.add('over'); });
@@ -366,49 +389,81 @@
   drop.addEventListener('drop', function (e) { e.preventDefault(); if (e.dataTransfer && e.dataTransfer.files.length) pick(e.dataTransfer.files[0]); });
   window.addEventListener('dragover', function (e) { e.preventDefault(); });
   window.addEventListener('drop', function (e) { e.preventDefault(); });
-  mail.addEventListener('input', function () { mail.classList.remove('bad'); });
+  areaIn.addEventListener('input', function () { areaIn.classList.remove('bad'); });
 
-  function fail(code) {
-    send.disabled = false; sendt.textContent = SENDT; send.style.setProperty('--p', 0);
-    var t = { email: 'Check your email address.', size: 'That file is over 15 MB.', type: 'Use a JPG, PNG, WEBP, HEIC or PDF file.',
-              busy: 'Too many requests right now. Please try again later.' }[code];
-    say(t || 'Something went wrong. Please write to zeromouseclicks@agentmail.to instead.', true);
+  // "54", "54,4 m2", "580 sq ft", "580 sf" -> m²
+  function parseArea(t) {
+    t = (t || '').trim().toLowerCase();
+    if (!t) return null;
+    var m = t.match(/(\d{1,3}(?:[ .,]\d{3})*(?:[.,]\d+)?|\d+(?:[.,]\d+)?)/);
+    if (!m) return NaN;
+    var n = m[1];
+    if (/^\d{1,3}([ .,]\d{3})+$/.test(n) && !/[.,]\d{1,2}$/.test(n)) n = n.replace(/[ .,]/g, '');
+    else n = n.replace(/ /g, '').replace(',', '.');
+    var v = parseFloat(n);
+    if (/ft|sf|sq|pie|′|'/.test(t.slice(m.index + m[1].length))) v = v * 0.09290304;
+    return v >= 12 && v <= 2000 ? Math.round(v * 100) / 100 : NaN;
   }
-  function done() {
-    document.getElementById('who').textContent = mail.value.trim();
-    var d = document.getElementById('done'), tick = document.getElementById('tick');
-    function show() {
-      form.hidden = true; d.hidden = false;
+  function idle() { busy = false; send.disabled = false; sendt.textContent = SENDT; send.style.setProperty('--p', 0); }
+  function progress(s, f) {
+    if (s === 'boot' && f < 1 && !booted) sendt.innerHTML = STAGE.boot + '&hellip;<span class="st">first time only &middot; about 35 MB</span>';
+    else { if (s !== 'boot') booted = true; sendt.innerHTML = (STAGE[s] || 'Working') + '&hellip;<span class="st">on your device &middot; nothing is uploaded</span>'; }
+    send.style.setProperty('--p', (s === 'boot' ? 0.12 * f : f).toFixed(3));
+  }
+  function fail(e) {
+    idle();
+    var c = e && e.code;
+    if (c === 'no_area') {
+      areaIn.classList.add('bad'); areaIn.focus();
+      say("We couldn't read the area on the plan. Type it (m² or sq ft) and try again.", true);
+    } else if (c === 'bad_image') say("This image couldn't be opened. Try a JPG or PNG.", true);
+    else if (c === 'boot') say('The engine could not load. Check your connection and try again.', true);
+    else say("We couldn't draw this plan. Try a sharper or straighter image, or write to us below.", true);
+    shake();
+    mailto.href = 'mailto:zeromouseclicks@agentmail.to?subject=' + encodeURIComponent('Plan set: it did not work') +
+      '&body=' + encodeURIComponent('Hi, the plan set did not work for my floor plan (I will attach the image).\n\nDetails: ' + (c || '') + ' ' + String(e && e.message || '').slice(-300));
+  }
+  function show(r) {
+    var s = r.summary;
+    if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+    pdfUrl = URL.createObjectURL(r.pdf); dl.href = pdfUrl;
+    var base = (picked && picked.name || 'floor-plan').replace(/\.[^.]+$/, '').replace(/[^\w-]+/g, '_').slice(0, 40);
+    dl.setAttribute('download', base + '_plan-set.pdf');
+    document.getElementById('sum').textContent = (s.sheets > 0 ? s.sheets + ' sheets' : 'Plan set') + ', A3. Footprint ' + s.W.toFixed(2) + ' × ' + s.H.toFixed(2) + ' m, private area ' +
+      Number(s.area).toFixed(1) + ' m²' + (s.area_read ? ' (read from the plan).' : '.');
+    var ul = document.getElementById('rooms'); ul.innerHTML = '';
+    s.rooms.forEach(function (x) {
+      var li = document.createElement('li'), a = document.createElement('span'), b = document.createElement('b');
+      a.textContent = x.name; b.textContent = x.area.toFixed(2) + ' m²'; li.appendChild(a); li.appendChild(b); ul.appendChild(li);
+    });
+    mailto.href = 'mailto:zeromouseclicks@agentmail.to?subject=' + encodeURIComponent('Plan set: feedback or more') +
+      '&body=' + encodeURIComponent('Hi, I made a plan set (' + s.area + ' m², ' + s.rooms.length + ' spaces).\n\nWhat I need / what looks off:\n');
+    var tick = document.getElementById('tick');
+    function reveal() {
+      form.hidden = true; doneBox.hidden = false; idle();
       if (!on) return;
       tick.style.strokeDashoffset = 1;
-      M.animate(d, { opacity: [0, 1], y: [24, 0] }, { duration: 0.7, ease: ease });
+      M.animate(doneBox, { opacity: [0, 1], y: [24, 0] }, { duration: 0.7, ease: ease });
       M.animate(0, 1, { duration: 0.8, delay: 0.25, ease: 'easeOut', onUpdate: function (v) { tick.style.strokeDashoffset = 1 - v; } });
+      M.animate(all('li', ul), { opacity: [0, 1], x: [-12, 0] }, { duration: 0.5, delay: M.stagger(0.06, { startDelay: 0.4 }) });
     }
-    if (on) M.animate(form, { opacity: 0, y: -16, filter: 'blur(8px)' }, { duration: 0.4 }).then(show); else show();
+    if (on) M.animate(form, { opacity: 0, y: -16, filter: 'blur(8px)' }, { duration: 0.4 }).then(reveal); else reveal();
+    if (!touch) dl.click();                       // desktop: download straight away; phones: tap the button
   }
+  document.getElementById('again').addEventListener('click', function () {
+    doneBox.hidden = true; form.hidden = false; form.style.opacity = 1; form.style.filter = 'none'; form.style.transform = 'none';
+    picked = null; input.value = ''; areaIn.value = ''; thumb.removeAttribute('src');
+    drop.classList.remove('has', 'pic'); dzt.textContent = touch ? 'Take a photo or choose an image' : 'Drop the floor plan here';
+    dzs.innerHTML = touch ? 'of the floor plan &middot; JPG, PNG, WEBP' : 'or choose an image &middot; JPG, PNG, WEBP'; say('');
+  });
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    var noFile = !picked, noMail = !mail.value.trim() || !mail.checkValidity();
-    if (noFile) drop.classList.add('bad');
-    if (noMail) mail.classList.add('bad');
-    if (noFile || noMail) {
-      say(noFile ? 'Add the brochure image first.' : 'Check your email address.', true);
-      if (on) M.animate(form, { x: [0, -8, 8, -5, 5, 0] }, { duration: 0.42 });
-      return;
-    }
-    var fd = new FormData(form);
-    fd.set('file', picked, picked.name || 'brochure');
-    send.disabled = true; sendt.textContent = 'Sending…'; say('');
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', FN);
-    xhr.upload.onprogress = function (ev) { if (ev.lengthComputable) send.style.setProperty('--p', (ev.loaded / ev.total).toFixed(3)); };
-    xhr.onload = function () {
-      var r = {};
-      try { r = JSON.parse(xhr.responseText); } catch (x) { r = {}; }
-      if (xhr.status === 200 && r.ok) done(); else fail(r.error || xhr.status);
-    };
-    xhr.onerror = function () { fail('net'); };
-    xhr.send(fd);
+    if (busy) return;
+    var area = parseArea(areaIn.value);
+    if (!picked) { drop.classList.add('bad'); say('Add the floor plan image first.', true); shake(); return; }
+    if (area !== null && isNaN(area)) { areaIn.classList.add('bad'); say('Write the area as a number, like 54.4 or 585 sq ft.', true); shake(); return; }
+    busy = true; send.disabled = true; say(''); progress('boot', 0);
+    engine().then(function (Z) { return Z.generate(picked, area, progress); }).then(show, fail);
   });
 
   if (!on) { started = true; return; }
