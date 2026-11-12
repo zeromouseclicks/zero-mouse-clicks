@@ -119,6 +119,7 @@
   .msg { min-height:18px; margin-top:12px; text-transform:none; letter-spacing:.02em; font-size:12px; }
   .msg.err { color:#ff8a8a; }
   .fine { margin-top:2px; font-size:11px; text-transform:none; letter-spacing:.02em; line-height:1.7; }
+  #detail { margin-bottom:10px; color:#6d6d67; user-select:all; -webkit-user-select:all; overflow-wrap:anywhere; }
   .fine a { color:var(--fg); text-decoration:none; border-bottom:1px solid #3a3a36; }
   .done { margin-top:30px; max-width:520px; }
   .done svg { width:44px; height:44px; color:var(--ink); }
@@ -290,6 +291,7 @@
           <p class="mono fine" id="wait"></p>
         </div>
         <p class="msg mono" id="msg" role="status" aria-live="polite"></p>
+        <p class="mono fine" id="detail" hidden></p>
         <p class="mono fine" id="fine">Nothing is uploaded. First run loads the engine, about 35&nbsp;MB.<br>Looks off, or need more? <a id="mailto" href="mailto:zeromouseclicks@agentmail.to?subject=Plan%20set">Write to us</a></p>
       </form>
       <div class="done" id="done" hidden>
@@ -650,8 +652,8 @@
   var client = null;
   function engine() {
     if (!client) client = new Promise(function (res, rej) {
-      var s = document.createElement('script'); s.src = 'app/client.js?v2';
-      s.onload = function () { res(window.ZMC); }; s.onerror = function () { client = null; rej(Object.assign(new Error('client'), { code: 'boot' })); };
+      var s = document.createElement('script'); s.src = 'app/client.js?v3';
+      s.onload = function () { res(window.ZMC); }; s.onerror = function () { client = null; rej(Object.assign(new Error('step client · app/client.js did not load'), { code: 'boot' })); };
       document.head.appendChild(s);
     });
     return client;
@@ -702,7 +704,7 @@
 
   // while it works: a live view of the plan, the steps with what each one does, and a clock
   function begin(noArea) {
-    busy = true; send.disabled = true; say(''); t0 = performance.now(); at = -1;
+    busy = true; send.disabled = true; say(''); $('detail').hidden = true; t0 = performance.now(); at = -1;
     order = ['boot'].concat(noArea ? ['area'] : [], ['locate', 'read', 'texts', 'draw']);
     wl.innerHTML = ''; rows = {};
     order.forEach(function (key) {
@@ -761,11 +763,15 @@
       areaIn.classList.add('bad'); areaIn.focus();
       say("We couldn't read the area on the plan. Type it (m² or sq ft) and try again.", true);
     } else if (c === 'bad_image') say("This image couldn't be opened. Try a JPG or PNG.", true);
-    else if (c === 'boot') say('The engine could not load. Check your connection and try again.', true);
+    else if (c === 'old') say('This browser is too old for the engine. Update it (on iPhone: iOS 16.4 or later) or try on a computer.', true);
+    else if (c === 'boot') say('The engine could not load on this device. Try again; if it keeps failing, send us the detail below.', true);
     else say("We couldn't draw this plan. Try a sharper or straighter image, or write to us.", true);
     shake();
+    var dev = (navigator.userAgent.match(/\(([^)]+)\)/) || [])[1] || '';
+    var tech = (c || 'error') + ' · ' + String(e && e.message || '').slice(0, 400) + ' · ' + dev + ' · ' + mmss((performance.now() - t0) / 1000);
+    if (c !== 'no_area' && c !== 'bad_image') { $('detail').textContent = 'Detail: ' + tech; $('detail').hidden = false; }
     mailto.href = 'mailto:zeromouseclicks@agentmail.to?subject=' + encodeURIComponent('Plan set: it did not work') +
-      '&body=' + encodeURIComponent('Hi, the plan set did not work for my floor plan (I will attach the image).\n\nDetails: ' + (c || '') + ' ' + String(e && e.message || '').slice(-300));
+      '&body=' + encodeURIComponent('Hi, the plan set did not work for my floor plan (I will attach the image).\n\nDetail: ' + tech);
   }
   function show(r) {
     var s = r.summary, secs = (performance.now() - t0) / 1000;
