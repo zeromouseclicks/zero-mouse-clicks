@@ -3,7 +3,7 @@
    ZMC.generate(file, area, onStage, onPreview)  -> Promise<{ pdf: Blob, summary }>
        onStage(stage, fraction)   boot, area, locate, read, texts, vector, draw, done
        onPreview(kind, blob)      found, seen, drawn: JPG of what the engine has so far
-   Errores: err.code = 'no_area' | 'bad_image' | 'boot' | 'failed' */
+   Errores: err.code = 'no_area' | 'bad_image' | 'old' | 'boot' | 'failed'; err.message trae el detalle técnico */
 (function () {
   var TESS = {
     js: 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js',
@@ -12,7 +12,27 @@
     lang: 'https://cdn.jsdelivr.net/npm/@tesseract.js-data/eng/4.0.0_best_int'
   };
   var here = (document.currentScript && document.currentScript.src || location.href).replace(/[^/]*$/, '');
-  var worker = null, sched = null, job = null;
+  var worker = null, sched = null, job = null, up = false, heard = 0, where = '';
+  // si el motor se queda mudo mientras carga (red cortada, memoria), se avisa en vez de esperar para siempre
+  setInterval(function () {
+    if (!job || up || !worker || Date.now() - heard < 120000) return;
+    var k = job; job = null;
+    try { worker.terminate(); } catch (x) {}
+    worker = null;
+    k.rej(fail('boot', 'no answer from the engine for 120 s · last: ' + (where || 'nothing')));
+  }, 5000);
+  var ua = navigator.userAgent;
+  var ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  // lean: teléfonos y equipos con poca memoria: una cosa a la vez (ver engine.js)
+  var lean = ios || /Mobi|Android/i.test(ua) || (navigator.deviceMemory && navigator.deviceMemory <= 4);
+
+  function fail(code, message) { var e = new Error(message); e.code = code; return e; }
+  // WebAssembly con SIMD: Chrome 91+, Firefox 89+, Safari / iOS 16.4+
+  function supported() {
+    try {
+      return typeof WebAssembly === 'object' && WebAssembly.validate(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 1, 5, 1, 96, 0, 1, 123, 3, 2, 1, 0, 10, 10, 1, 8, 0, 65, 0, 253, 15, 253, 98, 11]));
+    } catch (e) { return false; }
+  }
 
   function load(src) {
     return new Promise(function (res, rej) {
@@ -26,7 +46,7 @@
     sched = load(TESS.js).then(async function () {
       var s = Tesseract.createScheduler();
       var n = Math.max(1, Math.min(4, (navigator.hardwareConcurrency || 2) - 1));
-      if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) n = Math.min(n, 2);
+      if (lean) n = ios ? 1 : Math.min(n, 2);
       var ws = [];
       for (var i = 0; i < n; i++) {
         ws.push(Tesseract.createWorker('eng', 1, { workerPath: TESS.worker, corePath: TESS.core, langPath: TESS.lang })
@@ -53,36 +73,38 @@
 
   function engine() {
     if (worker) return worker;
-    worker = new Worker(here + 'engine.js?v2');
+    worker = new Worker(here + 'engine.js?v3');
     worker.onmessage = function (e) {
-      var m = e.data;
+      var m = e.data; heard = Date.now(); if (m.type === 'progress') where = m.stage + ' ' + Math.round(m.frac * 100) + '%';
       if (m.type === 'ocr') {
         ocr(m.pngs).then(function (rows) { worker.postMessage({ type: 'ocr-result', id: m.id, rows: rows }); },
           function (err) { worker.postMessage({ type: 'ocr-result', id: m.id, error: String(err) }); });
         return;
       }
       if (!job) return;
-      if (m.type === 'progress') job.stage(m.stage, m.frac);
+      if (m.type === 'progress') { if (m.stage !== 'boot' || m.frac >= 1) up = true; job.stage(m.stage, m.frac); }
       else if (m.type === 'preview') job.preview(m.kind, new Blob([m.jpg], { type: 'image/jpeg' }));
       else if (m.type === 'done') { var j = job; job = null; j.res({ pdf: new Blob([m.pdf], { type: 'application/pdf' }), summary: m.summary }); }
       else if (m.type === 'error') {
         var k = job; job = null;
-        var err = new Error(m.message); err.code = m.code;
-        if (m.code === 'boot') { worker.terminate(); worker = null; }
-        k.rej(err);
+        if (m.code === 'boot') { worker.terminate(); worker = null; up = false; }
+        k.rej(fail(m.code, m.message));
       }
     };
     worker.onerror = function (e) {
-      if (job) { var k = job; job = null; var err = new Error(e.message || 'worker'); err.code = 'boot'; k.rej(err); }
-      worker = null;
+      var d = 'worker · ' + (e.message || 'error') + (e.filename ? ' · ' + String(e.filename).split('/').pop() + ':' + e.lineno : '');
+      if (job) { var k = job; job = null; k.rej(fail(up ? 'failed' : 'boot', d)); }
+      try { worker.terminate(); } catch (x) {}
+      worker = null; up = false;
     };
-    worker.postMessage({ type: 'boot' });
+    heard = Date.now(); where = '';
+    worker.postMessage({ type: 'boot', lean: lean });
     return worker;
   }
 
   // la imagen como JPG/PNG derecha (orientación EXIF aplicada) y de máximo 3200 px de lado
   async function prepare(file) {
-    var MAX = 3200, bmp;
+    var MAX = lean ? 2400 : 3200, bmp;
     try { bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
     catch (e) {
       bmp = await new Promise(function (res, rej) {
@@ -103,14 +125,16 @@
   }
 
   window.ZMC = {
-    warm: function () { engine(); ocrReady(); },
+    lean: lean,
+    warm: function () { if (!supported()) return; engine(); if (!lean) ocrReady(); },
     generate: async function (file, area, onStage, onPreview) {
-      if (job) throw Object.assign(new Error('busy'), { code: 'busy' });
+      if (job) throw fail('busy', 'busy');
+      if (!supported()) throw fail('old', 'no WebAssembly SIMD');
       var buf = await prepare(file);
-      var w = engine(); ocrReady();
+      var w = engine(); if (!lean) ocrReady();
       return new Promise(function (res, rej) {
         job = { res: res, rej: rej, stage: onStage || function () {}, preview: onPreview || function () {} };
-        w.postMessage({ type: 'run', image: buf, area: area || null }, [buf]);
+        w.postMessage({ type: 'run', image: buf, area: area || null, lean: lean }, [buf]);
       });
     }
   };
