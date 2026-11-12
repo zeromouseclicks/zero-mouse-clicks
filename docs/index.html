@@ -206,6 +206,56 @@
   .note { color:var(--mute); font-size:14px; max-width:460px; margin:40px auto 0; text-wrap:pretty; }
   .note a { color:var(--fg); text-decoration:none; border-bottom:1px solid #3a3a36; }
 
+  /* contact card */
+  .contact { text-align:left; }
+  .contact h2, .contact > .wrap > .sub { text-align:center; }
+  .card { position:relative; max-width:640px; margin:clamp(30px,4vw,48px) auto 0; padding:clamp(20px,3vw,30px); border-radius:22px;
+          background:linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.012)); border:1px solid #232321;
+          box-shadow:0 0 0 1px rgba(159,208,255,.04), 0 40px 120px -40px rgba(159,208,255,.25); scroll-margin-top:84px; }
+  .card.ping { animation:ping 1.2s cubic-bezier(.2,.8,.2,1); }
+  @keyframes ping { 0% { box-shadow:0 0 0 0 rgba(159,208,255,.55), 0 40px 120px -40px rgba(159,208,255,.25); } 100% { box-shadow:0 0 0 22px rgba(159,208,255,0), 0 40px 120px -40px rgba(159,208,255,.25); } }
+  .to { display:flex; align-items:center; gap:10px; margin-bottom:16px; font-size:13px; color:var(--mute); }
+  .to b { color:var(--fg); font-weight:500; font-family:"JetBrains Mono",ui-monospace,monospace; font-size:12px; letter-spacing:.02em; }
+  .to i { width:8px; height:8px; border-radius:50%; background:var(--win); box-shadow:0 0 10px var(--win); flex:none; }
+  .topics { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; border:0; }
+  .topics legend { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+  .topics label { position:relative; cursor:pointer; }
+  .topics input { position:absolute; opacity:0; inset:0; cursor:pointer; }
+  .topics span { display:inline-block; padding:8px 14px; border-radius:999px; border:1px solid #2a2a27; font-size:13px; color:var(--mute); transition:all .2s; }
+  .topics input:checked + span { color:#000; background:var(--fg); border-color:var(--fg); }
+  .topics input:focus-visible + span { box-shadow:0 0 0 3px rgba(159,208,255,.4); }
+  .topics label:hover span { color:var(--fg); }
+  .card .f { width:100%; background:#0b0b0a; color:var(--fg); border:1px solid #2a2a27; border-radius:14px; padding:13px 16px;
+             font:inherit; font-size:15px; outline:none; transition:border-color .25s, box-shadow .25s; }
+  .card .f::placeholder { color:#5d5d58; }
+  .card .f:focus { border-color:var(--ink); box-shadow:0 0 0 4px rgba(159,208,255,.12); }
+  .card .f.bad { border-color:#ff6b6b; }
+  .card textarea.f { display:block; min-height:118px; resize:vertical; margin-top:10px; line-height:1.5; }
+  .att { display:flex; align-items:center; gap:12px; margin-top:10px; padding:10px; border:1px dashed #33332f; border-radius:14px; cursor:pointer; position:relative; transition:border-color .25s, background .25s; }
+  .att:hover, .att.over { border-color:var(--ink); background:rgba(159,208,255,.04); }
+  .att input { position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .att .ph { width:48px; height:48px; flex:none; border-radius:9px; background:#111 center/cover no-repeat; display:grid; place-items:center; color:var(--ink); border:1px solid #232321; }
+  .att .ph svg { width:20px; height:20px; }
+  .att.has .ph svg { display:none; }
+  .att .tx { min-width:0; flex:1; } .att .tx b { display:block; font-weight:500; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .att .tx span { display:block; font-size:12px; color:var(--mute); }
+  .att .x { position:relative; z-index:2; display:none; background:none; border:0; color:var(--mute); font-size:20px; line-height:1; padding:6px 8px; cursor:pointer; border-radius:8px; }
+  .att.has .x { display:block; } .att .x:hover { color:var(--fg); background:#1a1a18; }
+  .det { margin-top:10px; padding:10px 12px; border-radius:10px; background:#0b0b0a; border:1px solid #1d1d1b; font-size:11px; text-transform:none; letter-spacing:.02em; overflow-wrap:anywhere; }
+  .card .send { margin-top:14px; }
+  .cmsg { min-height:18px; margin-top:10px; font-size:12px; text-transform:none; letter-spacing:.02em; text-align:center; }
+  .cmsg.err { color:#ff8a8a; }
+  .sent { text-align:center; padding:28px 6px 10px; }
+  .sent svg { width:46px; height:46px; color:var(--ink); }
+  .sent #ctick { stroke-dasharray:1; stroke-dashoffset:0; }
+  .sent b { display:block; font-size:clamp(24px,3vw,32px); font-weight:700; letter-spacing:-.03em; margin-top:10px; }
+  .sent p { color:var(--mute); margin-top:6px; } .sent p em { color:var(--fg); font-style:normal; }
+  .sent button { margin-top:16px; }
+  .hp { position:absolute; left:-9999px; width:1px; height:1px; opacity:0; }
+  .done .alt2 { display:block; margin-top:14px; text-transform:none; letter-spacing:.02em; font-size:12px; }
+  .done .alt2 a, .fine a, .note a { cursor:pointer; }
+  @media (max-width:520px) { .topics span { padding:7px 12px; font-size:12px; } }
+
   footer { position:relative; z-index:1; border-top:1px solid var(--line); padding:26px 28px 34px; font-size:13px; color:var(--mute);
            display:flex; flex-wrap:wrap; gap:10px 24px; justify-content:space-between; }
   footer a { text-decoration:none; } footer a:hover { color:var(--fg); } footer nav { display:flex; gap:22px; }
@@ -292,7 +342,7 @@
         </div>
         <p class="msg mono" id="msg" role="status" aria-live="polite"></p>
         <p class="mono fine" id="detail" hidden></p>
-        <p class="mono fine" id="fine">Nothing is uploaded. First run loads the engine, about 35&nbsp;MB.<br>Looks off, or need more? <a id="mailto" href="mailto:zeromouseclicks@agentmail.to?subject=Plan%20set">Write to us</a></p>
+        <p class="mono fine" id="fine">Nothing is uploaded. First run loads the engine, about 35&nbsp;MB.<br>Looks off, or need more? <a id="mailto" href="#contact" data-topic="help">Write to us</a></p>
       </form>
       <div class="done" id="done" hidden>
         <svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" stroke-width="1.5"/><path id="tick" d="M15 27l7 7 15-16" fill="none" stroke="currentColor" stroke-width="2" pathLength="1"/></svg>
@@ -301,6 +351,7 @@
         <ul class="rooms mono" id="rooms"></ul>
         <a class="btn send dl" id="dl" download="plan-set.pdf" href="#">Download PDF</a>
         <button class="again mono" id="again" type="button">Make another</button>
+        <span class="mono alt2">Something looks off, or need a CAD file, sections or a quote? <a href="#contact" data-topic="more" id="doneLink">Write to us</a></span>
       </div>
     </div>
 
@@ -418,11 +469,46 @@
   </div>
 </section>
 
+<section class="rv contact" id="contact">
+  <div class="wrap">
+    <h2 class="sp">Talk to a human.</h2>
+    <p class="sub fade">Something looks off, or you need more? Send it here. No email app needed: we answer at the address you write.</p>
+    <form class="card fade" id="cform" novalidate>
+      <div class="to"><i></i><span>To</span><b>zeromouseclicks@agentmail.to</b></div>
+      <fieldset class="topics">
+        <legend>What is it about?</legend>
+        <label><input type="radio" name="topic" value="help"><span>It didn't work</span></label>
+        <label><input type="radio" name="topic" value="more" checked><span>CAD, sections or a quote</span></label>
+        <label><input type="radio" name="topic" value="feedback"><span>Feedback</span></label>
+        <label><input type="radio" name="topic" value="other"><span>Other</span></label>
+      </fieldset>
+      <input class="f" type="email" name="email" id="cmail" placeholder="Your email, so we can answer" required autocomplete="email" maxlength="254" aria-label="Your email">
+      <textarea class="f" name="note" id="cnote" placeholder="Your message" maxlength="3000" aria-label="Your message"></textarea>
+      <label class="att" id="catt">
+        <input type="file" id="cfile" accept="image/*,application/pdf" aria-label="Attach the brochure image or PDF">
+        <span class="ph" id="cph"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5l-7.8 7.8a5 5 0 01-7.1-7.1l8.5-8.5a3.3 3.3 0 014.7 4.7l-8.5 8.5a1.7 1.7 0 01-2.4-2.4l7.8-7.8" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>
+        <span class="tx"><b id="cft">Attach the brochure</b><span id="cfs">Image or PDF, up to 15 MB &middot; optional</span></span>
+        <button class="x" type="button" id="cfx" aria-label="Remove the attachment">&times;</button>
+      </label>
+      <p class="det mono" id="cdet" hidden></p>
+      <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button class="btn send" id="csend" type="submit">Send</button>
+      <p class="cmsg mono" id="cmsg" role="status" aria-live="polite"></p>
+    </form>
+    <div class="card sent" id="csent" hidden>
+      <svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" stroke-width="1.5"/><path id="ctick" d="M15 27l7 7 15-16" fill="none" stroke="currentColor" stroke-width="2" pathLength="1"/></svg>
+      <b>Sent.</b>
+      <p>We'll answer at <em id="cwho"></em>.</p>
+      <button class="again mono" type="button" id="cagain">Send another</button>
+    </div>
+  </div>
+</section>
+
 <section class="close rv">
   <div class="wrap">
     <h2 class="sp">Zero mouse clicks.<br><em>One plan set.</em></h2>
     <a class="btn fade" href="#request">Make a plan set</a>
-    <p class="note fade">An early prototype. Drawn from marketing plans: verify dimensions on site. Need a CAD file, more sections or a quote? <a href="mailto:zeromouseclicks@agentmail.to?subject=Plan%20set">Write to us</a>.</p>
+    <p class="note fade">An early prototype. Drawn from marketing plans: verify dimensions on site. Need a CAD file, more sections or a quote? <a href="#contact" data-topic="more">Write to us</a>.</p>
   </div>
 </section>
 
@@ -433,7 +519,7 @@
   <nav aria-label="Footer">
     <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>
     <a href="https://www.linkedin.com/in/julian-holmes-paez-martinez-47a36a208/">LinkedIn</a>
-    <a href="mailto:zeromouseclicks@agentmail.to">Contact</a>
+    <a href="#contact" data-topic="other">Contact</a>
   </nav>
 </footer>
 <div id="clicks" class="mono" aria-live="polite">Mouse clicks: <b id="cn">0</b></div>
@@ -635,7 +721,7 @@
   var MAXB = 40 * 1024 * 1024;
   var form = $('req'), drop = $('drop'), input = $('file'), thumb = $('thumb'), mine = $('mine'), mineSrc = $('mineSrc'), lives = all('.lv'), dzt = $('dzt'), dzs = $('dzs');
   var areaIn = $('area'), msg = $('msg'), send = $('send'), work = $('work'), wl = $('wl'), clock = $('clock'), pbar = $('pbar'), wait = $('wait');
-  var doneBox = $('done'), dl = $('dl'), mailto = $('mailto');
+  var doneBox = $('done'), dl = $('dl');
   var picked = null, url = null, pdfUrl = null, liveUrl = null, busy = false, t0 = 0, timer = null, lock = null, rows = {}, order = [], at = -1;
   var STEPS = {
     boot: ['Loading the engine', 'Python, three small models and fonts, about 35 MB. Only the first time: after this it stays on your device.'],
@@ -770,8 +856,8 @@
     var dev = (navigator.userAgent.match(/\(([^)]+)\)/) || [])[1] || '';
     var tech = (c || 'error') + ' · ' + String(e && e.message || '').slice(0, 400) + ' · ' + dev + ' · ' + mmss((performance.now() - t0) / 1000);
     if (c !== 'no_area' && c !== 'bad_image') { $('detail').textContent = 'Detail: ' + tech; $('detail').hidden = false; }
-    mailto.href = 'mailto:zeromouseclicks@agentmail.to?subject=' + encodeURIComponent('Plan set: it did not work') +
-      '&body=' + encodeURIComponent('Hi, the plan set did not work for my floor plan (I will attach the image).\n\nDetail: ' + tech);
+    window.zmcContact = { topic: 'help', detail: c === 'no_area' ? '' : tech, file: picked,
+      note: c === 'no_area' ? '' : "The plan set did not work for this floor plan." };
   }
   function show(r) {
     var s = r.summary, secs = (performance.now() - t0) / 1000;
@@ -787,8 +873,8 @@
       var li = document.createElement('li'), a = document.createElement('span'), b = document.createElement('b');
       a.textContent = x.name; b.textContent = x.area.toFixed(2) + ' m²'; li.appendChild(a); li.appendChild(b); ul.appendChild(li);
     });
-    mailto.href = 'mailto:zeromouseclicks@agentmail.to?subject=' + encodeURIComponent('Plan set: feedback or more') +
-      '&body=' + encodeURIComponent('Hi, I made a plan set (' + s.area + ' m², ' + s.rooms.length + ' spaces).\n\nWhat I need / what looks off:\n');
+    window.zmcContact = { topic: 'more', file: picked, area: String(s.area),
+      detail: 'Plan set made: ' + s.area + ' m², ' + s.rooms.length + ' spaces, ' + s.sheets + ' sheets, ' + mmss(secs) };
     var tick = $('tick');
     function reveal() {
       form.hidden = true; doneBox.hidden = false; idle();
@@ -815,6 +901,103 @@
     begin(area === null);
     engine().then(function (Z) { return Z.generate(picked, area, progress, preview); }).then(show, fail);
   });
+
+  /* ---------- contact card: straight to zeromouseclicks@agentmail.to, no email app ---------- */
+  (function () {
+    var FN = 'https://ebqxcaelgmxofwtofrdc.supabase.co/functions/v1/zmc-request', MAXB = 15 * 1024 * 1024;
+    var cform = $('cform'), cmail = $('cmail'), cnote = $('cnote'), catt = $('catt'), cfile = $('cfile'), cph = $('cph'),
+        cft = $('cft'), cfs = $('cfs'), cdet = $('cdet'), csend = $('csend'), cmsg = $('cmsg'), csent = $('csent');
+    var att = null, attUrl = null, det = '', area = '', sending = false;
+    function csay(t, bad) { cmsg.textContent = t; cmsg.className = 'cmsg mono' + (bad ? ' err' : ''); }
+    function attach(f) {
+      if (attUrl) { URL.revokeObjectURL(attUrl); attUrl = null; }
+      att = null; catt.classList.remove('has'); cph.style.backgroundImage = '';
+      cft.textContent = 'Attach the brochure'; cfs.innerHTML = 'Image or PDF, up to 15 MB &middot; optional';
+      if (!f) return;
+      if (!/^image\/|^application\/pdf$/.test(f.type || 'image/')) { csay('Attach an image or a PDF.', true); return; }
+      if (f.size > MAXB) { csay('That file is over 15 MB. Try a smaller one.', true); return; }
+      att = f; catt.classList.add('has'); csay('');
+      if (/^image\/(jpeg|png|webp|gif)$/.test(f.type)) { attUrl = URL.createObjectURL(f); cph.style.backgroundImage = 'url("' + attUrl + '")'; }
+      cft.textContent = f.name || 'brochure'; cfs.textContent = (f.size / 1048576).toFixed(1) + ' MB · attached';
+    }
+    cfile.addEventListener('change', function () { attach(cfile.files[0]); });
+    $('cfx').addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); cfile.value = ''; attach(null); });
+    ['dragenter', 'dragover'].forEach(function (n) { catt.addEventListener(n, function (e) { e.preventDefault(); catt.classList.add('over'); }); });
+    ['dragleave', 'drop'].forEach(function (n) { catt.addEventListener(n, function () { catt.classList.remove('over'); }); });
+    catt.addEventListener('drop', function (e) { e.preventDefault(); if (e.dataTransfer && e.dataTransfer.files.length) attach(e.dataTransfer.files[0]); });
+    [cmail, cnote].forEach(function (x) { x.addEventListener('input', function () { x.classList.remove('bad'); }); });
+    function topic(v) { all('input[name=topic]', cform).forEach(function (r) { r.checked = r.value === v; }); }
+
+    // every "Write to us" opens this card, carrying what the visitor was doing
+    function open(t) {
+      var ctx = window.zmcContact || {};
+      if (!csent.hidden) { csent.hidden = true; cform.hidden = false; }
+      topic(t === 'help' || t === 'more' ? (ctx.topic === 'help' ? 'help' : t) : t || 'other');
+      if (ctx.file && !att) attach(ctx.file);
+      det = ctx.detail || ''; area = ctx.area || '';
+      cdet.textContent = det ? 'Included: ' + det : ''; cdet.hidden = !det;
+      if (ctx.note && !cnote.value) cnote.value = ctx.note;
+      setTimeout(function () { (cmail.value ? cnote : cmail).focus({ preventScroll: true }); }, 450);
+      cform.classList.remove('ping'); void cform.offsetWidth; cform.classList.add('ping');
+    }
+    all('a[href="#contact"]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        $('contact').scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
+        open(a.getAttribute('data-topic'));
+      });
+    });
+
+    function done(email) {
+      $('cwho').textContent = email; cform.hidden = true; csent.hidden = false;
+      csent.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'center' });
+      var tick = $('ctick');
+      if (!on) return;
+      tick.style.strokeDashoffset = 1;
+      M.animate(csent, { opacity: [0, 1], y: [18, 0] }, { duration: 0.6, ease: ease });
+      M.animate(0, 1, { duration: 0.8, delay: 0.2, ease: 'easeOut', onUpdate: function (v) { tick.style.strokeDashoffset = 1 - v; } });
+    }
+    $('cagain').addEventListener('click', function () {
+      cnote.value = ''; cfile.value = ''; attach(null); det = ''; cdet.hidden = true; window.zmcContact = null;
+      csent.hidden = true; cform.hidden = false; csay('');
+    });
+    cform.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (sending) return;
+      var email = cmail.value.trim(), note = cnote.value.trim();
+      var badMail = !email || !cmail.checkValidity(), empty = !note && !att;
+      if (badMail) cmail.classList.add('bad');
+      if (empty) cnote.classList.add('bad');
+      if (badMail || empty) {
+        csay(badMail ? 'Check your email address, so we can answer.' : 'Write a message or attach the brochure.', true);
+        if (on) M.animate(cform, { x: [0, -8, 8, -5, 5, 0] }, { duration: 0.42 });
+        (badMail ? cmail : cnote).focus();
+        return;
+      }
+      var fd = new FormData(cform);
+      fd.set('email', email); fd.set('note', note);
+      fd.set('topic', (cform.querySelector('input[name=topic]:checked') || {}).value || 'other');
+      if (det) fd.set('detail', det.slice(0, 1200));
+      if (area) fd.set('area', area);
+      if (att) fd.set('file', att, att.name || 'brochure'); else fd.delete('file');
+      sending = true; csend.disabled = true; csend.textContent = 'Sending…'; csay('');
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', FN);
+      xhr.upload.onprogress = function (ev) { if (ev.lengthComputable && att) csend.textContent = 'Sending… ' + Math.round(100 * ev.loaded / ev.total) + '%'; };
+      function end() { sending = false; csend.disabled = false; csend.textContent = 'Send'; }
+      xhr.onload = function () {
+        var r = {}; try { r = JSON.parse(xhr.responseText); } catch (x) {}
+        end();
+        if (xhr.status === 200 && r.ok) return done(email);
+        var t = { email: 'Check your email address, so we can answer.', size: 'That file is over 15 MB.', type: 'Attach a JPG, PNG, WEBP, HEIC or PDF.',
+                  busy: 'Too many messages right now. Please try again in an hour.', empty: 'Write a message or attach the brochure.' }[r.error];
+        csay(t || 'It could not be sent. Please try again in a moment.', true);
+        cmsg.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'center' });
+      };
+      xhr.onerror = function () { end(); csay('It could not be sent. Check your connection and try again.', true); };
+      xhr.send(fd);
+    });
+  })();
 
   if (!on) return;
 
