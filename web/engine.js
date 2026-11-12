@@ -27,19 +27,30 @@ function bytes(path) {
   });
 }
 
+// lean: teléfonos (sobre todo iPhone, con poca memoria por pestaña). Todo se carga de uno en uno
+// y los modelos no guardan memoria entre corridas.
+var lean = false, step = 'start';
+
+function session(k) {
+  var opt = { executionProviders: ['wasm'], graphOptimizationLevel: 'all' };
+  if (lean) { opt.enableCpuMemArena = false; opt.enableMemPattern = false; }
+  return bytes(MODELS[k]).then(function (b) { return ort.InferenceSession.create(b, opt); }).then(function (s) { sessions[k] = s; });
+}
+
 function boot() {
   if (ready) return ready;
   ready = (async function () {
     stage('boot', 0.02);
-    var sess = Object.keys(MODELS).map(function (k) {
-      return bytes(MODELS[k]).then(function (b) {
-        return ort.InferenceSession.create(b, { executionProviders: ['wasm'], graphOptimizationLevel: 'all' });
-      }).then(function (s) { sessions[k] = s; });
-    });
+    var keys = Object.keys(MODELS), sess = lean ? null : Promise.all(keys.map(session));
+    if (sess) sess.catch(function () {});
+    step = 'python';
     py = await loadPyodide({ indexURL: CDN.pyodide });
     stage('boot', 0.25);
-    await py.loadPackage(['numpy', 'opencv-python', 'pillow', 'charset-normalizer']);
+    step = 'packages';
+    if (lean) { await py.loadPackage('numpy'); stage('boot', 0.35); await py.loadPackage('opencv-python'); stage('boot', 0.55); await py.loadPackage(['pillow', 'charset-normalizer']); }
+    else await py.loadPackage(['numpy', 'opencv-python', 'pillow', 'charset-normalizer']);
     stage('boot', 0.7);
+    step = 'files';
     var files = await Promise.all([bytes('py/zmc.zip'), bytes('py/reportlab.whl'),
       bytes('fonts/DejaVuSans.ttf'), bytes('fonts/DejaVuSans-Bold.ttf')]);
     py.unpackArchive(files[0], 'zip');
@@ -47,14 +58,21 @@ function boot() {
     py.FS.mkdirTree('/usr/share/fonts/truetype/dejavu');
     py.FS.writeFile('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', new Uint8Array(files[2]));
     py.FS.writeFile('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', new Uint8Array(files[3]));
+    files = null;
+    step = 'import';
     glue = py.pyimport('zmc_web');
     py.runPython('import zmc.drawing, zmc.sections, zmc.finish, zmc.vectorize5');
-    await Promise.all(sess);
+    stage('boot', 0.85);
+    step = 'models';
+    if (sess) await sess; else for (var i = 0; i < keys.length; i++) await session(keys[i]);
+    step = 'ready';
     stage('boot', 1);
   })();
   ready.catch(function () { ready = null; });
   return ready;
 }
+
+function detail(err) { return 'step ' + step + ' · ' + String(err && (err.stack || err.message) || err).slice(0, 500); }
 
 // avance: fracción al empezar cada etapa y cuántas corridas de modelo se esperan dentro de ella
 var STAGES = { area: 0.17, locate: 0.25, read: 0.38, texts: 0.8, vector: 0.93, draw: 0.96 };
@@ -83,15 +101,17 @@ function ocr(pngs) {
 
 self.onmessage = async function (e) {
   var m = e.data;
-  if (m.type === 'boot') { boot().catch(function (err) { post({ type: 'error', code: 'boot', message: String(err) }); }); return; }
+  if (m.lean) lean = true;
+  if (m.type === 'boot') { boot().catch(function (err) { post({ type: 'error', code: 'boot', message: detail(err) }); }); return; }
   if (m.type === 'ocr-result') {
     var w = waiting[m.id]; delete waiting[m.id];
     if (w) { if (m.error) w.rej(new Error(m.error)); else w.res(m.rows); }
     return;
   }
   if (m.type !== 'run') return;
+  try { await boot(); } catch (err) { post({ type: 'error', code: 'boot', message: detail(err) }); return; }
   try {
-    await boot();
+    step = 'run';
     var js = {
       infer: infer, ocr: ocr,
       progress: function (s) { cur = { stage: s, frac: STAGES[s] || 0.5 }; stage(s, cur.frac); },
@@ -107,6 +127,6 @@ self.onmessage = async function (e) {
   } catch (err) {
     var s = String(err && err.message || err);
     var code = /NoArea/.test(s) ? 'no_area' : /bad_image/.test(s) ? 'bad_image' : 'failed';
-    post({ type: 'error', code: code, message: s.slice(-600) });
+    post({ type: 'error', code: code, message: 'stage ' + cur.stage + ' · ' + s.slice(-600) });
   }
 };
