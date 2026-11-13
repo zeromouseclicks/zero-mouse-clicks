@@ -64,7 +64,8 @@ def classify(model, objs, image=None):
     v4.1: candidatos con puntaje y cupos por tamaño del apartamento (máx. 1 cocina, 1 ropas,
     baños ~ 1 por cada 35 m²), para que sillas o cojines confundidos con aparatos no creen baños."""
     s2 = model['m_per_px'] ** 2
-    rooms = {r['id']: dict(r, area=r['area_px'] * s2, kinds=[]) for r in model['rooms']}
+    net = model.get('net_px') or {}
+    rooms = {r['id']: dict(r, area=net.get(r['id'], r['area_px']) * s2, kinds=[]) for r in model['rooms']}
     for o in objs:
         if o['room'] in rooms:
             rooms[o['room']]['kinds'].append(o)
@@ -188,6 +189,15 @@ def classify(model, objs, image=None):
         beds = prim[:1] + sorted([r for r in rooms.values() if r['type'] == 'bed' and r is not prim[0]], key=lambda r: -r['area'])
         for i, r in enumerate(beds):
             r['n'] = i + 1
+    # números impresos en el folleto («Habitación 1», «Bedroom 2») mandan si no se repiten
+    for typ in ('bed', 'bath'):
+        rs = [r for r in rooms.values() if r['type'] == typ and not (prim and r is prim[0])]
+        nums = {r['id']: next((t.get('num') for t in r.get('texts', []) if t.get('type') == typ and t.get('num')), None) for r in rs}
+        got = [v for v in nums.values() if v]
+        if got and len(got) == len(set(got)):
+            free_n = [k for k in range(1, 20) if k not in got]
+            for r in sorted(rs, key=lambda r: -r['area']):
+                r['n'] = nums[r['id']] or free_n.pop(0)
     for r in rooms.values():
         base = ROOM_NAMES[r['type']]
         own = [t['name'] for t in r.get('texts', []) if t['type'] == r['type']]

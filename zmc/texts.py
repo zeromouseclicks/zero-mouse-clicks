@@ -96,6 +96,78 @@ def _key(n):
     return None
 
 
+_Q1 = "'’′`´"
+_Q2 = '"”″'
+FT = r"(\d{1,2})\s*[" + _Q1 + r"]\s*-?\s*(\d{1,2}(?:\s+\d/\d)?)?\s*(?:[" + _Q2 + r"]|[" + _Q1 + r"]{2})?"
+DIM_FT = re.compile(FT + r"\s*[x×X\*]\s*" + FT)
+DIM_M = re.compile(r"(?<![\d.,])(\d{1,2}[.,]\d{1,2})\s*(?:m(?![a-z0-9]))?\s*[x×X\*]\s*(\d{1,2}[.,]\d{1,2})(?![\d])")
+
+
+def _ft(f, i):
+    v = float(f) * 0.3048
+    if i:
+        i = i.strip()
+        if ' ' in i:
+            a, fr = i.split(None, 1); p, q = fr.split('/')
+            v += (float(a) + float(p) / max(1.0, float(q))) * 0.0254
+        else:
+            v += float(i) * 0.0254
+    return v
+
+
+def _lines(words):
+    """Agrupa palabras en renglones (misma altura, contiguas) -> [(texto, [(ini, fin, palabra)])]."""
+    ws = sorted(words, key=lambda w: (w['y'] + w['h'] / 2, w['x']))
+    rows = []
+    for w in ws:
+        cy = w['y'] + w['h'] / 2
+        for r in rows:
+            if abs(r['cy'] - cy) < 0.5 * max(r['h'], w['h']):
+                r['w'].append(w); break
+        else:
+            rows.append(dict(cy=cy, h=w['h'], w=[w]))
+    out = []
+    for r in rows:
+        seq = sorted(r['w'], key=lambda w: w['x'])
+        # partir donde hay un salto grande (dos rótulos en el mismo renglón)
+        grp = [[seq[0]]]
+        for w in seq[1:]:
+            p = grp[-1][-1]
+            if w['x'] - (p['x'] + p['w']) > 2.5 * max(p['h'], w['h']):
+                grp.append([w])
+            elif not (abs(w['x'] - p['x']) < 0.3 * p['h'] and w['text'] == p['text']):     # repetida (otra pasada)
+                grp[-1].append(w)
+        for g in grp:
+            txt, spans = '', []
+            for w in g:
+                if txt:
+                    txt += ' '
+                spans.append((len(txt), len(txt) + len(w['text']), w)); txt += w['text']
+            out.append((txt, spans))
+    return out
+
+
+def line_dims(words):
+    """Medidas «a x b» en metros (2.69 x 2.20, 3,5 x 2,8) o pies-pulgadas (12'4" x 11'0") leídas por renglón."""
+    out = []
+    for txt, spans in _lines(words):
+        for rx, kind in ((DIM_FT, 'ft'), (DIM_M, 'm')):
+            for mm_ in rx.finditer(txt):
+                ws = [w for a, b, w in spans if a < mm_.end() and b > mm_.start()]
+                if not ws:
+                    continue
+                if kind == 'ft':
+                    a = _ft(mm_.group(1), mm_.group(2)); b = _ft(mm_.group(3), mm_.group(4))
+                else:
+                    a = float(mm_.group(1).replace(',', '.')); b = float(mm_.group(2).replace(',', '.'))
+                if not (0.5 <= a <= 25 and 0.5 <= b <= 25):
+                    continue
+                x0 = min(w['x'] for w in ws); x1 = max(w['x'] + w['w'] for w in ws)
+                y0 = min(w['y'] for w in ws); y1 = max(w['y'] + w['h'] for w in ws)
+                out.append(dict(a=round(a, 3), b=round(b, 3), x=(x0 + x1) / 2, y=(y0 + y1) / 2, h=min(30, y1 - y0), unit=kind))
+    return out
+
+
 def parse(words):
     """-> (labels, dims). label: dict(type, name, x, y, h, primary); dim: dict(a, b, x, y)."""
     nums, labs, prim = [], [], []
@@ -115,8 +187,16 @@ def parse(words):
             continue
         kt = _key(n)
         if kt:
+            num = None                     # «Habitación 1», «Bedroom 2»: el número impreso
+            m_ = re.search(r'(\d)$', n)
+            if m_ and len(n) > 3:
+                num = int(m_.group(1))
+            for o in words:
+                if num is None and abs((o['y'] + o['h'] / 2) - cy) < 0.6 * w['h'] and 0 <= o['x'] - (w['x'] + w['w']) < 1.6 * w['h'] \
+                        and re.fullmatch(r'[1-9]', _norm(o['text'])):
+                    num = int(_norm(o['text']))
             labs.append(dict(type=kt[0], name=kt[1], x=w['x'] + w['w'] / 2, x0=w['x'], x1=w['x'] + w['w'], y=cy,
-                             h=min(w['h'], 30), conf=w['conf'], primary=False))
+                             h=min(w['h'], 30), conf=w['conf'], primary=False, num=num))
     out = []
     for it in sorted(labs, key=lambda q: -q['conf']):
         if not any(o['type'] == it['type'] and abs(it['y'] - o['y']) < 1.2 * max(it['h'], o['h'])
@@ -156,29 +236,68 @@ def parse(words):
         if best is not None:
             b = nums[best]; used |= {i, best}
             dims.append(dict(a=a['v'], b=b['v'], x=(a['x'] + b['x']) / 2, y=(a['y'] + b['y']) / 2, h=max(a['h'], b['h'])))
+    # medidas con «x» explícita por renglón (también pies-pulgadas); sin duplicar las ya emparejadas
+    for d in line_dims(words):
+        if not any(abs(d['x'] - o['x']) < 2.5 * max(d['h'], o['h']) and abs(d['y'] - o['y']) < 0.8 * max(d['h'], o['h'])
+                   for o in dims):
+            dims.append(d)
     return labs, dims
 
 
+AREA_PRIV = ('priv', 'interior', 'net', 'util', 'living')
+AREA_GROSS = ('constru', 'total', 'built', 'gross', 'bruta', 'cubierta')
+SQFT = 0.09290304
+
+
 def find_areas(words):
-    """Áreas declaradas en el folleto, como (no_es_privada, m²); la privada primero («Área Privada: 47 m²»)."""
+    """Áreas declaradas en el folleto, como (rango, m², tipo): tipo 'private' («Área privada: 47 m²»),
+    'gross' («Área construida total: 55 m²», «1,250 sq ft») o None; las privadas primero."""
     c = []
     ws = sorted(words, key=lambda w: (w['y'], w['x']))
     for i, w in enumerate(ws):
         n = _norm(w['text'])
-        m = re.fullmatch(r'(\d{2,3}(?:[.,]\d{1,2})?)(m2|m\?|m)?', n) if n else None
-        if not m:
+        if not n:
             continue
-        unit = m.group(2) or any(_norm(o['text']).startswith('m') and len(_norm(o['text'])) <= 2 and abs(o['y'] - w['y']) < w['h']
-                                 and 0 < o['x'] - w['x'] < 4 * w['h'] + w['w'] for o in ws)
-        if not unit:
+        right = [_norm(o['text']) for o in ws if abs(o['y'] - w['y']) < w['h'] and 0 < o['x'] - w['x'] < 6 * w['h'] + w['w']]
+        m = re.fullmatch(r'(\d{2,3}(?:[.,]\d{1,2})?)(m2|m\?|m)?', n)
+        ft = re.fullmatch(r'(\d{1,2}[.,]\d{3}|\d{3,4})(sqft|sf|ft2|ft)?', n)
+        v = None; kind = None
+        if ft and (ft.group(2) or any(r.startswith(('sq', 'sf', 'ft', 'pie')) for r in right[:3])):
+            v = float(re.sub(r'[.,]', '', ft.group(1))) * SQFT
+            kind = 'gross'                      # EE. UU.: pies² brutos (ANSI Z765, a caras exteriores)
+            if not 14 <= v <= 600:
+                continue
+        elif m:
+            unit = m.group(2) or any(r.startswith('m') and len(r) <= 2 for r in right[:2])
+            if not unit:
+                continue
+            v = float(m.group(1).replace(',', '.'))
+            if not 15 <= v <= 600:
+                continue
+        else:
             continue
-        v = float(m.group(1).replace(',', '.'))
-        if not 15 <= v <= 600:
-            continue
-        priv = any(_norm(o['text']).startswith(('priv', 'interior', 'net')) and 0 < w['y'] - o['y'] < 4.5 * w['h']
-                   and abs(o['x'] - w['x']) < 14 * w['h'] for o in ws)
-        c.append((not priv, v))
-    return sorted(set(c))
+        # rótulo más cercano: misma línea a la izquierda o líneas de arriba
+        best = None
+        for o in ws:
+            on = _norm(o['text'])
+            if not on.startswith(AREA_PRIV + AREA_GROSS):
+                continue
+            same = abs(o['y'] - w['y']) < 0.8 * w['h'] and 0 < w['x'] - o['x'] < 25 * w['h']
+            above = 0 < w['y'] - o['y'] < 4.5 * w['h'] and abs(o['x'] - w['x']) < 14 * w['h']
+            if not (same or above):
+                continue
+            dy = 0 if same else w['y'] - o['y']
+            k = 'private' if on.startswith(AREA_PRIV) else 'gross'
+            if best is None or dy < best[0] - 0.5 * w['h'] or (abs(dy - best[0]) <= 0.5 * w['h'] and k == 'private'):
+                best = (dy, k)
+        if best and (kind is None or best[1] == 'private'):
+            kind = best[1]
+        c.append(({'private': 0, None: 1, 'gross': 2}[kind], round(v, 2), kind))
+    out = []
+    for q in sorted(set(c)):
+        if not any(abs(q[1] - o[1]) < 0.01 for o in out):
+            out.append(q)
+    return out
 
 
 def _room_at(lab, x, y, rad):

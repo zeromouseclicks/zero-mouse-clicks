@@ -14,7 +14,9 @@ def _plan(argv):
     p.add_argument("image", help="floor-plan image (JPG/PNG)")
     p.add_argument("-o", "--out", help="output PDF (default: <image>_plan-set.pdf)")
     p.add_argument("--area", default="auto",
-                   help="declared private / net interior area in m², or 'auto' to read it from the image (default)")
+                   help="declared area in m² (private by default), or 'auto' to read it from the image (default). "
+                        "Room dimensions printed on the plan take precedence when they agree with each other")
+    p.add_argument("--area-kind", choices=["private", "gross"], help="definition of --area: private (net + partitions) or gross (built, with walls)")
     p.add_argument("--project", default="Marketing floor plan", help="project name for the title block")
     p.add_argument("--unit", default="Unit", help="unit / type name for the title block")
     p.add_argument("--debug", action="store_true", help="also write <out>_debug.jpg (mask and vector model)")
@@ -23,18 +25,26 @@ def _plan(argv):
     area = None if str(a.area).lower() in ("auto", "-", "") else float(a.area)
     from .pipeline import run
     try:
-        r = run(a.image, area, a.project, a.unit, out, debug=(os.path.splitext(out)[0] + "_debug.jpg") if a.debug else None)
+        r = run(a.image, area, a.project, a.unit, out, debug=(os.path.splitext(out)[0] + "_debug.jpg") if a.debug else None,
+                area_kind=a.area_kind)
     except ValueError as e:
         sys.exit(f"zmc: {e}. Pass it with --area <m²>.")
     info = r["info"]
     print(f"Wrote {out}")
-    print(f"  footprint {r['W']:.2f} x {r['H']:.2f} m · private area {info.get('area', area)} m²"
+    print(f"  footprint {r['W']:.2f} x {r['H']:.2f} m · declared area {info.get('area', area)} m²"
           + (" (read from image)" if area is None else ""))
     for x in r["fin"]["rooms"].values():
         print(f"  {x['name']:<28s} {x['area']:6.2f} m²")
-    sc = info.get("scale") or {}
-    if sc.get("dims") and sc.get("used"):
-        print(f"  scale check vs. dimensions printed on the plan: {100 * (sc['used'] / sc['dims'] - 1):+.1f} %")
+    mod = r["mod"]
+    fit = mod.get("scale_fit")
+    if fit:
+        print(f"  scale from {fit['n']} of {fit['n_values']} dimensions printed on the plan "
+              f"({fit['n_rooms']} spaces, 90 % within ±{100 * (fit['spread'] or 0):.1f} %)"
+              + (f"; stretched image corrected ({100 * (info['stretch_corrected'] - 1):+.1f} % in height)" if info.get("stretch_corrected") else ""))
+    else:
+        print(f"  scale from the declared area ({(mod.get('area_check') or {}).get('kind') or 'private'})")
+    for c in info.get("area_check") or []:
+        print(f"  declared {c['area']:.1f} m² ≈ {c['kind']} area at the plan scale ({100 * c['dev']:+.1f} %)")
 
 
 def _synth(argv):

@@ -430,6 +430,7 @@ def render(size=320, style=None):
 
     t_ext = rnd(0.15, 0.30) * px
     t_int = rnd(0.07, 0.15) * px
+    LAST.update(ox=ox / SS, oy=oy / SS, t_ext_px=max(3, int(t_ext)) / SS, t_int_px=2 * max(2, int(t_int / 2)) / SS, rot=0)
     _b = rnd(105, 185); _g = _b + rnd(8, 25)
     wood = [(_b, _g, min(250, _g + rnd(8, 28)))]  # BGR: madera gris-café
     # pisos
@@ -636,6 +637,7 @@ def render(size=320, style=None):
     if RNG.random() < 0.5:  # rotación de 90°
         kk = int(RNG.integers(1, 4))
         img, mask = np.rot90(img, kk).copy(), np.rot90(mask, kk).copy()
+        LAST['rot'] = kk
     return img, mask, style
 
 

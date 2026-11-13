@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "zero-mouse-clicks"
-version = "0.1.0"
+version = "0.2.0"
 description = "Architectural plan sets (PDF) from a marketing floor-plan image, with small on-device models and rules. No cloud API."
 readme = "README.md"
 license = {text = "Apache-2.0"}

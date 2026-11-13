@@ -83,7 +83,8 @@ class Plan:
             o['tag'] = f'D-{i + 1:02d}'
         for i, o in enumerate(w):
             o['tag'] = f'W-{i + 1:02d}'
-        self.rooms = [dict(id=r['id'], area=r['area_px'] * s * s, X=self.X(r['cx']), Y=self.Y(r['cy']))
+        net = model.get('net_px') or {}
+        self.rooms = [dict(id=r['id'], area=net.get(r['id'], r['area_px']) * s * s, X=self.X(r['cx']), Y=self.Y(r['cy']))
                       for r in model['rooms']]
         self.t = model['thickness_px'] * s
         self.objs, self.elec, self.contours = [], [], {}
@@ -131,7 +132,7 @@ def _frame(c, title, number, meta, scale_txt):
         c.line(a, b, cc, d)
     # rótulo (abajo a la derecha, ISO 7200 simplificado)
     rows = [('Title', title), ('Project', meta['project']), ('Unit', meta['unit']),
-            ('Declared private area', f"{meta['area']:.1f} m²"), ('Scale', scale_txt),
+            (meta.get('area_label', 'Declared private area'), f"{meta['area']:.1f} m²" if meta.get('area') else '—'), ('Scale', scale_txt),
             ('Date', meta['date']), ('Drawn by', 'Zero Mouse Clicks · rules engine'),
             ('Sheet', f"{number}  ({meta['sheet_i']}/{meta['sheet_n']})")]
     rh = 9 * mm
@@ -156,7 +157,7 @@ def _frame(c, title, number, meta, scale_txt):
     c.setFont(F, 7.5)
     for i, line in enumerate(['Drawn from marketing plan —', 'verify dimensions on site.',
                               'Marketing plans are not to scale; this set is',
-                              'scaled from the declared private area. Wall',
+                              meta.get('scaled_from', 'scaled from the declared private area.') + ' Wall',
                               'thicknesses and openings are approximate.']):
         c.drawString(tb + 5 * mm, ny + (19 - 4 * i) * mm, line)
     return tb
@@ -580,25 +581,64 @@ def sheet_schedules(c, P, meta, scale):
     ax, ay = x0 + 12 * mm, y0 + 60 * mm
     c.setFont(FB, 9); c.drawString(ax, ay, 'ASSUMPTIONS')
     c.setFont(F, 7.5)
+    ay += 0
     for i, s in enumerate([
-        f"1. Scale derived from {P.m.get('scale_from', 'declared area')}"
-        + (f" (declared private area {meta['area']:.1f} m² = sum of net interior spaces)." if P.m.get('scale_from', 'declared area') == 'declared area' else '.')
-        + (f" Cross-check with the room dimensions printed on the plan: {100 * (P.m['m_per_px'] / P.m['scale_dims'] - 1):+.1f} %." if P.m.get('scale_dims') else ''),
+        meta.get('assume1') or (f"1. Scale derived from {P.m.get('scale_from', 'declared area')}."),
         '2. Walls, doors and windows read from the image by a small on-device model and squared by rules.',
         '3. Door heights 2.10 m and window heights 1.20 m are assumed; clear height 2.45 m assumed.',
         '4. Room names are read from the labels printed on the plan when present; otherwise inferred by rules.',
         '5. Electrical points (A-104) are a rule-based schematic proposal, not taken from the source plan.',
         '6. ' + NOTE + '.']):
-        c.drawString(ax, ay - (6 + 5 * i) * mm, s)
+        import textwrap
+        for j, ln in enumerate(textwrap.wrap(s, 150, subsequent_indent='    ')):
+            c.drawString(ax, ay - (6 + 4.2 * j) * mm, ln)
+        ay -= (5 + 4.2 * max(0, len(textwrap.wrap(s, 150)) - 1)) * mm
     c.showPage()
 
 
-def make_pdf(model, out_pdf, project='Marketing floor plan', unit='Unit', area=None, fin=None):
+def scale_texts(model, P):
+    """Textos del rótulo y de los supuestos según de dónde salió la escala (v6)."""
+    out = {}
+    chk = model.get('area_check') or {}
+    kind = chk.get('kind')
+    out['area_label'] = {'private': 'Declared private area', 'gross': 'Declared built (gross) area'}.get(kind, 'Declared area')
+    fit = model.get('scale_fit')
+    s = model['m_per_px']
+    terms = model.get('area_terms_px') or {}
+    net = sum(r['area'] for r in P.rooms if not r.get('exterior'))
+    if fit:
+        sp = fit.get('spread')
+        out['scaled_from'] = f"scaled from {fit['n']} printed room dimensions."
+        a1 = (f"1. Scale fitted to {fit['n']} of the {fit['n_values']} room dimensions printed on the plan "
+              f"({fit['n_rooms']} spaces; 90 % agree within ±{100 * (sp or 0):.1f} %)")
+        if fit.get('aniso_before'):
+            sx, sy = fit['aniso_before']
+            a1 += f"; the image was stretched {100 * (sy / sx - 1):+.1f} % in height and was corrected"
+        a1 += '.'
+        if chk.get('area'):
+            dev = chk.get('dev', 0.0)
+            what = 'private area (net spaces + half of the partitions)' if kind == 'private' else 'built area (gross, with walls)'
+            a1 += f" Declared {chk['area']:.1f} m² vs {what} measured at this scale: {100 * dev:+.1f} %."
+        out['assume1'] = a1
+    elif chk.get('area'):
+        if kind == 'gross':
+            out['scaled_from'] = 'scaled from the declared built (gross) area.'
+            out['assume1'] = (f"1. Scale derived from the declared built area {chk['area']:.1f} m² (gross footprint with walls); "
+                              f"net interior {net:.1f} m². No room dimensions printed on the plan to cross-check.")
+        else:
+            out['scaled_from'] = 'scaled from the declared private area.'
+            out['assume1'] = (f"1. Scale derived from the declared private area {chk['area']:.1f} m² (net spaces + half of the partitions); "
+                              f"net interior {net:.1f} m². No room dimensions printed on the plan to cross-check.")
+    return out
+
+
+def make_pdf(model, out_pdf, project='Marketing floor plan', unit='Unit', area=None, fin=None, area_kind=None):
     P = Plan(model, fin)
     from . import sections
     cuts = sections.pick_cuts(P) if fin else []
-    meta = dict(project=project, unit=unit, area=area or model['area_m2'],
+    meta = dict(project=project, unit=unit, area=area or model.get('area_m2'),
                 date=datetime.date.today().isoformat(), sheet_n=(4 + len(cuts)) if fin else 2)
+    meta.update(scale_texts(model, P))
     c = canvas.Canvas(out_pdf, pagesize=(PAGE_W, PAGE_H))
     c.setTitle(f'{project} — {unit} — floor plan set')
     c.setAuthor('Zero Mouse Clicks')

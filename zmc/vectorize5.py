@@ -201,16 +201,17 @@ def _footprint(W, cands, mask, t):
     return lab == (1 + int(np.argmax(st[1:, 4])))
 
 
-def vectorize5(mask, area_m2=None, image=None):
+def vectorize5(mask, area_m2=None, image=None, scale=None):
+    """scale: m/px ya conocido (p. ej. de las medidas impresas); manda sobre el área para clasificar vanos."""
     mask = main_envelope(mask)
     t = wall_thickness(mask)
     walls = _walls(mask, t)
     W = _raster(walls, mask.shape)
-    s0 = float(np.sqrt(area_m2 / (0.8 * max(1, np.count_nonzero(footprint(mask)))))) if area_m2 else 0.02
+    s0 = scale or (float(np.sqrt(area_m2 / (0.8 * max(1, np.count_nonzero(footprint(mask)))))) if area_m2 else 0.02)
     cands = _gap_candidates(walls, W, t, s0)
     fp = _footprint(W, cands, mask, t)
     green = green_mask(image) if image is not None else np.zeros(mask.shape, bool)
-    s0 = float(np.sqrt(area_m2 / (0.88 * max(1, (fp & ~green).sum())))) if area_m2 else 0.02
+    s0 = scale or (float(np.sqrt(area_m2 / (0.88 * max(1, (fp & ~green).sum())))) if area_m2 else 0.02)
     cands = [g for g in _gap_candidates(walls, W, t, s0)]
     mask[~fp] = BG
     openings = _classify_gaps(cands, mask, fp & ~green, t, s0)
@@ -335,8 +336,8 @@ def vectorize5(mask, area_m2=None, image=None):
         trimmed.append([o, a, b, c, d])
     walls = trimmed
     inner_px = sum(r['area_px'] for r in rooms if not r['exterior']) or int(fp.sum())
-    m_per_px = float(np.sqrt(area_m2 / inner_px)) if area_m2 and inner_px else None
+    m_per_px = scale or (float(np.sqrt(area_m2 / inner_px)) if area_m2 and inner_px else None)
     bbox = [min(w[1] for w in walls), min(w[2] for w in walls), max(w[3] for w in walls), max(w[4] for w in walls)] if walls else [0, 0, mask.shape[1], mask.shape[0]]
     return dict(thickness_px=t, m_per_px=m_per_px, area_m2=area_m2, bbox=bbox,
                 walls=walls, openings=openings, rooms=rooms, shape=list(mask.shape),
-                footprint=fp, room_labels=lab, scale_from='declared area', inner_px=inner_px)
+                footprint=fp, room_labels=lab, scale_from='declared area' if not scale else 'given scale', inner_px=inner_px, s0=s0)

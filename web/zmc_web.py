@@ -1,4 +1,4 @@
-"""Zero Mouse Clicks en el navegador (Pyodide). Mismo pipeline v5 que la CLI.
+"""Zero Mouse Clicks en el navegador (Pyodide). Mismo pipeline (v6: escala por medidas impresas) que la CLI.
 
 Los modelos corren con onnxruntime-web y los textos con tesseract.js; este módulo atiende
 las peticiones del generador `zmc.pipeline.steps` llamando a esas funciones de JavaScript.
@@ -53,8 +53,9 @@ def _preview(image, mask=None, box=None, mod=None, fin=None):
     return cv2.imencode('.jpg', out, [cv2.IMWRITE_JPEG_QUALITY, 82])[1].reshape(-1)
 
 
-async def run(data, area, project, unit, js):
-    """data: bytes de la imagen (JPG/PNG). area: m² o None. js: objeto con infer, ocr, progress y preview.
+async def run(data, area, project, unit, js, area_kind=None):
+    """data: bytes de la imagen (JPG/PNG). area: m² o None. area_kind: 'gross' si se escribió en pies² (EE. UU.),
+    si no None. js: objeto con infer, ocr, progress y preview.
     Devuelve (pdf: Uint8Array, resumen: str JSON)."""
     raw = data.to_py() if hasattr(data, 'to_py') else data
     im0 = cv2.imdecode(np.frombuffer(raw, np.uint8), cv2.IMREAD_COLOR)
@@ -70,7 +71,9 @@ async def run(data, area, project, unit, js):
         except Exception:
             pass                                   # una vista previa nunca debe tumbar el plano
 
-    gen = pipeline.steps(im0, area, project, unit, buf, progress=progress)
+    if area_kind is not None and not isinstance(area_kind, str):
+        area_kind = None
+    gen = pipeline.steps(im0, area, project, unit, buf, progress=progress, area_kind=area_kind or None)
     try:
         req = next(gen)
         while True:
@@ -94,6 +97,13 @@ async def run(data, area, project, unit, js):
     info = r['info']
     rooms = [dict(name=x['name'], area=round(float(x['area']), 2)) for x in r['fin']['rooms'].values()]
     pdf = buf.getvalue()
+    mod = r['mod']
+    fit = mod.get('scale_fit') or {}
+    chk = mod.get('area_check') or {}
+    net = round(float(sum(x['area'] for x in r['fin']['rooms'].values() if x.get('type') != 'patio')), 1)
     summary = dict(sheets=pdf.count(b'/Type /Page') - pdf.count(b'/Type /Pages'), W=round(float(r['W']), 2), H=round(float(r['H']), 2), area=info.get('area', area),
-                   area_read=area is None, rooms=rooms)
+                   area_read=area is None, rooms=rooms, net=net,
+                   scale=dict(src='dims' if fit else 'area', n=int(fit.get('n', 0)), of=int(fit.get('n_values', 0)),
+                              spread=round(float(fit.get('spread') or 0), 4), stretch=info.get('stretch_corrected'),
+                              area_kind=chk.get('kind'), area_dev=round(float(chk.get('dev', 0.0)), 4)))
     return to_js(pdf), json.dumps(summary)

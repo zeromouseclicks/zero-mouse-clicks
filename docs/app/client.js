@@ -73,7 +73,7 @@
 
   function engine() {
     if (worker) return worker;
-    worker = new Worker(here + 'engine.js?v3');
+    worker = new Worker(here + 'engine.js?v4');
     worker.onmessage = function (e) {
       var m = e.data; heard = Date.now(); if (m.type === 'progress') where = m.stage + ' ' + Math.round(m.frac * 100) + '%';
       if (m.type === 'ocr') {
@@ -132,14 +132,14 @@
   window.ZMC = {
     lean: lean,
     warm: function () { if (!supported()) return; engine(); if (!lean) ocrReady(); },
-    generate: async function (file, area, onStage, onPreview) {
+    generate: async function (file, area, onStage, onPreview, areaKind) {
       if (job) throw fail('busy', 'busy');
       if (!supported()) throw fail('old', 'no WebAssembly SIMD');
       var buf = await prepare(file);
       var w = engine(); if (!lean) ocrReady();
       return new Promise(function (res, rej) {
         job = { res: res, rej: rej, stage: onStage || function () {}, preview: onPreview || function () {} };
-        w.postMessage({ type: 'run', image: buf, area: area || null, lean: lean }, [buf]);
+        w.postMessage({ type: 'run', image: buf, area: area || null, areaKind: areaKind || null, lean: lean }, [buf]);
       });
     }
   };
