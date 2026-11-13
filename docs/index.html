@@ -130,6 +130,8 @@
   .rooms li { display:flex; justify-content:space-between; padding:7px 2px; border-bottom:1px solid var(--line); }
   .rooms li b { color:var(--fg); font-weight:400; }
   .done .dl { margin-top:22px; }
+  .dlhint { margin-top:12px; text-transform:none; letter-spacing:.02em; line-height:1.5; }
+  .dlhint a { color:inherit; }
   .again { display:block; margin:14px auto 0; background:none; border:0; color:var(--mute); cursor:pointer; text-transform:none; letter-spacing:.02em; font-size:13px; border-bottom:1px solid #3a3a36; padding:0 0 2px; }
   .again:hover { color:var(--fg); }
 
@@ -350,6 +352,7 @@
         <p class="sub" id="sum"></p>
         <ul class="rooms mono" id="rooms"></ul>
         <a class="btn send dl" id="dl" download="plan-set.pdf" href="#">Download PDF</a>
+        <p class="mono fine dlhint" id="dlhint" hidden><span id="dlhow"></span> <a id="openpdf" href="#" target="_blank" rel="noopener">Open the PDF</a></p>
         <button class="again mono" id="again" type="button">Make another</button>
         <span class="mono alt2">Something looks off, or need a CAD file, sections or a quote? <a href="#contact" data-topic="more" id="doneLink">Write to us</a></span>
       </div>
@@ -533,6 +536,7 @@
   var root = document.documentElement;
   var ease = [0.2, 0.8, 0.2, 1];
   var touch = window.matchMedia('(hover: none)').matches;
+  var ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   function all(sel, el) { return Array.prototype.slice.call((el || document).querySelectorAll(sel)); }
   function $(id) { return document.getElementById(id); }
 
@@ -866,6 +870,13 @@
     pdfUrl = URL.createObjectURL(r.pdf); dl.href = pdfUrl;
     var base = (picked && picked.name || 'floor-plan').replace(/\.[^.]+$/, '').replace(/[^\w-]+/g, '_').slice(0, 40);
     dl.setAttribute('download', base + '_plan-set.pdf');
+    // iPhone/iPad: a plain download leaves no trace (and Chrome on iOS may do nothing), so we hand the PDF to the share sheet
+    pdfFile = null;
+    try { var pf = new File([r.pdf], base + '_plan-set.pdf', { type: 'application/pdf' }); if (ios && navigator.canShare && navigator.canShare({ files: [pf] })) pdfFile = pf; } catch (e) {}
+    dl.textContent = ios ? 'Save PDF' : 'Download PDF';
+    $('openpdf').href = pdfUrl;
+    $('dlhow').textContent = pdfFile ? 'Tap Save PDF, then \u201cSave to Files\u201d: it lands in the Files app.' : 'Tap Save PDF to open it, then Share \u2192 \u201cSave to Files\u201d.';
+    $('dlhint').hidden = !ios;
     $('sum').textContent = (s.sheets > 0 ? s.sheets + ' sheets' : 'Plan set') + ', A3, drawn in ' + mmss(secs) + '. Footprint ' + s.W.toFixed(2) + ' × ' + s.H.toFixed(2) +
       ' m, private area ' + Number(s.area).toFixed(1) + ' m²' + (s.area_read ? ' (read from the plan).' : '.');
     var ul = $('rooms'); ul.innerHTML = '';
@@ -887,6 +898,13 @@
     if (on) M.animate(form, { opacity: 0, y: -16, filter: 'blur(8px)' }, { duration: 0.4, delay: 0.5 }).then(reveal); else reveal();
     if (!touch) dl.click();                       // desktop: download straight away; phones: tap the button
   }
+  var pdfFile = null;
+  dl.addEventListener('click', function (e) {
+    if (!ios) return;                             // computers and Android: a normal download
+    e.preventDefault();
+    if (pdfFile) navigator.share({ files: [pdfFile], title: pdfFile.name }).catch(function (err) { if (!err || err.name !== 'AbortError') window.open(pdfUrl, '_blank'); });
+    else window.open(pdfUrl, '_blank');
+  });
   $('again').addEventListener('click', function () {
     doneBox.hidden = true; form.hidden = false; form.style.opacity = 1; form.style.filter = 'none'; form.style.transform = 'none';
     picked = null; input.value = ''; areaIn.value = ''; thumb.removeAttribute('src');
