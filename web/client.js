@@ -82,7 +82,12 @@
         return;
       }
       if (!job) return;
-      if (m.type === 'progress') { if (m.stage !== 'boot' || m.frac >= 1) up = true; job.stage(m.stage, m.frac); }
+      if (m.type === 'progress') {
+        if (m.stage !== 'boot' || m.frac >= 1) up = true;
+        // phones: the text reader is done after 'texts'; let its workers go before the sheets are drawn (iPhone kills tabs that use too much memory)
+        if (lean && sched && (m.stage === 'vector' || m.stage === 'draw')) { var o = sched; sched = null; o.then(function (s) { return s.terminate(); }).catch(function () {}); }
+        job.stage(m.stage, m.frac);
+      }
       else if (m.type === 'preview') job.preview(m.kind, new Blob([m.jpg], { type: 'image/jpeg' }));
       else if (m.type === 'done') { var j = job; job = null; j.res({ pdf: new Blob([m.pdf], { type: 'application/pdf' }), summary: m.summary }); }
       else if (m.type === 'error') {
