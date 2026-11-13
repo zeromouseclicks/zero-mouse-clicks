@@ -8,7 +8,7 @@ version = "0.2.0"
 description = "Architectural plan sets (PDF) from a marketing floor-plan image, with small on-device models and rules. No cloud API."
 readme = "README.md"
 license = {text = "Apache-2.0"}
-authors = [{name = "Julián Páez"}]
+authors = [{name = "Zero Mouse Clicks contributors"}]
 requires-python = ">=3.9"
 dependencies = [
   "numpy>=1.24",

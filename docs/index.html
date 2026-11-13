@@ -79,12 +79,21 @@
                       border-radius:999px; background:rgba(0,0,0,.78); backdrop-filter:blur(8px); }
   .drop.has.pic .dz svg { display:none; }
   .drop.has.pic .dz b { font-size:13px; font-weight:500; max-width:60%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .row { display:grid; grid-template-columns:1fr 1.15fr; gap:10px; margin-top:10px; }
+  .row { display:grid; grid-template-columns:1.3fr 1fr; gap:10px; margin-top:10px; }
   .row input { width:100%; background:#0b0b0a; color:var(--fg); border:1px solid #2a2a27; border-radius:999px; padding:14px 20px;
                font:inherit; font-size:15px; outline:none; transition:border-color .25s, box-shadow .25s; }
   .row input::placeholder { color:#5d5d58; }
   .row input:focus { border-color:var(--ink); box-shadow:0 0 0 4px rgba(159,208,255,.12); }
   .row input.bad, .drop.bad { border-color:#ff6b6b; }
+  .af { position:relative; min-width:0; }
+  .af > input { padding-right:124px; }
+  .unit { position:absolute; right:6px; top:6px; bottom:6px; display:flex; gap:2px; padding:3px; border-radius:999px; background:#141413; border:1px solid #242422; }
+  .unit label { position:relative; display:flex; cursor:pointer; }
+  .row .unit input { position:absolute; inset:0; width:100%; height:100%; opacity:0; margin:0; padding:0; border:0; cursor:pointer; }
+  .unit span { display:flex; align-items:center; padding:0 10px; border-radius:999px; font-family:"JetBrains Mono",ui-monospace,monospace; font-size:12px; letter-spacing:.03em; color:var(--mute); transition:color .2s, background .2s; white-space:nowrap; }
+  .unit label:hover span { color:var(--fg); }
+  .unit input:checked + span { background:var(--fg); color:#000; }
+  .unit input:focus-visible + span { box-shadow:0 0 0 3px rgba(159,208,255,.45); }
   .send { display:block; width:100%; border:0; cursor:pointer; font:inherit; font-weight:600; font-size:15px; padding:14px 20px; position:relative; overflow:hidden; text-align:center; }
   .send[disabled] { cursor:progress; }
   /* while it works */
@@ -208,6 +217,34 @@
   .note { color:var(--mute); font-size:14px; max-width:460px; margin:40px auto 0; text-wrap:pretty; }
   .note a { color:var(--fg); text-decoration:none; border-bottom:1px solid #3a3a36; }
 
+  /* why the name */
+  .why .pill { margin-bottom:26px; }
+  .why h2 em { font-family:"Instrument Serif",Georgia,serif; font-style:italic; font-weight:400; letter-spacing:-.01em; color:var(--ink); }
+  .why .sub { max-width:640px; }
+  .vs { display:grid; grid-template-columns:1fr 1fr; gap:14px; max-width:900px; margin:clamp(34px,4vw,52px) auto 0; text-align:left; }
+  .vs .col { border:1px solid #232321; border-radius:20px; padding:clamp(20px,2.4vw,28px); background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)); }
+  .vs .col > b { display:block; font-size:12px; letter-spacing:.1em; margin-bottom:14px; }
+  .vs ul { list-style:none; display:grid; gap:10px; }
+  .vs li { position:relative; padding-left:26px; font-size:15px; line-height:1.4; }
+  .vs .cw li { color:#6d6d68; text-decoration:line-through; text-decoration-color:rgba(255,107,107,.55); }
+  .vs .cw li::before { content:"×"; position:absolute; left:2px; top:-1px; color:#ff6b6b; text-decoration:none; }
+  .vs .zc { border-color:rgba(159,208,255,.35); box-shadow:0 30px 90px -40px rgba(159,208,255,.35); }
+  .vs .zc > b { color:var(--ink); }
+  .vs .zc li { color:var(--fg); }
+  .vs .zc li::before { content:""; position:absolute; left:3px; top:5px; width:11px; height:6px; border-left:2px solid var(--win); border-bottom:2px solid var(--win); transform:rotate(-45deg); }
+  .vs .tally { margin-top:18px; padding-top:14px; border-top:1px solid #1f1f1d; font-size:12px; letter-spacing:.08em; }
+  .vs .cw .tally { color:#ff8a8a; } .vs .zc .tally { color:var(--win); }
+  .tenets { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; max-width:1100px; margin:clamp(28px,3.5vw,44px) auto 0; text-align:left; }
+  .tenets div { border-top:1px solid #2a2a27; padding-top:16px; }
+  .tenets b { display:block; font-size:17px; font-weight:600; letter-spacing:-.01em; margin-bottom:6px; }
+  .tenets span { display:block; color:var(--mute); font-size:14px; line-height:1.5; }
+  .aim { max-width:640px; margin:clamp(34px,4vw,52px) auto 0; font-size:clamp(17px,1.6vw,20px); line-height:1.5; color:#c9c9c4; text-wrap:pretty; }
+  .aim em { display:block; margin-top:8px; font-family:"Instrument Serif",Georgia,serif; font-style:italic; font-size:clamp(24px,2.6vw,32px); color:var(--fg); line-height:1.2; }
+  @media (max-width:900px) { .tenets { grid-template-columns:1fr 1fr; } }
+  @media (max-width:640px) { .vs, .tenets { grid-template-columns:1fr; } }
+  @media (max-width:560px) { header nav a[href="#why"] { display:none; } }
+  #clicks.off { opacity:0; pointer-events:none; } #clicks { transition:opacity .3s, border-color .25s, color .25s; }
+
   /* contact card */
   .contact { text-align:left; }
   .contact h2, .contact > .wrap > .sub { text-align:center; }
@@ -262,7 +299,8 @@
            display:flex; flex-wrap:wrap; gap:10px 24px; justify-content:space-between; }
   footer a { text-decoration:none; } footer a:hover { color:var(--fg); } footer nav { display:flex; gap:22px; }
   #clicks { position:fixed; left:20px; bottom:18px; z-index:7; padding:6px 11px; border:1px solid var(--line); border-radius:999px;
-            background:rgba(0,0,0,.7); backdrop-filter:blur(8px); } #clicks b { color:var(--fg); font-weight:500; }
+            background:rgba(0,0,0,.7); backdrop-filter:blur(8px); text-decoration:none; transition:border-color .25s, color .25s; }
+  #clicks b { color:var(--fg); font-weight:500; } #clicks:hover { border-color:var(--ink); color:var(--fg); }
 
   @media (min-width:981px) {
     .req.work .drop { display:none; } .req.work .work { margin-top:0; }
@@ -306,6 +344,7 @@
   </a>
   <nav aria-label="Main">
     <a href="#set">What you get</a>
+    <a href="#why">Why the name</a>
     <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>
   </nav>
 </header>
@@ -333,7 +372,13 @@
           </span>
         </label>
         <div class="row">
-          <input type="text" name="area" id="area" inputmode="decimal" placeholder="Area, m&sup2; or sq ft (optional)" maxlength="24" aria-label="Private area in square meters or square feet, optional. Leave it empty to read it from the plan.">
+          <div class="af">
+            <input type="text" name="area" id="area" inputmode="decimal" placeholder="Area (optional)" maxlength="24" aria-label="Apartment area, optional. Leave it empty to read it from the plan.">
+            <span class="unit" role="radiogroup" aria-label="Area unit">
+              <label><input type="radio" name="unit" value="m2" id="u_m2" checked><span>m&sup2;</span></label>
+              <label><input type="radio" name="unit" value="sqft" id="u_ft"><span>sq&nbsp;ft</span></label>
+            </span>
+          </div>
           <button class="btn send" id="send" type="submit"><span id="sendt">Get the plan set</span></button>
         </div>
         <div class="work" id="work" hidden>
@@ -518,6 +563,45 @@
   </div>
 </section>
 
+<section class="rv why" id="why">
+  <div class="wrap">
+    <span class="pill mono fade"><i></i>Why the name</span>
+    <h2 class="sp">Why zero mouse clicks.<br><em>Drafting, minus the click-work.</em></h2>
+    <p class="sub fade">Construction still runs on drawings: plans, schedules, sections, quantities. Producing them has meant hours inside CAD and BIM software, re-tracing what someone already drew, one click at a time. AI can now read the source and do the drafting. You ask for the deliverable; the clicks disappear.</p>
+    <div class="vs fade">
+      <div class="col cw">
+        <b class="mono">The click way</b>
+        <ul>
+          <li>Trace every wall, snap every corner</li>
+          <li>Place each door and window by hand</li>
+          <li>Measure, type and chain every dimension</li>
+          <li>Fill the area and opening schedules</li>
+          <li>Frame, title-block, export. Repeat.</li>
+        </ul>
+        <p class="tally mono">hundreds of clicks per plan</p>
+      </div>
+      <div class="col zc">
+        <b class="mono">The zero-click way</b>
+        <ul>
+          <li>Vision models read walls, doors and windows</li>
+          <li>Rules square the geometry onto clean axes</li>
+          <li>Scale fitted to the dimensions printed on the plan</li>
+          <li>Areas and schedules computed room by room</li>
+          <li>One A3 PDF, framed and titled</li>
+        </ul>
+        <p class="tally mono">one image in &middot; zero clicks</p>
+      </div>
+    </div>
+    <div class="tenets">
+      <div class="fade"><b>Read, don't trace.</b><span>Pixels become walls, openings and rooms. The drawing is inferred, not redrawn.</span></div>
+      <div class="fade"><b>Intent over interface.</b><span>Ask for the outcome: a plan set, a schedule, a section. Not for the toolbar that builds it.</span></div>
+      <div class="fade"><b>Rules you can audit.</b><span>Every drafting decision is plain, open code. Read it, question it, improve it.</span></div>
+      <div class="fade"><b>Compute at the edge.</b><span>Small models in your browser. No cloud, no tokens, nothing uploaded.</span></div>
+    </div>
+    <p class="aim fade">Today, a plan set from a brochure. Next, CAD exports, quantities and the rest of the drawing set. <em>The craft of designing for construction, without the click-work.</em></p>
+  </div>
+</section>
+
 <section class="rv contact" id="contact">
   <div class="wrap">
     <h2 class="sp">Talk to a human.</h2>
@@ -564,14 +648,14 @@
 </main>
 
 <footer>
-  <span>&copy; 2026 Zero Mouse Clicks &middot; by <a href="https://www.linkedin.com/in/julian-holmes-paez-martinez-47a36a208/">Julián Páez</a></span>
+  <span>&copy; 2026 Zero Mouse Clicks &middot; open source, Apache-2.0</span>
   <nav aria-label="Footer">
+    <a href="#why">Why the name</a>
     <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>
-    <a href="https://www.linkedin.com/in/julian-holmes-paez-martinez-47a36a208/">LinkedIn</a>
     <a href="#contact" data-topic="other">Contact</a>
   </nav>
 </footer>
-<div id="clicks" class="mono" aria-live="polite">Mouse clicks: <b id="cn">0</b></div>
+<a id="clicks" class="mono" href="#why">Why <b>zero mouse clicks</b>?</a>
 
 <script src="https://cdn.jsdelivr.net/npm/motion@12.23.24/dist/motion.js"></script>
 <script>
@@ -601,17 +685,22 @@
   });
   if (on) root.classList.add('m');
 
+  // "Why zero mouse clicks?" chip: hidden while the section itself (or the footer) is on screen
+  (function () {
+    var chip = $('clicks'), seen = new Set();
+    if (!('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) seen.add(e.target); else seen.delete(e.target); });
+      chip.classList.toggle('off', seen.size > 0);
+    }, { threshold: 0.05 });
+    io.observe($('why')); io.observe(document.querySelector('footer'));
+  })();
+
   // spotlight that follows the pointer
   window.addEventListener('pointermove', function (e) {
     root.style.setProperty('--mx', e.clientX + 'px'); root.style.setProperty('--my', e.clientY + 'px');
   }, { passive: true });
 
-  // click counter
-  var n = 0, cn = $('cn'), box = $('clicks');
-  window.addEventListener('click', function () {
-    cn.textContent = ++n;
-    if (on) M.animate(box, { scale: [1.3, 1], borderColor: ['#ff6b6b', '#1f1f1d'] }, { type: 'spring', stiffness: 420, damping: 11 });
-  });
 
   /* ---------- how it works: one timeline, drawn as a pure function of time ---------- */
   (function () {
@@ -838,7 +927,14 @@
   areaIn.addEventListener('input', function () { areaIn.classList.remove('bad'); });
 
   // "54", "54,4 m2", "580 sq ft", "580 sf" -> m²
-  var areaKind = null;   // 'gross' when typed in sq ft (US listings measure to the outside of the walls)
+  var areaKind = null;   // 'gross' when it is in sq ft (US listings measure to the outside of the walls)
+  // unit: two small options next to the field; US visitors start in sq ft. Typing the unit flips it.
+  var uM2 = $('u_m2'), uFt = $('u_ft');
+  if (/^en-us$/i.test(navigator.language || '')) uFt.checked = true;
+  areaIn.addEventListener('input', function () {
+    var t = areaIn.value.toLowerCase();
+    if (/ft|sf|sq|pie|′|'/.test(t)) uFt.checked = true; else if (/m2|m²|mt|m\b/.test(t)) uM2.checked = true;
+  });
   function parseArea(t) {
     areaKind = null;
     t = (t || '').trim().toLowerCase();
@@ -849,7 +945,9 @@
     if (/^\d{1,3}([ .,]\d{3})+$/.test(n) && !/[.,]\d{1,2}$/.test(n)) n = n.replace(/[ .,]/g, '');
     else n = n.replace(/ /g, '').replace(',', '.');
     var v = parseFloat(n);
-    if (/ft|sf|sq|pie|′|'/.test(t.slice(m.index + m[1].length))) { v = v * 0.09290304; areaKind = 'gross'; }
+    var tail = t.slice(m.index + m[1].length);
+    var ft = /ft|sf|sq|pie|′|'/.test(tail) || (!/m/.test(tail) && uFt.checked);
+    if (ft) { v = v * 0.09290304; areaKind = 'gross'; }
     return v >= 12 && v <= 2000 ? Math.round(v * 100) / 100 : NaN;
   }
 
@@ -913,7 +1011,7 @@
     var c = e && e.code;
     if (c === 'no_area') {
       areaIn.classList.add('bad'); areaIn.focus();
-      say("We couldn't read the area on the plan. Type it (m² or sq ft) and try again.", true);
+      say("We couldn't read the area or the dimensions on the plan. Type the area and try again.", true);
     } else if (c === 'bad_image') say("This image couldn't be opened. Try a JPG or PNG.", true);
     else if (c === 'old') say('This browser is too old for the engine. Update it (on iPhone: iOS 16.4 or later) or try on a computer.', true);
     else if (c === 'boot') say('The engine could not load on this device. Try again; if it keeps failing, send us the detail below.', true);
@@ -984,7 +1082,7 @@
     if (busy) return;
     var area = parseArea(areaIn.value);
     if (!picked) { drop.classList.add('bad'); say('Add the floor plan image first.', true); shake(); return; }
-    if (area !== null && isNaN(area)) { areaIn.classList.add('bad'); say('Write the area as a number, like 54.4 or 585 sq ft.', true); shake(); return; }
+    if (area !== null && isNaN(area)) { areaIn.classList.add('bad'); say(/\d/.test(areaIn.value) ? 'That area looks off. Check the number and the unit (m\u00b2 or sq ft).' : 'Write the area as a number, like 54.4.', true); shake(); return; }
     begin(area === null);
     engine().then(function (Z) { return Z.generate(picked, area, progress, preview, areaKind); }).then(show, fail);
   });

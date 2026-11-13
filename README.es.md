@@ -54,4 +54,4 @@ Los reportes y aportes son bienvenidos, sobre todo los casos en que falla. **Com
 
 [Apache 2.0](LICENSE), para el código y los pesos de los modelos. Puedes usarlo, modificarlo y redistribuirlo, también con fines comerciales, conservando la licencia y el [NOTICE](NOTICE). Se entrega «tal cual», sin garantías: verifica siempre las medidas en obra. La licencia no autoriza el uso del nombre «Zero Mouse Clicks».
 
-Creado por **Julián Páez** · Lo que habitas — IA para el sector AECO.
+Hecho por quienes contribuyen a Zero Mouse Clicks. Preguntas o ideas: abre un issue o escribe desde [zeromouseclicks.com](https://zeromouseclicks.com/#contact).

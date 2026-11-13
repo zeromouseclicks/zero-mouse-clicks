@@ -111,4 +111,4 @@ Issues and pull requests are welcome, especially failing cases. Please **only sh
 
 [Apache License 2.0](LICENSE), for the code and the model weights. You can use, modify and redistribute it, also commercially, keeping the license and the [NOTICE](NOTICE). The software is provided "as is", without warranties: always verify dimensions on site. The license does not grant use of the "Zero Mouse Clicks" name.
 
-Created by **Julián Páez** · Lo que habitas — AI for the AECO sector.
+Made by the Zero Mouse Clicks contributors. Questions or ideas: open an issue, or write from [zeromouseclicks.com](https://zeromouseclicks.com/#contact).

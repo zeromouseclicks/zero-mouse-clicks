@@ -1,10 +1,10 @@
 Zero Mouse Clicks
-Copyright 2026 Julián Páez (Lo que habitas)
+Copyright 2026 The Zero Mouse Clicks Authors
 
-This product includes software and model weights developed by Julián Páez.
-The model weights in zmc/models/ were trained only on synthetic floor plans
-produced by zmc/synth.py. No third-party floor-plan dataset was used.
+This product includes software and model weights developed by the Zero Mouse
+Clicks authors. The model weights in zmc/models/ were trained only on synthetic
+floor plans produced by zmc/synth.py. No third-party floor-plan dataset was used.
 
-"Zero Mouse Clicks" is a name used by the author; the Apache License 2.0 does
+"Zero Mouse Clicks" is the name of this project; the Apache License 2.0 does
 not grant permission to use it to identify other products or services
 (see section 6 of the License).

@@ -31,8 +31,9 @@ def _plan(argv):
         sys.exit(f"zmc: {e}. Pass it with --area <m²>.")
     info = r["info"]
     print(f"Wrote {out}")
-    print(f"  footprint {r['W']:.2f} x {r['H']:.2f} m · declared area {info.get('area', area)} m²"
-          + (" (read from image)" if area is None else ""))
+    da = info.get('area', area)
+    print(f"  footprint {r['W']:.2f} x {r['H']:.2f} m"
+          + (f" · declared area {da} m²" + (" (read from image)" if area is None else "") if da else ""))
     for x in r["fin"]["rooms"].values():
         print(f"  {x['name']:<28s} {x['area']:6.2f} m²")
     mod = r["mod"]
