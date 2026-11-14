@@ -14,18 +14,16 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Cpath d='M8 8h16v16H8zM8 17h9M17 8v9' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root { --bg:#000; --fg:#f5f5f3; --mute:#85857f; --line:#1f1f1d; --ink:#9fd0ff; --door:#ffc878; --win:#a0ffc8; --fix:#beaaff; --mx:50vw; --my:30vh; }
   * { box-sizing:border-box; margin:0; padding:0; }
   html { scroll-behavior:smooth; }
   body { background:var(--bg); color:var(--fg); font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
          line-height:1.5; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
-  body::before { content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
-         background:radial-gradient(520px circle at var(--mx) var(--my), rgba(159,208,255,.09), transparent 62%); }
   a { color:inherit; }
   .wrap { position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:0 28px; }
-  .mono { font-family:"JetBrains Mono",ui-monospace,Menlo,monospace; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--mute); }
+  .mono { font-family:"JetBrains Mono",ui-monospace,Menlo,monospace; font-size:12px; letter-spacing:0; color:var(--mute); }
   #bar { position:fixed; inset:0 0 auto 0; height:2px; background:var(--ink); transform-origin:0 50%; transform:scaleX(0); z-index:8; }
 
   header { position:fixed; inset:0 0 auto 0; z-index:6; display:flex; align-items:center; justify-content:space-between; height:64px; padding:0 28px;
@@ -38,7 +36,8 @@
          border-radius:999px; font-size:15px; transition:box-shadow .3s; will-change:transform; }
   .btn:hover { box-shadow:0 0 0 6px rgba(245,245,243,.08), 0 0 40px rgba(159,208,255,.35); }
 
-  h1, h2 { font-weight:700; letter-spacing:-.04em; line-height:1; text-wrap:balance; }
+  h1, h2 { font-weight:600; letter-spacing:-.045em; line-height:1.02; text-wrap:balance; }
+  h1 em, h2 em { font-style:normal; color:#5c5c57; }
   h1 { font-size:clamp(42px, 5.6vw, 76px); }
   h2 { font-size:clamp(34px, 5.4vw, 68px); }
   .wd { display:inline-block; will-change:transform, filter; }
@@ -212,38 +211,65 @@
 
   .facts { font-size:clamp(28px, 4.6vw, 58px); font-weight:700; letter-spacing:-.035em; line-height:1.08; }
   .m .facts span { color:#33332f; }
-  .close em { font-family:"Instrument Serif",Georgia,serif; font-style:italic; font-weight:400; letter-spacing:-.01em; }
   .close .btn { margin-top:36px; }
   .note { color:var(--mute); font-size:14px; max-width:460px; margin:40px auto 0; text-wrap:pretty; }
   .note a { color:var(--fg); text-decoration:none; border-bottom:1px solid #3a3a36; }
 
-  /* why the name */
-  .why .pill { margin-bottom:26px; }
-  .why h2 em { font-family:"Instrument Serif",Georgia,serif; font-style:italic; font-weight:400; letter-spacing:-.01em; color:var(--ink); }
-  .why .sub { max-width:640px; }
-  .vs { display:grid; grid-template-columns:1fr 1fr; gap:14px; max-width:900px; margin:clamp(34px,4vw,52px) auto 0; text-align:left; }
-  .vs .col { border:1px solid #232321; border-radius:20px; padding:clamp(20px,2.4vw,28px); background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)); }
-  .vs .col > b { display:block; font-size:12px; letter-spacing:.1em; margin-bottom:14px; }
-  .vs ul { list-style:none; display:grid; gap:10px; }
-  .vs li { position:relative; padding-left:26px; font-size:15px; line-height:1.4; }
-  .vs .cw li { color:#6d6d68; text-decoration:line-through; text-decoration-color:rgba(255,107,107,.55); }
-  .vs .cw li::before { content:"×"; position:absolute; left:2px; top:-1px; color:#ff6b6b; text-decoration:none; }
-  .vs .zc { border-color:rgba(159,208,255,.35); box-shadow:0 30px 90px -40px rgba(159,208,255,.35); }
-  .vs .zc > b { color:var(--ink); }
-  .vs .zc li { color:var(--fg); }
-  .vs .zc li::before { content:""; position:absolute; left:3px; top:5px; width:11px; height:6px; border-left:2px solid var(--win); border-bottom:2px solid var(--win); transform:rotate(-45deg); }
-  .vs .tally { margin-top:18px; padding-top:14px; border-top:1px solid #1f1f1d; font-size:12px; letter-spacing:.08em; }
-  .vs .cw .tally { color:#ff8a8a; } .vs .zc .tally { color:var(--win); }
-  .tenets { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; max-width:1100px; margin:clamp(28px,3.5vw,44px) auto 0; text-align:left; }
-  .tenets div { border-top:1px solid #2a2a27; padding-top:16px; }
-  .tenets b { display:block; font-size:17px; font-weight:600; letter-spacing:-.01em; margin-bottom:6px; }
-  .tenets span { display:block; color:var(--mute); font-size:14px; line-height:1.5; }
-  .aim { max-width:640px; margin:clamp(34px,4vw,52px) auto 0; font-size:clamp(17px,1.6vw,20px); line-height:1.5; color:#c9c9c4; text-wrap:pretty; }
-  .aim em { display:block; margin-top:8px; font-family:"Instrument Serif",Georgia,serif; font-style:italic; font-size:clamp(24px,2.6vw,32px); color:var(--fg); line-height:1.2; }
-  @media (max-width:900px) { .tenets { grid-template-columns:1fr 1fr; } }
-  @media (max-width:640px) { .vs, .tenets { grid-template-columns:1fr; } }
+  /* why the name: the click race */
+  .race { display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:1040px; margin:clamp(36px,5vw,60px) auto 0; text-align:left; }
+  .lane { margin:0; }
+  .lane figcaption { display:flex; justify-content:space-between; align-items:baseline; padding:0 4px 12px; font-size:14px; color:var(--mute); }
+  .lane .ctr { font-family:"JetBrains Mono",ui-monospace,monospace; font-size:13px; }
+  .lane .ctr b { font-weight:500; font-size:clamp(22px,2.4vw,30px); color:var(--fg); letter-spacing:-.02em; font-variant-numeric:tabular-nums; margin-right:4px; }
+  .lane.ai .ctr b { color:var(--win); }
+  .lane .pane { position:relative; aspect-ratio:700/650; border-radius:18px; overflow:hidden; border:1px solid #232321; background:#07080a; }
+  .lane.ai .pane { border-color:rgba(159,208,255,.28); box-shadow:0 40px 110px -50px rgba(159,208,255,.45); }
+  .lane svg { display:block; width:100%; height:100%; }
+  .race .gr { stroke:#12161b; stroke-width:1; }
+  .race .tw { fill:none; stroke:#e9e9e4; stroke-width:3; stroke-linejoin:round; stroke-linecap:round; }
+  .race .tb rect { fill:#0e1013; stroke:#202328; } .race .tb path { fill:none; stroke:#6b7078; stroke-width:2; } .race .tb .on rect { fill:#1c2530; stroke:var(--ink); }
+  .race .rip { fill:none; stroke:#ff8a80; stroke-width:2; }
+  .race .cur { fill:#fff; stroke:#000; stroke-width:1.2; }
+  .race .vw { fill:rgba(159,208,255,.12); stroke:var(--ink); stroke-width:2.2; stroke-linejoin:round; }
+  .race .scan { stroke:#fff; stroke-width:2; filter:drop-shadow(0 0 6px #9fd0ff) drop-shadow(0 0 18px #9fd0ff); }
+  .tenets { list-style:none; display:flex; flex-wrap:wrap; justify-content:center; gap:10px 34px; max-width:1040px; margin:clamp(30px,4vw,48px) auto 0;
+            font-size:clamp(17px,1.7vw,21px); font-weight:500; letter-spacing:-.015em; color:#c9c9c4; }
+  .tenets li { position:relative; }
+  .tenets li + li::before { content:""; position:absolute; left:-19px; top:50%; width:4px; height:4px; margin-top:-2px; border-radius:50%; background:#3a3a36; }
+  @media (max-width:760px) { .race { grid-template-columns:1fr; } .tenets { flex-direction:column; align-items:center; gap:8px; } .tenets li + li::before { display:none; } }
+
+  /* no cloud, no tokens, open source: three small loops */
+  .tiles { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; max-width:1040px; margin:clamp(34px,4.5vw,56px) auto 0; }
+  .tile { margin:0; border:1px solid #1f1f1d; border-radius:18px; padding:20px 20px 16px; background:linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.008)); }
+  .tile svg, .tile .odo { display:block; width:100%; aspect-ratio:240/150; }
+  .tile figcaption { margin-top:12px; font-size:14px; color:var(--mute); text-align:left; }
+  .tile figcaption a { color:var(--fg); text-decoration:none; border-bottom:1px solid #3a3a36; }
+  .tile .ln { fill:none; stroke:#3a3d42; stroke-width:1.6; } .tile .dt { fill:#3a3d42; }
+  .tile .chipb { fill:#0d1218; stroke:var(--ink); stroke-width:1.6; }
+  .tile .doc { fill:#f5f5f3; }
+  .tile .pk { fill:var(--ink); filter:drop-shadow(0 0 6px #9fd0ff); }
+  .tile .cloud { fill:none; stroke:#3a3d42; stroke-width:1.6; } .tile .wire { fill:none; stroke:#3a3d42; stroke-width:1.6; stroke-dasharray:3 4; } .tile .cut { stroke:#ff8a80; stroke-width:2; }
+  .tile .br { fill:none; stroke:#3a3d42; stroke-width:2.2; } .tile .fork { stroke:var(--ink); stroke-dasharray:180; stroke-dashoffset:180; }
+  .tile .cm { fill:#000; stroke:#6b7078; stroke-width:2; } .tile .c3, .tile .c4 { stroke:var(--ink); } .tile .c6 { fill:var(--win); stroke:var(--win); }
+  .odo { position:relative; overflow:hidden; display:flex !important; align-items:center; justify-content:center; }
+  .odo .win { display:block; height:1em; overflow:hidden; font-weight:600; font-size:clamp(70px,8vw,104px); letter-spacing:-.05em; line-height:1; font-variant-numeric:tabular-nums; }
+  .odo .roll { display:flex; flex-direction:column; }
+  .odo .roll i { display:block; font-style:normal; height:1em; }
+  .odo .win { -webkit-mask-image:linear-gradient(transparent, #000 18%, #000 82%, transparent); mask-image:linear-gradient(transparent, #000 18%, #000 82%, transparent); }
+  .tiles.play .pk { animation:pk 3.2s cubic-bezier(.6,0,.3,1) infinite; }
+  @keyframes pk { 0% { transform:translate(0,0); opacity:0; } 10% { opacity:1; } 45% { transform:translate(43px,0); } 55% { transform:translate(43px,0); opacity:1; } 70% { opacity:0; } 100% { transform:translate(43px,0); opacity:0; } }
+  .tiles.play .chipb { animation:chip 3.2s ease-in-out infinite; }
+  @keyframes chip { 0%, 40% { fill:#0d1218; } 52% { fill:#1d3347; } 75%, 100% { fill:#0d1218; } }
+  .tiles.play .roll { animation:odo 4.2s cubic-bezier(.7,0,.2,1) infinite; }
+  @keyframes odo { 0% { transform:translateY(0); } 40% { transform:translateY(0); } 70% { transform:translateY(-5em); } 100% { transform:translateY(-5em); } }
+  .tiles.play .fork { animation:fork 4.4s cubic-bezier(.5,0,.3,1) infinite; }
+  @keyframes fork { 0% { stroke-dashoffset:180; opacity:1; } 55%, 85% { stroke-dashoffset:0; opacity:1; } 100% { stroke-dashoffset:0; opacity:0; } }
+  .tiles.play .c3 { animation:pop 4.4s infinite; animation-delay:.9s; } .tiles.play .c4 { animation:pop 4.4s infinite; animation-delay:1.5s; } .tiles.play .c6 { animation:pop 4.4s infinite; animation-delay:2.3s; }
+  @keyframes pop { 0% { transform:scale(1); } 6% { transform:scale(1.6); } 14% { transform:scale(1); } }
+  .tile .cm { transform-box:fill-box; transform-origin:center; }
+  @media (max-width:760px) { .tiles { grid-template-columns:1fr; max-width:420px; } }
   @media (max-width:560px) { header nav a[href="#why"] { display:none; } }
-  #clicks.off { opacity:0; pointer-events:none; } #clicks { transition:opacity .3s, border-color .25s, color .25s; }
+  @media (prefers-reduced-motion:reduce) { .tiles.play * { animation:none !important; } }
 
   /* contact card */
   .contact { text-align:left; }
@@ -354,9 +380,8 @@
 <section class="hero rv" id="request">
   <div class="wrap">
     <div class="tool">
-      <span class="pill mono fade"><i></i>Free &middot; runs in your browser</span>
-      <h1 class="sp">A brochure in.<br>A plan set out.</h1>
-      <p class="sub fade">Drop the floor plan from a developer's brochure. Get the drawings an architect would make from it: six A3 sheets in one PDF.</p>
+      <h1 class="sp">A brochure in.<br><em>A plan set out.</em></h1>
+      <p class="sub fade">Drop a developer's floor plan. Get six A3 drawing sheets in one PDF.</p>
 
       <form class="req fade" id="req" novalidate>
         <label class="drop" id="drop">
@@ -389,7 +414,7 @@
         </div>
         <p class="msg mono" id="msg" role="status" aria-live="polite"></p>
         <p class="mono fine" id="detail" hidden></p>
-        <p class="mono fine" id="fine">Nothing is uploaded. First run loads the engine, about 35&nbsp;MB.<br>Looks off, or need more? <a id="mailto" href="#contact" data-topic="help">Write to us</a></p>
+        <p class="mono fine" id="fine">Free. Runs in your browser, nothing is uploaded. <a id="mailto" href="#contact" data-topic="help">Help</a></p>
       </form>
       <div class="done" id="done" hidden>
         <svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" stroke-width="1.5"/><path id="tick" d="M15 27l7 7 15-16" fill="none" stroke="currentColor" stroke-width="2" pathLength="1"/></svg>
@@ -545,8 +570,8 @@
 
 <section class="rv" id="set">
   <div class="wrap">
-    <h2 class="sp">Six sheets. One PDF.</h2>
-    <p class="sub fade">What an architect would hand you, drawn to scale on A3. <span id="ztip">Move over a sheet to zoom in.</span></p>
+    <h2 class="sp">Six sheets.<br><em>One PDF.</em></h2>
+    <span id="ztip" hidden></span>
     <div class="viewer fade" id="viewer">
       <img id="big" src="img/sheets/A-101_s.jpg" alt="Sheet A-101, floor plan" draggable="false">
       <span class="tip mono" id="tip">Hover to zoom</span>
@@ -559,53 +584,58 @@
 <section class="rv">
   <div class="wrap">
     <p class="facts" id="facts"><span>No cloud.</span> <span>No tokens.</span> <span>Open source.</span></p>
-    <p class="sub fade">Three tiny models and plain rules, trained only on synthetic plans. They run in your browser, so your image never leaves your device. The engine is on <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>.</p>
+    <div class="tiles" id="tiles">
+      <figure class="tile fade" aria-label="Runs on your device: the image never leaves it">
+        <svg viewBox="0 0 240 150" aria-hidden="true">
+          <rect class="ln" x="18" y="22" width="150" height="108" rx="10"/><path class="ln" d="M18 40h150"/>
+          <circle class="dt" cx="30" cy="31" r="2.6"/><circle class="dt" cx="39" cy="31" r="2.6"/><circle class="dt" cx="48" cy="31" r="2.6"/>
+          <rect class="chipb" x="74" y="64" width="38" height="38" rx="6"/>
+          <path class="ln" d="M80 64v-6M93 64v-6M106 64v-6M80 102v6M93 102v6M106 102v6M74 70h-6M74 83h-6M74 96h-6M112 70h6M112 83h6M112 96h6"/>
+          <rect class="doc" x="34" y="72" width="16" height="20" rx="2"/>
+          <circle class="pk" cx="50" cy="82" r="3.2"/>
+          <path class="cloud" d="M190 62a14 14 0 0 1 27-4a11 11 0 0 1 3 21h-31a10 10 0 0 1 1-17z"/>
+          <path class="wire" d="M168 76 C178 76 182 76 192 76"/><path class="cut" d="M176 66l12 20"/>
+        </svg>
+        <figcaption>Stays on your device</figcaption>
+      </figure>
+      <figure class="tile fade" aria-label="Zero tokens, zero API calls">
+        <div class="odo" aria-hidden="true"><span class="win"><span class="roll"><i>0</i><i>7</i><i>3</i><i>9</i><i>1</i><i>0</i></span></span></div>
+        <figcaption>Tokens per plan</figcaption>
+      </figure>
+      <figure class="tile fade" aria-label="Open source under Apache-2.0">
+        <svg viewBox="0 0 240 150" aria-hidden="true">
+          <path class="br main" d="M20 96H220"/><path class="br fork" d="M70 96 C 95 96 95 56 120 56 H160 C 185 56 185 96 205 96"/>
+          <circle class="cm c1" cx="40" cy="96" r="5"/><circle class="cm c2" cx="70" cy="96" r="5"/><circle class="cm c3" cx="120" cy="56" r="5"/>
+          <circle class="cm c4" cx="160" cy="56" r="5"/><circle class="cm c5" cx="150" cy="96" r="5"/><circle class="cm c6" cx="205" cy="96" r="6"/>
+        </svg>
+        <figcaption><a href="https://github.com/zeromouseclicks/zero-mouse-clicks">Fork it on GitHub</a></figcaption>
+      </figure>
+    </div>
   </div>
 </section>
 
 <section class="rv why" id="why">
   <div class="wrap">
-    <span class="pill mono fade"><i></i>Why the name</span>
-    <h2 class="sp">Why zero mouse clicks.<br><em>Drafting, minus the click-work.</em></h2>
-    <p class="sub fade">Construction still runs on drawings: plans, schedules, sections, quantities. Producing them has meant hours inside CAD and BIM software, re-tracing what someone already drew, one click at a time. AI can now read the source and do the drafting. You ask for the deliverable; the clicks disappear.</p>
-    <div class="vs fade">
-      <div class="col cw">
-        <b class="mono">The click way</b>
-        <ul>
-          <li>Trace every wall, snap every corner</li>
-          <li>Place each door and window by hand</li>
-          <li>Measure, type and chain every dimension</li>
-          <li>Fill the area and opening schedules</li>
-          <li>Frame, title-block, export. Repeat.</li>
-        </ul>
-        <p class="tally mono">hundreds of clicks per plan</p>
-      </div>
-      <div class="col zc">
-        <b class="mono">The zero-click way</b>
-        <ul>
-          <li>Vision models read walls, doors and windows</li>
-          <li>Rules square the geometry onto clean axes</li>
-          <li>Scale fitted to the dimensions printed on the plan</li>
-          <li>Areas and schedules computed room by room</li>
-          <li>One A3 PDF, framed and titled</li>
-        </ul>
-        <p class="tally mono">one image in &middot; zero clicks</p>
-      </div>
+    <h2 class="sp">Why zero mouse clicks?</h2>
+    <div class="race fade" id="race">
+      <figure class="lane cad">
+        <figcaption><span>Drafting by hand</span><span class="ctr"><b id="rcA">0</b> clicks</span></figcaption>
+        <div class="pane"><svg viewBox="140 100 700 650" id="raceA" aria-hidden="true"></svg></div>
+      </figure>
+      <figure class="lane ai">
+        <figcaption><span>Zero Mouse Clicks</span><span class="ctr"><b id="rcB">0</b> clicks</span></figcaption>
+        <div class="pane"><svg viewBox="140 100 700 650" id="raceB" aria-hidden="true"></svg></div>
+      </figure>
     </div>
-    <div class="tenets">
-      <div class="fade"><b>Read, don't trace.</b><span>Pixels become walls, openings and rooms. The drawing is inferred, not redrawn.</span></div>
-      <div class="fade"><b>Intent over interface.</b><span>Ask for the outcome: a plan set, a schedule, a section. Not for the toolbar that builds it.</span></div>
-      <div class="fade"><b>Rules you can audit.</b><span>Every drafting decision is plain, open code. Read it, question it, improve it.</span></div>
-      <div class="fade"><b>Compute at the edge.</b><span>Small models in your browser. No cloud, no tokens, nothing uploaded.</span></div>
-    </div>
-    <p class="aim fade">Today, a plan set from a brochure. Next, CAD exports, quantities and the rest of the drawing set. <em>The craft of designing for construction, without the click-work.</em></p>
+    <ul class="tenets" aria-label="Principles">
+      <li class="fade">Read, don't trace.</li><li class="fade">Intent over interface.</li><li class="fade">Rules you can audit.</li><li class="fade">Compute at the edge.</li>
+    </ul>
   </div>
 </section>
 
 <section class="rv contact" id="contact">
   <div class="wrap">
     <h2 class="sp">Talk to a human.</h2>
-    <p class="sub fade">Something looks off, or you need more? Send it here. No email app needed: we answer at the address you write.</p>
     <form class="card fade" id="cform" novalidate>
       <div class="to"><i></i><span>To</span><b>zeromouseclicks@agentmail.to</b></div>
       <fieldset class="topics">
@@ -641,7 +671,7 @@
   <div class="wrap">
     <h2 class="sp">Zero mouse clicks.<br><em>One plan set.</em></h2>
     <a class="btn fade" href="#request">Make a plan set</a>
-    <p class="note fade">An early prototype. Drawn from marketing plans: verify dimensions on site. Need a CAD file, more sections or a quote? <a href="#contact" data-topic="more">Write to us</a>.</p>
+    <p class="note fade">Early prototype. Verify dimensions on site.</p>
   </div>
 </section>
 
@@ -696,10 +726,117 @@
     io.observe($('why')); io.observe(document.querySelector('footer'));
   })();
 
-  // spotlight that follows the pointer
-  window.addEventListener('pointermove', function (e) {
-    root.style.setProperty('--mx', e.clientX + 'px'); root.style.setProperty('--my', e.clientY + 'px');
-  }, { passive: true });
+  /* ---------- why the name: the click race. Drafting by hand (a click per corner, door and dimension) vs one image ---------- */
+  (function () {
+    var A = $('raceA'), B = $('raceB'), cA = $('rcA'), cB = $('rcB'), host = $('race');
+    if (!A || !B) return;
+    var NS = 'http://www.w3.org/2000/svg', X0 = 140, Y0 = 100, W = 700, H = 650;
+    function el(tag, at, parent) { var e = document.createElementNS(NS, tag); for (var k in at) e.setAttribute(k, at[k]); parent.appendChild(e); return e; }
+    function pts(d) { return (d.match(/-?\d+(?:\.\d+)?,-?\d+(?:\.\d+)?/g) || []).map(function (q) { var a = q.split(','); return [+a[0], +a[1]]; }); }
+    var polys = all('#plan .w').map(function (p) { return pts(p.getAttribute('d')); }).filter(function (v) { return v.length > 2; });
+    var doors = all('#plan .d').map(function (p) { return pts(p.getAttribute('d')); }).filter(function (v) { return v.length === 2; });
+    if (!polys.length) return;
+    // grid on both panes
+    [A, B].forEach(function (svg) {
+      el('rect', { x: X0, y: Y0, width: W, height: H, fill: '#07080a' }, svg);
+      var g = el('g', { 'class': 'gr' }, svg);
+      for (var x = X0; x <= X0 + W; x += 35) el('line', { x1: x, y1: Y0, x2: x, y2: Y0 + H }, g);
+      for (var y = Y0; y <= Y0 + H; y += 35) el('line', { x1: X0, y1: y, x2: X0 + W, y2: y }, g);
+    });
+    // left: toolbar, traced walls, ripples, cursor
+    var tb = el('g', { 'class': 'tb' }, A), tools = [];
+    ['M7 19L19 7', 'M7 19V7M7 7a12 12 0 0 1 12 12', 'M6 13h14M6 9v8M20 9v8', 'M8 8h10M13 8v12'].forEach(function (d, i) {
+      var g = el('g', { transform: 'translate(' + (166 + i * 36) + ',708)' }, tb);
+      el('rect', { x: 0, y: 0, width: 26, height: 26, rx: 6 }, g); el('path', { d: d }, g); tools.push(g);
+    });
+    var trace = el('path', { 'class': 'tw', d: '' }, A), rips = [];
+    for (var r = 0; r < 5; r++) rips.push(el('circle', { 'class': 'rip', cx: 0, cy: 0, r: 0, opacity: 0 }, A));
+    var cur = el('path', { 'class': 'cur', d: 'M0 0L0 24L6.5 18.5L11 28L15.5 26L11 16.8L19 16.8Z' }, A);
+    // the actions: pick a tool, then click every corner; doors (hinge, leaf); a chain of dimensions on top
+    var acts = [], t = 0.3, DT = 0.105;
+    function act(x, y, kind, extra) { t += (kind === 'tool' ? 0.22 : DT); acts.push({ t: t, x: x, y: y, kind: kind, p: extra }); }
+    polys.forEach(function (poly, k) {
+      act(179, 721, 'tool', 0);
+      poly.forEach(function (q, i) { act(q[0], q[1], 'v', { k: k, i: i }); });
+      act(poly[0][0], poly[0][1], 'v', { k: k, i: poly.length });
+    });
+    act(215, 721, 'tool', 1);
+    doors.forEach(function (d) { act(d[0][0], d[0][1], 'd'); act(d[1][0], d[1][1], 'd'); });
+    act(251, 721, 'tool', 2);
+    var xs = [];
+    polys.forEach(function (poly) { poly.forEach(function (q) { if (q[1] < 140) xs.push(Math.round(q[0])); }); });
+    xs = xs.filter(function (v, i, a) { return a.indexOf(v) === i; }).sort(function (a, b) { return a - b; }).slice(0, 7);
+    for (var i = 0; i + 1 < xs.length; i++) { act(xs[i], 112, 'm'); act(xs[i + 1], 112, 'm'); act((xs[i] + xs[i + 1]) / 2, 106, 'm'); }
+    var END = t + 0.4, L = END + 1.6;
+    // right: the brochure, a scan, the drawing appears at once
+    var img = el('image', { href: 'img/brochure.jpg', x: 0, y: 0, width: 900, height: 900, opacity: 0 }, B);
+    var clip = el('clipPath', { id: 'rclip' }, B), crect = el('rect', { x: X0, y: Y0, width: 0, height: H }, clip);
+    var vg = el('g', { 'clip-path': 'url(#rclip)' }, B);
+    polys.forEach(function (poly) { el('path', { 'class': 'vw', d: 'M' + poly.map(function (q) { return q.join(','); }).join('L') + 'Z' }, vg); });
+    doors.forEach(function (d) { el('path', { d: 'M' + d[0].join(',') + 'L' + d[1].join(','), stroke: '#9fd0ff', 'stroke-width': 2, fill: 'none' }, vg); });
+    var scan = el('line', { 'class': 'scan', x1: X0, y1: Y0, x2: X0, y2: Y0 + H, opacity: 0 }, B);
+
+    function sg(t, a, b) { var v = (t - a) / (b - a); return v < 0 ? 0 : v > 1 ? 1 : v; }
+    function sm(p) { return p * p * (3 - 2 * p); }
+    function render(t) {
+      var fade = 1 - sm(sg(t, L - 0.5, L));
+      // left
+      var n = 0, last = null, nxt = acts[0];
+      for (var j = 0; j < acts.length; j++) { if (acts[j].t <= t) { n++; last = acts[j]; } else { nxt = acts[j]; break; } }
+      if (n === acts.length) nxt = null;
+      var cx, cy;
+      if (!last) { cx = 330; cy = 520; } else if (!nxt) { cx = last.x; cy = last.y; }
+      else { var f = sm(sg(t, last.t, nxt.t - 0.02)); cx = last.x + (nxt.x - last.x) * f; cy = last.y + (nxt.y - last.y) * f; }
+      if (!last && nxt) { var f0 = sm(sg(t, 0, nxt.t)); cx = 330 + (nxt.x - 330) * f0; cy = 520 + (nxt.y - 520) * f0; }
+      cur.setAttribute('transform', 'translate(' + cx.toFixed(1) + ',' + cy.toFixed(1) + ')');
+      var d = '';
+      polys.forEach(function (poly, k) {
+        var done = -1;
+        for (var j = 0; j < n; j++) if (acts[j].kind === 'v' && acts[j].p.k === k) done = acts[j].p.i;
+        if (done < 0) return;
+        var seq = poly.concat([poly[0]]).slice(0, done + 1);
+        d += 'M' + seq.map(function (q) { return q[0].toFixed(1) + ',' + q[1].toFixed(1); }).join('L');
+        var nx = acts[n];
+        if (nx && nx.kind === 'v' && nx.p.k === k && done + 1 < seq.length + 1 && last && last.kind === 'v') d += 'L' + cx.toFixed(1) + ',' + cy.toFixed(1);
+      });
+      trace.setAttribute('d', d);
+      for (var r = 0; r < rips.length; r++) {
+        var a = acts[n - 1 - r];
+        if (!a) { rips[r].setAttribute('opacity', 0); continue; }
+        var age = t - a.t;
+        rips[r].setAttribute('cx', a.x); rips[r].setAttribute('cy', a.y);
+        rips[r].setAttribute('r', (4 + 26 * sg(age, 0, 0.45)).toFixed(1));
+        rips[r].setAttribute('opacity', (1 - sg(age, 0, 0.45)).toFixed(2));
+      }
+      var tool = -1; for (var j = 0; j < n; j++) if (acts[j].kind === 'tool') tool = acts[j].p;
+      tools.forEach(function (g, i) { g.setAttribute('class', i === tool ? 'on' : ''); });
+      cA.textContent = n;
+      A.style.opacity = fade;
+      // right
+      img.setAttribute('opacity', (sm(sg(t, 0.1, 0.6)) * (1 - 0.75 * sm(sg(t, 2.6, 3.4)))).toFixed(2));
+      var sp = sm(sg(t, 0.8, 2.5)), sx = X0 + W * sp;
+      crect.setAttribute('width', (W * sp).toFixed(1));
+      scan.setAttribute('x1', sx); scan.setAttribute('x2', sx); scan.setAttribute('opacity', (sg(t, 0.75, 0.9) * (1 - sg(t, 2.45, 2.7))).toFixed(2));
+      B.style.opacity = fade;
+      cB.textContent = '0';
+    }
+    var calmNow = window.matchMedia('(prefers-reduced-motion: reduce)').matches, t0 = null, vis = false, raf = 0;
+    function frame(ms) { if (t0 === null) t0 = ms; render(((ms - t0) / 1000) % L); if (vis) raf = requestAnimationFrame(frame); }
+    render(calmNow ? END : 0.01);
+    if (calmNow || !('IntersectionObserver' in window)) { render(END); return; }
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting && !vis) { vis = true; t0 = null; raf = requestAnimationFrame(frame); }
+        else if (!e.isIntersecting) { vis = false; cancelAnimationFrame(raf); }
+      });
+    }, { threshold: 0.25 }).observe(host);
+  })();
+
+  // the three small loops start when they are seen
+  (function () {
+    var tl = $('tiles'); if (!tl || !('IntersectionObserver' in window)) { if (tl) tl.classList.add('play'); return; }
+    new IntersectionObserver(function (es) { es.forEach(function (e) { tl.classList.toggle('play', e.isIntersecting); }); }, { threshold: 0.2 }).observe(tl);
+  })();
 
 
   /* ---------- how it works: one timeline, drawn as a pure function of time ---------- */
