@@ -1014,7 +1014,7 @@
   var client = null;
   function engine() {
     if (!client) client = new Promise(function (res, rej) {
-      var s = document.createElement('script'); s.src = 'app/client.js?v5';
+      var s = document.createElement('script'); s.src = 'app/client.js?v6';
       s.onload = function () { res(window.ZMC); }; s.onerror = function () { client = null; rej(Object.assign(new Error('step client · app/client.js did not load'), { code: 'boot' })); };
       document.head.appendChild(s);
     });

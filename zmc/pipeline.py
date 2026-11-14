@@ -42,8 +42,10 @@ def drive(gen, backend=local_backend):
         return e.value
 
 def _probs(name, im):
-    n = MODELS[name][1]
-    h, w = im.shape[:2]; x = np.full((n, n, 3), 255, np.uint8); x[:h, :w] = im
+    # modelos con forma dinámica: se rellena solo hasta el siguiente múltiplo de 32 (antes, siempre 640/768).
+    # A 768 px un modelo pedía ~650 MB de memoria en onnxruntime-web; a 448, ~150 MB (el iPhone se cerraba).
+    h, w = im.shape[:2]; n = max(64, -(-max(h, w) // 32) * 32)
+    x = np.full((n, n, 3), 255, np.uint8); x[:h, :w] = im
     z = (yield ('infer', name, x))[:h, :w]
     e = np.exp(z - z.max(-1, keepdims=True)); return e / e.sum(-1, keepdims=True)
 
@@ -94,10 +96,11 @@ def run(path, area, proj, unit, pdf, legacy=False, debug=None, side=None, area_k
         raise FileNotFoundError(f'Cannot read image: {path}')
     return drive(steps(im0, area, proj, unit, pdf, legacy, debug, side, area_kind=area_kind))
 
-def steps(im0, area, proj, unit, pdf, legacy=False, debug=None, side=None, progress=None, area_kind=None):
+def steps(im0, area, proj, unit, pdf, legacy=False, debug=None, side=None, progress=None, area_kind=None, side_max=None):
     """Núcleo de `run` como generador de pasos (ver arriba). progress(etapa) avisa el avance; con datos
     (image, mask, box, mod, fin) entrega resultados intermedios para mostrarlos mientras se trabaja.
-    area_kind: definición del área dada ('private' | 'gross' | None = no se sabe; se trata como privada)."""
+    area_kind: definición del área dada ('private' | 'gross' | None = no se sabe; se trata como privada).
+    side_max: lado máximo de la imagen que leen los modelos (teléfonos: 512, para no agotar la memoria)."""
     say = progress or (lambda *_, **__: None)
     info = {}
     cands = []                   # áreas declaradas: (rango, m², tipo)
@@ -126,7 +129,8 @@ def steps(im0, area, proj, unit, pdf, legacy=False, debug=None, side=None, progr
         crop = im0[int(y0 * k):int(np.ceil(y1 * k)), int(x0 * k):int(np.ceil(x1 * k))]
         info['crop'] = (int(x0 * k), int(y0 * k), int(np.ceil(x1 * k)), int(np.ceil(y1 * k)))
         fixed = side is not None
-        side = side or 640
+        top = side_max or 640
+        side = side or top
         say('read')
         im = _fit(crop, side); m = yield from predict_steps(im, tta=fixed)
         if not fixed:
@@ -136,7 +140,7 @@ def steps(im0, area, proj, unit, pdf, legacy=False, debug=None, side=None, progr
             if area0:
                 ppm = 1.0 / vectorize5(m1.copy(), area0, image=im)['m_per_px']
                 if ppm > 64:
-                    side = int(np.clip(side * 55 / ppm, 416, 640))
+                    side = int(np.clip(side * 55 / ppm, min(416, top), top))
                     im = _fit(crop, side)
                 info['ppm'] = round(ppm, 1)
             m = yield from predict_steps(im, tta=True)

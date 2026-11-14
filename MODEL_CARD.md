@@ -4,13 +4,13 @@ Three small semantic-segmentation models used together by `zmc/pipeline.py`.
 
 | File | Classes | Parameters | Size | Input |
 |---|---|---|---|---|
-| `zmc/models/unet_v2.onnx` | 5 | ~190 k | 0.8 MB | 1×640×640×3 |
-| `zmc/models/unet_v3.onnx` | 5 | ~330 k | 1.3 MB | 1×768×768×3 |
-| `zmc/models/unet_v4.onnx` | 8 | ~330 k | 1.3 MB | 1×768×768×3 |
+| `zmc/models/unet_v2.onnx` | 5 | ~190 k | 0.8 MB | 1×N×N×3 (trained at 640) |
+| `zmc/models/unet_v3.onnx` | 5 | ~330 k | 1.3 MB | 1×N×N×3 (trained at 768) |
+| `zmc/models/unet_v4.onnx` | 8 | ~330 k | 1.3 MB | 1×N×N×3 (trained at 768) |
 
 Classes: `0 background · 1 interior space · 2 wall · 3 door · 4 window` (v2, v3) plus `5 counter/closet/bar · 6 fixed fixture (toilet, sink, cooktop, appliance) · 7 loose furniture` (v4).
 
-**Input**: an RGB image as float32 in 0–255, **BGR channel order** (as read by OpenCV), padded with white to the fixed size. **Output**: per-pixel logits, shape 1×H×W×classes.
+**Input**: an RGB image as float32 in 0–255, **BGR channel order** (as read by OpenCV), padded with white to a square whose side N is a multiple of 32 (the input shape is dynamic since 0.2.1: smaller inputs use far less memory, which matters on phones). **Output**: per-pixel logits, shape 1×H×W×classes.
 
 ## Architecture
 

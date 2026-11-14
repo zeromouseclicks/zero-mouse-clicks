@@ -53,7 +53,7 @@ def _preview(image, mask=None, box=None, mod=None, fin=None):
     return cv2.imencode('.jpg', out, [cv2.IMWRITE_JPEG_QUALITY, 82])[1].reshape(-1)
 
 
-async def run(data, area, project, unit, js, area_kind=None):
+async def run(data, area, project, unit, js, area_kind=None, lean=False):
     """data: bytes de la imagen (JPG/PNG). area: m² o None. area_kind: 'gross' si se escribió en pies² (EE. UU.),
     si no None. js: objeto con infer, ocr, progress y preview.
     Devuelve (pdf: Uint8Array, resumen: str JSON)."""
@@ -73,7 +73,8 @@ async def run(data, area, project, unit, js, area_kind=None):
 
     if area_kind is not None and not isinstance(area_kind, str):
         area_kind = None
-    gen = pipeline.steps(im0, area, project, unit, buf, progress=progress, area_kind=area_kind or None)
+    gen = pipeline.steps(im0, area, project, unit, buf, progress=progress, area_kind=area_kind or None,
+                         side_max=512 if lean else None)
     try:
         req = next(gen)
         while True:

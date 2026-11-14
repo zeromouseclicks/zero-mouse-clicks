@@ -2,7 +2,7 @@
 
 Small on-device segmentation models (ONNX) + rules. No cloud API, no LLM tokens.
 """
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 
 def plan_set(image, out_pdf, area=None, project="Marketing floor plan", unit="Unit", debug=None, area_kind=None):

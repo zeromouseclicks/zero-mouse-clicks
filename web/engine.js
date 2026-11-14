@@ -7,7 +7,7 @@ var CDN = {
   ort: 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/'
 };
 var BASE = self.location.href.replace(/[^/]*$/, '');          // .../app/
-var VERSION = 'v3';
+var VERSION = 'v4';
 importScripts(CDN.pyodide + 'pyodide.js', CDN.ort + 'ort.wasm.min.js');
 
 ort.env.wasm.wasmPaths = CDN.ort;
@@ -118,7 +118,7 @@ self.onmessage = async function (e) {
       preview: function (kind, jpg) { var b = jpg.slice().buffer; post({ type: 'preview', kind: kind, jpg: b }, [b]); }
     };
     var area = (m.area === null || m.area === undefined) ? null : m.area;
-    var r = await glue.run(new Uint8Array(m.image), area, m.project || 'Marketing floor plan', m.unit || 'Unit', js, m.areaKind || null);
+    var r = await glue.run(new Uint8Array(m.image), area, m.project || 'Marketing floor plan', m.unit || 'Unit', js, m.areaKind || null, lean);
     var pdf = r.get(0), summary = JSON.parse(r.get(1));
     var copy = pdf.slice();
     r.destroy();

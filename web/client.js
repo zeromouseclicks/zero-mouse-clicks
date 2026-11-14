@@ -73,7 +73,7 @@
 
   function engine() {
     if (worker) return worker;
-    worker = new Worker(here + 'engine.js?v4');
+    worker = new Worker(here + 'engine.js?v5');
     worker.onmessage = function (e) {
       var m = e.data; heard = Date.now(); if (m.type === 'progress') where = m.stage + ' ' + Math.round(m.frac * 100) + '%';
       if (m.type === 'ocr') {
