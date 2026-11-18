@@ -12,3 +12,7 @@ private/
 *_plan-set.pdf
 *_debug.jpg
 !examples/*
+
+# furniture bench: developer images stay local (evaluation only), results are regenerated
+bench/images/
+bench/results/
