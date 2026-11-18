@@ -4,7 +4,7 @@
 
 [Read in English](README.md)
 
-Las constructoras y los portales inmobiliarios publican las plantas de los apartamentos como imágenes de colores: muebles, pisos de madera, sombras, nombres de los espacios y algunas medidas. Zero Mouse Clicks lee una de esas imágenes y dibuja el juego de planos que haría un arquitecto: muros, puertas y ventanas, ejes, cotas en cadena, áreas, cuadros, acabados de piso, una propuesta eléctrica esquemática y dos cortes.
+Las constructoras y los portales inmobiliarios publican las plantas de los apartamentos como imágenes de colores: muebles, pisos de madera, sombras, nombres de los espacios y algunas medidas. Zero Mouse Clicks lee una de esas imágenes y dibuja el juego de planos que haría un arquitecto: muros, puertas y ventanas, ejes, cotas en cadena, áreas, cuadros, acabados de piso, una propuesta eléctrica esquemática, una planta de mobiliario y dos cortes.
 
 Todo corre en tu propio computador: tres modelos de segmentación muy pequeños (ONNX, de 0,8 a 1,3 MB) más reglas explícitas. Los modelos se entrenaron **solo con plantas sintéticas** que genera el código de este repositorio, así que sobre los pesos no pesa ninguna licencia de bases de datos de terceros.
 
@@ -34,7 +34,7 @@ Entre 8 y 35 segundos por planta en CPU, según el equipo y el tamaño de la ima
 
 ## Qué entrega
 
-Un PDF A3 con seis láminas: A-101 planta, A-102 cuadros de áreas y de puertas y ventanas, A-103 acabados de piso, A-104 eléctrico esquemático, A-201 corte por la cocina y A-202 corte por el baño. Las alturas y los puntos eléctricos son supuestos, no información leída de la imagen.
+Un PDF A3 con ocho láminas: G-001 portada con cifras, imagen de origen e índice; A-101 planta, A-102 cuadros de áreas y de puertas y ventanas, A-103 acabados de piso, A-104 eléctrico esquemático, A-105 planta de mobiliario, A-201 corte por la cocina y A-202 corte por el baño, cada uno con la planta ampliada del espacio. Cada lámina lleva marco ISO 5457 con zonas, columna de rótulo (panel propio, plano llave, notas, revisiones, número grande) y cuadros de cantidades en el espacio libre. En la A-105 cada mueble y aparato leído de la imagen se vuelve una pieza (cama, mesa de noche, sofá, comedor con sus sillas, escritorio, banquetas, plantas, aparatos de cocina y sanitarios) con medida de catálogo y orientación, dibujada con un bloque paramétrico (`zmc/furnish.py`, `zmc/blocks.py`). Las alturas y los puntos eléctricos son supuestos, no información leída de la imagen.
 
 ## Limitaciones conocidas
 
@@ -42,6 +42,7 @@ Un PDF A3 con seis láminas: A-101 planta, A-102 cuadros de áreas y de puertas 
 - Algunos espacios salen con el tipo equivocado, sobre todo sin OCR.
 - Las imágenes de baja resolución (menos de ~800 px) pierden muros.
 - Los acabados de piso se adivinan por la textura y fallan con frecuencia.
+- Los muebles (A-105) solo aparecen donde el modelo vio algo, y el tipo sale de reglas: en el banco de muebles (`bench/`, 92 piezas marcadas a mano en 4 plantas) el 49 % sale con el tipo correcto y el 94 % de esas mira hacia el lado correcto; en plantas reales de constructoras es cerca del 30 %. El siguiente paso es un modelo entrenado con tipos de mueble.
 - No hay escaleras, apartamentos de dos niveles ni muros curvos.
 - Las plantas de mercadeo no vienen a escala. Si el folleto trae las medidas de los espacios, la escala sale de ellas (votación entre todas, X e Y por separado; corrige imágenes estiradas) y el plano suele quedar dentro del 1–2 %. Sin medidas impresas, la escala sale del área declarada según su definición (privada ≈ espacios netos + media partición; construida o pies² ≈ huella con muros): escribe el área privada cuando puedas.
 - Los comentarios del código están en español.

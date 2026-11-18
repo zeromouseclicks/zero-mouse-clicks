@@ -68,9 +68,26 @@ def pick_cuts(P):
             rt = sum(1 for o in fx if (o['X0'] + o['X1']) / 2 > c)
             d = +1 if rt >= len(fx) - rt else -1
             cuts.append(dict(axis='x', c=c, dir=d, room=r['id'], name='B', title='SECTION B-B  (BATHROOM)'))
+    for ct in cuts:
+        ct['zone'] = _zone(P, ct)
     if not cuts:  # sin cocina ni baño detectados: corte longitudinal por el centro
         cuts.append(dict(axis='y', c=P.H / 2, dir=+1, room=None, name='A', title='SECTION A-A'))
     return cuts
+
+
+def _zone(P, cut):
+    """Recuadro de la vista ampliada: la zona de cocina (mesones y aparatos) o el baño completo."""
+    rb = _room_bbox(P, cut['room']) if cut.get('room') else None
+    if rb is None:
+        return None
+    if cut['name'] == 'A':
+        objs = [o for o in P.objs if o['room'] == cut['room'] and (o.get('casework') in ('counter', 'island / bar')
+                or o.get('fixture') in ('cooktop', 'sink', 'fridge'))]
+        if objs:
+            x0 = min(o['X0'] for o in objs) - 0.7; y0 = min(o['Y0'] for o in objs) - 0.7
+            x1 = max(o['X1'] for o in objs) + 0.7; y1 = max(o['Y1'] for o in objs) + 0.7
+            return (max(rb[0], x0), max(rb[1], y0), min(rb[2], x1), min(rb[3], y1))
+    return rb
 
 
 def _frame_of(cut, P):
@@ -109,6 +126,96 @@ def _dist(cut, x0, y0, x1, y1):
     return (lo - cut['c']) if cut['dir'] > 0 else (cut['c'] - hi)
 
 
+def _panel_section(c, x, y, w, h):
+    from . import layout as L
+    y = L.header(c, x, y, w, 'Assumed heights')
+    rows = [('Clear height', f'{CLEAR:.2f} m'), ('Slab', f'{SLAB:.2f} m'), ('Floor to floor', f'{CLEAR + SLAB:.2f} m'),
+            ('Door height', f'{DOOR_H:.2f} m'), ('Window sill', f'{SILL:.2f} m'), ('Window sill, bathroom', f'{SILL_BATH:.2f} m'),
+            ('Counter', '0.90 m'), ('Upper cabinets', '1.50–2.20 m')]
+    for a, b in rows:
+        c.setFont(L.F, 6.6); c.setFillGray(0.1); c.drawString(x, y - 2.4 * mm, a); c.drawRightString(x + w, y - 2.4 * mm, b)
+        c.setStrokeGray(0.85); c.setLineWidth(0.25); c.line(x, y - 3.6 * mm, x + w, y - 3.6 * mm)
+        y -= 5.2 * mm
+    y -= 3 * mm
+    y = L.header(c, x, y, w, 'Graphics')
+    for fill, txt in (((0.2,), 'Wall or slab, cut'), ((0.75,), 'Slab, hatched'), (None, 'Element seen beyond the cut')):
+        c.saveState(); c.setLineWidth(0.4)
+        if fill:
+            c.setFillGray(fill[0]); c.rect(x, y - 4 * mm, 10 * mm, 3.4 * mm, stroke=1, fill=1)
+        else:
+            c.setStrokeGray(0.3); c.rect(x, y - 4 * mm, 10 * mm, 3.4 * mm, stroke=1, fill=0)
+        c.restoreState()
+        c.setFont(L.F, 6.6); c.setFillGray(0.1); c.drawString(x + 13 * mm, y - 3.2 * mm, txt)
+        y -= 6 * mm
+    y -= 2 * mm
+    L.wrap(c, 'Sections are schematic: the source plan has no heights. Cabinets, hood, mirror and tiling follow '
+              'standard practice and must be confirmed with the developer.', x, y, w, size=6.0)
+
+
+def _room_panel(c, P, cut, zone, x, ytop, xr, ybot):
+    """Datos del espacio ampliado: aparatos con su medida, largo de mesón, acabados. Útil para cotizar."""
+    from . import layout as L
+    w = xr - x
+    if w < 55 * mm:
+        return
+    w = min(w, 95 * mm)
+    from .furnish import NAMES
+    rid = cut.get('room')
+    r = next((q for q in P.rooms if q['id'] == rid), None)
+    y = L.header(c, x, ytop, w, 'In this space')
+    zx0, zy0, zx1, zy1 = zone
+    inz = lambda X, Y: zx0 - 0.1 <= X <= zx1 + 0.1 and zy0 - 0.1 <= Y <= zy1 + 0.1
+    rows = []
+    for it in P.items:
+        if it['room'] == rid and inz(it['X'], it['Y']) and it['type'] in ('fridge', 'cooktop', 'sink', 'washer', 'toilet', 'lavatory', 'shower', 'bathtub'):
+            rows.append((NAMES.get(it['type'], it['type']), f"{it['w']:.2f} × {it['d']:.2f}", 'assumed' if it.get('src') == 'assumed' else 'read'))
+    cw = [o for o in P.objs if o['room'] == rid and o['kind'] == 'casework' and inz((o['X0'] + o['X1']) / 2, (o['Y0'] + o['Y1']) / 2)]
+    for o in cw:
+        L_ = max(o['X1'] - o['X0'], o['Y1'] - o['Y0']); D_ = min(o['X1'] - o['X0'], o['Y1'] - o['Y0'])
+        rows.append((str(o.get('casework', 'casework')).capitalize(), f'{L_:.2f} × {D_:.2f}', 'read'))
+    if rows:
+        y = L.table(c, x, y, ['Item', 'Size (m)', 'Source'], rows, [w * 0.46, w * 0.30, w * 0.24], align=['l', 'r', 'l'])
+    runs = [o for o in cw if o.get('casework') in ('counter', 'island / bar', 'vanity')]
+    facts = []
+    if runs:
+        facts.append(('Countertop length', f"{sum(max(o['X1'] - o['X0'], o['Y1'] - o['Y0']) for o in runs):.2f} m"))
+    if r:
+        facts.append(('Floor', {'wood': 'F1 wood-look', 'tile': 'F2 ceramic tile', 'porcelain': 'F3 porcelain', 'exterior': 'F4 exterior'}.get(r.get('floor'), '—')))
+        facts.append(('Net area', f"{r['area']:.2f} m²"))
+    if cut['name'] == 'B':
+        facts.append(('Wall tiling (assumed)', 'to 1.20 m; full height at shower'))
+    y -= 2 * mm
+    for a, b in facts:
+        if y < ybot + 4 * mm:
+            break
+        c.setFont(L.F, 6.6); c.setFillGray(0.1); c.drawString(x, y - 2.4 * mm, a); c.drawRightString(x + w, y - 2.4 * mm, b)
+        c.setStrokeGray(0.85); c.setLineWidth(0.25); c.line(x, y - 3.6 * mm, x + w, y - 3.6 * mm)
+        y -= 5.2 * mm
+
+
+def section_scale(P, cut, SCALES):
+    """Escala con la que se dibujará el corte (para el índice de la portada)."""
+    from . import layout as L
+    u, span = _frame_of(cut, P)
+    cut_walls = [(o, a, b, cc, d) for (o, a, b, cc, d) in P.walls if _crosses(cut, a, b, cc, d)]
+    cut_walls += [(op['orient'], op['X0'], op['Y0'], op['X1'], op['Y1']) for op in P.ops
+                  if _crosses(cut, op['X0'], op['Y0'], op['X1'], op['Y1'])]
+    us = [x for w in cut_walls for x in _urange(cut, u, w[1], w[2], w[3], w[4])]
+    full0, full1 = (min(us), max(us)) if us else (0, span)
+    umin, umax = full0, full1
+    bb = cut.get('zone') or (_room_bbox(P, cut['room']) if cut.get('room') else None)
+    if bb:
+        ra, rb_ = _urange(cut, u, bb[0], bb[1], bb[2], bb[3])
+        umin, umax = max(full0, ra - 1.2), min(full1, rb_ + 1.2)
+        if umax - umin < 1.0:
+            umin, umax = full0, full1
+    dx0, dy0, dx1, dy1 = L.drawing_area()
+    avail_w = (dx1 - dx0) - 70 * mm
+    avail_h = (dy1 - dy0) * 0.42
+    total_h = CLEAR + 2 * SLAB
+    return next((s for s in SCALES if (umax - umin) * 1000 / s * mm <= avail_w and total_h * 1000 / s * mm <= avail_h), SCALES[-1])
+
+
 def sheet_section(c, P, meta, cut, number, frame_fn, F, FB, FRAME, TB_W, SCALES, dim_fn):
     x0, y0, x1, y1 = FRAME
     u, span = _frame_of(cut, P)
@@ -121,7 +228,7 @@ def sheet_section(c, P, meta, cut, number, frame_fn, F, FB, FRAME, TB_W, SCALES,
     full0, full1 = (min(us), max(us)) if us else (0, span)
     # ventana: el espacio protagonista (cocina o baño) más ~1.2 m a cada lado, para dibujar a escala grande
     umin, umax = full0, full1
-    bb = _room_bbox(P, cut['room']) if cut.get('room') else None
+    bb = cut.get('zone') or (_room_bbox(P, cut['room']) if cut.get('room') else None)
     if bb:
         ra, rb_ = _urange(cut, u, bb[0], bb[1], bb[2], bb[3])
         umin, umax = max(full0, ra - 1.2), min(full1, rb_ + 1.2)
@@ -129,14 +236,17 @@ def sheet_section(c, P, meta, cut, number, frame_fn, F, FB, FRAME, TB_W, SCALES,
             umin, umax = full0, full1
     span = umax - umin
     total_h = CLEAR + 2 * SLAB
-    avail_w = (x1 - TB_W) - x0 - 70 * mm
-    avail_h = (y1 - y0) - 80 * mm
+    from . import layout as L
+    dx0, dy0, dx1, dy1 = L.drawing_area()
+    avail_w = (dx1 - dx0) - 70 * mm          # cotas a la izquierda y niveles a la derecha
+    avail_h = (dy1 - dy0) * 0.42             # la mitad inferior es para la planta ampliada
     scale = next((s for s in SCALES if span * 1000 / s * mm <= avail_w and total_h * 1000 / s * mm <= avail_h), SCALES[-1])
     k = 1000 / scale * mm
-    ox = x0 + 35 * mm + (avail_w - span * k) / 2 - umin * k
-    oy = y0 + 40 * mm + (avail_h - total_h * k) / 2 + SLAB * k
-
-    tb = frame_fn(c, cut['title'], number, meta, f'1:{scale}  (A3)')
+    ox = dx0 + 28 * mm + (avail_w - span * k) / 2 - umin * k
+    oy = dy1 - 8 * mm - (CLEAR + SLAB) * k
+    sec_bottom = oy - SLAB * k - 0.95 * k - 7 * mm
+    meta['panel'] = _panel_section
+    tb = frame_fn(c, cut['title'], number, meta, f'1:{scale}')
 
     def T(uu, z):
         return ox + uu * k, oy + z * k
@@ -345,13 +455,50 @@ def sheet_section(c, P, meta, cut, number, frame_fn, F, FB, FRAME, TB_W, SCALES,
            xl - 7 * mm, f'{CLEAR + 2 * SLAB:.2f}', False, k)
     # cota horizontal total del corte
     dim_fn(c, T(umin, -SLAB), T(umax, -SLAB), T(0, -SLAB - 0.75)[1], f'{umax - umin:.2f}', True, k)
-    # título de vista y supuestos
-    sx, sy = x0 + 12 * mm, y0 + 10 * mm
-    c.setFont(FB, 10); c.drawString(sx, sy + 6 * mm, f"{cut['title']}  —  1:{scale}")
-    c.setFont(F, 7)
-    c.drawString(sx, sy + 2.8 * mm, f'Assumed: clear height {CLEAR:.2f} m, slab {SLAB:.2f} m (floor-to-floor {CLEAR + SLAB:.2f} m), '
-                                    f'doors {DOOR_H:.2f} m, window sill {SILL:.2f} m ({SILL_BATH:.2f} m in bathrooms), counter 0.90 m.')
-    c.drawString(sx, sy - 0.5 * mm, 'Schematic section derived from the plan; heights are standard assumptions — verify with the developer.')
+    # título del corte, debajo del corte
+    tx_ = min(ox + umax * k + 14 * mm, dx1 - 75 * mm)
+    L.view_title(c, tx_, oy - SLAB * k - 9 * mm, 1, cut['title'].replace('  ', ' '), f'SCALE 1:{scale}   ·   dimensions in metres',
+                 'Schematic; heights are standard assumptions.')
+    # planta ampliada del mismo espacio
+    zone = cut.get('zone') or (_room_bbox(P, cut['room']) if cut.get('room') else None)
+    if zone:
+        from . import drawing as D
+        pad = 0.35
+        zx0, zy0 = max(-0.2, zone[0] - pad), max(-0.2, zone[1] - pad)
+        zx1, zy1 = min(P.W + 0.2, zone[2] + pad), min(P.H + 0.2, zone[3] + pad)
+        bw_, bh_ = (dx1 - dx0) * 0.6 - 25 * mm, (sec_bottom - 9 * mm) - (dy0 + 3 * mm)
+        es = next((s_ for s_ in (20, 25, 50, 75) if (zx1 - zx0) * 1000 / s_ * mm <= bw_ and (zy1 - zy0) * 1000 / s_ * mm <= bh_), None)
+        if es:
+            ke = 1000 / es * mm
+            ex0 = dx0 + 25 * mm + (bw_ - (zx1 - zx0) * ke) / 2
+            ey0 = dy0 + 3 * mm + (bh_ - (zy1 - zy0) * ke) / 2
+
+            def TE(xx, yy):
+                return ex0 + (xx - zx0) * ke, ey0 + (yy - zy0) * ke
+            c.saveState()
+            pth = c.beginPath(); pth.rect(ex0, ey0, (zx1 - zx0) * ke, (zy1 - zy0) * ke)
+            c.clipPath(pth, stroke=0, fill=0)
+            D._plan_body(c, P, TE, ke, 'plan', None, tags=True, only={cut['room']} if cut.get('room') else None)
+            # línea del corte dentro de la ampliación
+            c.setStrokeColorRGB(*L.ACC); c.setLineWidth(0.6); c.setDash([6, 2, 1, 2], 0)
+            if cut['axis'] == 'y':
+                a_, b_ = TE(zx0, cut['c']), TE(zx1, cut['c'])
+            else:
+                a_, b_ = TE(cut['c'], zy0), TE(cut['c'], zy1)
+            c.line(a_[0], a_[1], b_[0], b_[1]); c.setDash()
+            c.restoreState()
+            # borde de la ampliación (línea de corte del dibujo) y cotas del recuadro
+            c.saveState(); c.setStrokeGray(0.55); c.setLineWidth(0.3); c.setDash(4, 2)
+            c.rect(ex0, ey0, (zx1 - zx0) * ke, (zy1 - zy0) * ke); c.setDash(); c.restoreState()
+            rb = _room_bbox(P, cut['room']) if cut.get('room') else zone
+            ax0, ax1 = max(zx0, rb[0]), min(zx1, rb[2]); ay0, ay1 = max(zy0, rb[1]), min(zy1, rb[3])
+            dim_fn(c, TE(ax0, ay0), TE(ax1, ay0), TE(ax0, zy0)[1] - 6 * mm, f'{ax1 - ax0:.2f}', True, ke)
+            dim_fn(c, TE(ax0, ay0), TE(ax0, ay1), TE(zx0, ay0)[0] - 6 * mm, f'{ay1 - ay0:.2f}', False, ke)
+            _room_panel(c, P, cut, zone, ex0 + (zx1 - zx0) * ke + 16 * mm, sec_bottom - 12 * mm, dx1, dy0 + 6 * mm)
+            nm = 'KITCHEN' if cut['name'] == 'A' else 'BATHROOM'
+            L.view_title(c, x0 + 7 * mm, y0 + 12 * mm, 2, f'{nm} — ENLARGED PLAN', f'SCALE 1:{es}   ·   dimensions in metres',
+                         'Same drawing as A-101, enlarged; fixtures as standard blocks.')
+    L.scale_bar(c, tb - 7 * mm - (2 if scale <= 25 else 5) * k - 6 * mm, y0 + 12 * mm, k, n=2 if scale <= 25 else 5)
     c.showPage()
     return scale
 

@@ -556,4 +556,6 @@ def build(image, mask, model):
     doors(model, rooms)
     rooms = floors(image, model, objs, rooms)
     elec = electrical(model, objs, rooms)
-    return dict(objects=objs, rooms=rooms, electrical=elec)
+    from . import furnish
+    items = furnish.layout(image, mask, model, objs, rooms)
+    return dict(objects=objs, rooms=rooms, electrical=elec, items=items)

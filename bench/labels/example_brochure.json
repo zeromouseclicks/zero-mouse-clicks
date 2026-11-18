@@ -1,0 +1,287 @@
+{
+ "image": "brochure.jpg",
+ "note": "Synthetic example rendered in Blender for the project (docs/img/brochure.jpg). Balcony (exterior) not labelled.",
+ "items": [
+  {
+   "type": "bed",
+   "box": [
+    233,
+    135,
+    358,
+    284
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "nightstand",
+   "box": [
+    198,
+    135,
+    232,
+    168
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "nightstand",
+   "box": [
+    360,
+    135,
+    395,
+    168
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "bathtub",
+   "box": [
+    420,
+    140,
+    545,
+    190
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "toilet",
+   "box": [
+    518,
+    230,
+    562,
+    262
+   ],
+   "facing": "W"
+  },
+  {
+   "type": "lavatory",
+   "box": [
+    415,
+    232,
+    447,
+    302
+   ],
+   "facing": "E"
+  },
+  {
+   "type": "plant",
+   "box": [
+    532,
+    142,
+    560,
+    168
+   ],
+   "facing": null
+  },
+  {
+   "type": "bed",
+   "box": [
+    665,
+    138,
+    745,
+    284
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "nightstand",
+   "box": [
+    745,
+    135,
+    780,
+    168
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "desk",
+   "box": [
+    578,
+    160,
+    612,
+    245
+   ],
+   "facing": "E"
+  },
+  {
+   "type": "chair",
+   "box": [
+    618,
+    188,
+    652,
+    220
+   ],
+   "facing": null
+  },
+  {
+   "type": "cooktop",
+   "box": [
+    228,
+    388,
+    272,
+    425
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "sink",
+   "box": [
+    188,
+    437,
+    218,
+    482
+   ],
+   "facing": "E"
+  },
+  {
+   "type": "fridge",
+   "box": [
+    180,
+    522,
+    230,
+    570
+   ],
+   "facing": "E"
+  },
+  {
+   "type": "stool",
+   "box": [
+    275,
+    520,
+    300,
+    548
+   ],
+   "facing": null
+  },
+  {
+   "type": "stool",
+   "box": [
+    308,
+    520,
+    335,
+    548
+   ],
+   "facing": null
+  },
+  {
+   "type": "stool",
+   "box": [
+    340,
+    520,
+    367,
+    548
+   ],
+   "facing": null
+  },
+  {
+   "type": "dining_table",
+   "box": [
+    418,
+    457,
+    498,
+    540
+   ],
+   "facing": null
+  },
+  {
+   "type": "chair",
+   "box": [
+    405,
+    440,
+    437,
+    472
+   ],
+   "facing": null
+  },
+  {
+   "type": "chair",
+   "box": [
+    478,
+    440,
+    512,
+    472
+   ],
+   "facing": null
+  },
+  {
+   "type": "chair",
+   "box": [
+    405,
+    515,
+    437,
+    547
+   ],
+   "facing": null
+  },
+  {
+   "type": "chair",
+   "box": [
+    478,
+    515,
+    512,
+    547
+   ],
+   "facing": null
+  },
+  {
+   "type": "plant",
+   "box": [
+    528,
+    395,
+    560,
+    428
+   ],
+   "facing": null
+  },
+  {
+   "type": "tv_unit",
+   "box": [
+    652,
+    382,
+    775,
+    410
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "sofa",
+   "box": [
+    735,
+    413,
+    800,
+    578
+   ],
+   "facing": "W"
+  },
+  {
+   "type": "coffee_table",
+   "box": [
+    645,
+    467,
+    700,
+    523
+   ],
+   "facing": null
+  },
+  {
+   "type": "armchair",
+   "box": [
+    580,
+    555,
+    637,
+    610
+   ],
+   "facing": "N"
+  },
+  {
+   "type": "plant",
+   "box": [
+    757,
+    585,
+    790,
+    620
+   ],
+   "facing": null
+  }
+ ],
+ "path": "docs/img/brochure.jpg"
+}

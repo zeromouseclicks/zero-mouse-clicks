@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zero Mouse Clicks · furniture labeller</title>
+<style>
+  :root { --bg:#0b0b0c; --panel:#141416; --line:#26262a; --ink:#e9e9ea; --mute:#8b8b92; --acc:#9fd0ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:13px/1.4 system-ui, -apple-system, Segoe UI, sans-serif; display:grid; grid-template-columns:1fr 300px; height:100vh; }
+  #stage { position:relative; overflow:auto; }
+  canvas { display:block; cursor:crosshair; }
+  aside { background:var(--panel); border-left:1px solid var(--line); padding:14px; overflow:auto; }
+  h1 { font-size:14px; margin:0 0 10px; }
+  .row { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+  button, select, input { background:#1d1d21; color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:5px 8px; font:inherit; }
+  button:hover { border-color:var(--acc); }
+  .types button { padding:3px 6px; font-size:12px; }
+  .types button.on { background:var(--acc); color:#000; }
+  ul { list-style:none; padding:0; margin:0; }
+  li { display:flex; justify-content:space-between; padding:3px 4px; border-radius:4px; cursor:pointer; }
+  li.sel { background:#24303d; }
+  .mute { color:var(--mute); font-size:12px; }
+  kbd { border:1px solid var(--line); border-radius:3px; padding:0 4px; font-size:11px; }
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="cv"></canvas></div>
+<aside>
+  <h1>Furniture labeller</h1>
+  <div class="row">
+    <label><input type="file" id="img" accept="image/*" hidden><button onclick="img.click()">Open image</button></label>
+    <label><input type="file" id="js" accept=".json" hidden><button onclick="js.click()">Open labels</button></label>
+    <button id="save">Save JSON</button>
+  </div>
+  <div class="row"><label class="mute">Area m² (optional) <input id="area" size="5"></label></div>
+  <div class="mute" style="margin-bottom:6px">Type for the next box</div>
+  <div class="row types" id="types"></div>
+  <div class="mute" style="margin:6px 0">Drag to draw a box. Select one, then: arrows = where its front faces,
+    <kbd>0</kbd> = no facing, <kbd>Del</kbd> = delete, type buttons = change type. Scroll wheel + <kbd>Ctrl</kbd> = zoom.</div>
+  <ul id="list"></ul>
+  <p class="mute">Labels are for evaluation only (bench/eval.py). Brochure images from developers are never used for training.</p>
+</aside>
+<script>
+const TYPES = ['bed','nightstand','desk','chair','armchair','sofa','coffee_table','side_table','tv_unit','dining_table','stool','plant',
+               'fridge','cooktop','sink','washer','toilet','lavatory','shower','bathtub'];
+const ORIENTED = new Set(['bed','nightstand','desk','sofa','armchair','tv_unit','toilet','lavatory','fridge','cooktop','sink','washer','bathtub','chair']);
+let image = null, name = '', items = [], cur = 'bed', sel = -1, zoom = 1, drag = null;
+const cv = document.getElementById('cv'), cx = cv.getContext('2d');
+const typesEl = document.getElementById('types');
+TYPES.forEach(t => { const b = document.createElement('button'); b.textContent = t; b.onclick = () => {
+  cur = t; if (sel >= 0) { items[sel].type = t; if (!ORIENTED.has(t)) items[sel].facing = null; } render(); }; typesEl.appendChild(b); });
+
+document.getElementById('img').onchange = e => { const f = e.target.files[0]; if (!f) return; name = f.name;
+  const im = new Image(); im.onload = () => { image = im; zoom = Math.min(1, (innerWidth - 320) / im.width); render(); }; im.src = URL.createObjectURL(f); };
+document.getElementById('js').onchange = e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => {
+  const d = JSON.parse(t); items = d.items || []; if (d.area) document.getElementById('area').value = d.area; if (!name) name = d.image; render(); }); };
+document.getElementById('save').onclick = () => {
+  const area = parseFloat(document.getElementById('area').value);
+  const d = { image: name, note: '', items: items.map(i => ({ type: i.type, box: i.box.map(Math.round), facing: i.facing || null })) };
+  if (!isNaN(area)) d.area = area;
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(d, null, 1)], { type: 'application/json' }));
+  a.download = (name || 'labels').replace(/\.[^.]+$/, '') + '.json'; a.click(); };
+
+function pt(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / zoom, (e.clientY - r.top) / zoom]; }
+cv.onmousedown = e => { if (!image) return; const [x, y] = pt(e);
+  const hit = items.findIndex(i => x >= i.box[0] && x <= i.box[2] && y >= i.box[1] && y <= i.box[3]);
+  if (hit >= 0 && !e.shiftKey) { sel = hit; render(); return; }
+  drag = [x, y, x, y]; };
+cv.onmousemove = e => { if (!drag) return; const [x, y] = pt(e); drag[2] = x; drag[3] = y; render(); };
+cv.onmouseup = () => { if (!drag) return; const [a, b, c, d] = drag; drag = null;
+  if (Math.abs(c - a) > 4 && Math.abs(d - b) > 4) { items.push({ type: cur, box: [Math.min(a, c), Math.min(b, d), Math.max(a, c), Math.max(b, d)],
+    facing: ORIENTED.has(cur) ? 'S' : null }); sel = items.length - 1; } render(); };
+cv.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); zoom = Math.max(0.1, Math.min(4, zoom * (e.deltaY < 0 ? 1.15 : 1 / 1.15))); render(); }, { passive: false });
+addEventListener('keydown', e => { if (sel < 0) return;
+  const m = { ArrowUp: 'N', ArrowDown: 'S', ArrowLeft: 'W', ArrowRight: 'E' };
+  if (m[e.key]) { items[sel].facing = m[e.key]; e.preventDefault(); }
+  else if (e.key === '0') items[sel].facing = null;
+  else if (e.key === 'Delete' || e.key === 'Backspace') { items.splice(sel, 1); sel = -1; }
+  else return; render(); });
+
+function render() {
+  if (!image) return;
+  cv.width = image.width * zoom; cv.height = image.height * zoom;
+  cx.drawImage(image, 0, 0, cv.width, cv.height);
+  cx.lineWidth = 2; cx.font = '12px system-ui';
+  items.forEach((it, i) => { const [a, b, c, d] = it.box.map(v => v * zoom);
+    cx.strokeStyle = i === sel ? '#ffb000' : '#ff3b6b'; cx.strokeRect(a, b, c - a, d - b);
+    cx.fillStyle = cx.strokeStyle; cx.fillText(it.type, a + 3, b + 13);
+    if (it.facing) { const mx = (a + c) / 2, my = (b + d) / 2, L = Math.min(c - a, d - b) / 2;
+      const v = { N: [0, -1], S: [0, 1], E: [1, 0], W: [-1, 0] }[it.facing];
+      cx.beginPath(); cx.moveTo(mx, my); cx.lineTo(mx + v[0] * L, my + v[1] * L); cx.stroke();
+      cx.beginPath(); cx.arc(mx + v[0] * L, my + v[1] * L, 3, 0, 7); cx.fill(); } });
+  if (drag) { cx.strokeStyle = '#9fd0ff'; cx.strokeRect(drag[0] * zoom, drag[1] * zoom, (drag[2] - drag[0]) * zoom, (drag[3] - drag[1]) * zoom); }
+  [...typesEl.children].forEach(b => b.classList.toggle('on', b.textContent === (sel >= 0 ? items[sel].type : cur)));
+  const ul = document.getElementById('list'); ul.innerHTML = '';
+  items.forEach((it, i) => { const li = document.createElement('li'); li.className = i === sel ? 'sel' : '';
+    li.innerHTML = `<span>${i + 1}. ${it.type}</span><span class="mute">${it.facing || '·'}</span>`; li.onclick = () => { sel = i; render(); }; ul.appendChild(li); });
+}
+</script>
+</body>
+</html>

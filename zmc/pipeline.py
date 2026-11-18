@@ -166,7 +166,9 @@ def steps(im0, area, proj, unit, pdf, legacy=False, debug=None, side=None, progr
         info.update(labels=[(l['name'], l['primary']) for l in labs], dims=[(q['a'], q['b']) for q in dims],
                     scale=dict(used=mod['m_per_px'], declared=mod.get('scale_declared'), dims=mod.get('scale_dims'), src=mod['scale_from']))
     say('draw')
-    P = drawing.make_pdf(mod, pdf, project=proj, unit=unit, area=area, fin=fin, area_kind=(mod.get('area_check') or {}).get('kind'))
+    src_img = crop if not legacy else im0
+    P = drawing.make_pdf(mod, pdf, project=proj, unit=unit, area=area, fin=fin, area_kind=(mod.get('area_check') or {}).get('kind'),
+                         image=src_img)
     if debug:
         cv2.imwrite(debug, dbg.render(im, m, mod, fin, 2), [cv2.IMWRITE_JPEG_QUALITY, 78])
     return dict(mod=mod, fin=fin, W=P.W, H=P.H, im=im, mask=m, info=info)

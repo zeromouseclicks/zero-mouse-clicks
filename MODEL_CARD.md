@@ -34,6 +34,8 @@ IoU on 80 fresh plans from the current generator (512 px). This is in-distributi
 
 On 9 real marketing plans (not distributed) the evaluation was qualitative. The geometry is recognizable in all of them. Typical errors: dark furniture (kitchen islands) read as walls, white rugs read as background, chairs and cushions read as fixtures. The pipeline averages the three models and corrects much of this with rules.
 
+**Furniture types are not predicted by the models.** Class 7 only says *loose furniture* and class 6 *fixture*; since v0.3 the rules in `zmc/furnish.py` decide the type (bed, sofa, dining table, toilet…), the catalogue size and the facing of each piece. On the furniture bench (`bench/`, 92 hand-labelled pieces in 4 plans: the project's own synthetic example and 3 developer plans used for evaluation only) the models mark 82 % of the pieces and the rules give the right type to 49 % (about 30 % on the developer plans). See `bench/RESULTS.md`.
+
 ## Intended use
 
 Drafting a first architectural plan set from a marketing floor plan, for exploration, education, renovation quotes and research. **Not** for construction, permits or legal surveys without verification on site.

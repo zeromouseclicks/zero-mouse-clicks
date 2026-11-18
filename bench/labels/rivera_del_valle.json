@@ -1,0 +1,257 @@
+{
+ "image": "co_amarilo_rivera-del-valle_51m2.jpg",
+ "note": "Amarilo, Rivera del Valle (public marketing image). Evaluation only, never training.",
+ "items": [
+  {
+   "type": "sofa",
+   "box": [
+    130,
+    118,
+    237,
+    282
+   ],
+   "facing": "E"
+  },
+  {
+   "type": "side_table",
+   "box": [
+    248,
+    118,
+    285,
+    150
+   ],
+   "facing": null
+  },
+  {
+   "type": "armchair",
+   "box": [
+    272,
+    200,
+    312,
+    235
+   ],
+   "facing": null
+  },
+  {
+   "type": "armchair",
+   "box": [
+    272,
+    250,
+    312,
+    285
+   ],
+   "facing": null
+  },
+  {
+   "type": "dining_table",
+   "box": [
+    368,
+    200,
+    472,
+    265
+   ],
+   "facing": null
+  },
+  {
+   "type": "chair",
+   "box": [
+    385,
+    178,
+    415,
+    200
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "chair",
+   "box": [
+    423,
+    178,
+    455,
+    200
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "chair",
+   "box": [
+    385,
+    265,
+    415,
+    292
+   ],
+   "facing": "N"
+  },
+  {
+   "type": "chair",
+   "box": [
+    423,
+    265,
+    455,
+    292
+   ],
+   "facing": "N"
+  },
+  {
+   "type": "desk",
+   "box": [
+    490,
+    50,
+    650,
+    92
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "chair",
+   "box": [
+    508,
+    100,
+    548,
+    130
+   ],
+   "facing": "N"
+  },
+  {
+   "type": "bed",
+   "box": [
+    655,
+    50,
+    740,
+    218
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "bed",
+   "box": [
+    785,
+    50,
+    865,
+    218
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "nightstand",
+   "box": [
+    750,
+    50,
+    780,
+    80
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "cooktop",
+   "box": [
+    280,
+    535,
+    320,
+    578
+   ],
+   "facing": "N"
+  },
+  {
+   "type": "sink",
+   "box": [
+    360,
+    540,
+    400,
+    578
+   ],
+   "facing": "N"
+  },
+  {
+   "type": "fridge",
+   "box": [
+    410,
+    525,
+    478,
+    580
+   ],
+   "facing": "N"
+  },
+  {
+   "type": "washer",
+   "box": [
+    563,
+    458,
+    613,
+    510
+   ],
+   "facing": null
+  },
+  {
+   "type": "lavatory",
+   "box": [
+    700,
+    412,
+    735,
+    455
+   ],
+   "facing": "W"
+  },
+  {
+   "type": "toilet",
+   "box": [
+    670,
+    474,
+    732,
+    512
+   ],
+   "facing": "W"
+  },
+  {
+   "type": "bed",
+   "box": [
+    818,
+    368,
+    980,
+    498
+   ],
+   "facing": "W"
+  },
+  {
+   "type": "nightstand",
+   "box": [
+    948,
+    330,
+    980,
+    362
+   ],
+   "facing": "W"
+  },
+  {
+   "type": "nightstand",
+   "box": [
+    948,
+    503,
+    980,
+    535
+   ],
+   "facing": "W"
+  },
+  {
+   "type": "lavatory",
+   "box": [
+    778,
+    668,
+    820,
+    705
+   ],
+   "facing": "N"
+  },
+  {
+   "type": "toilet",
+   "box": [
+    848,
+    645,
+    885,
+    702
+   ],
+   "facing": "N"
+  }
+ ],
+ "area": 51
+}

@@ -1,0 +1,186 @@
+{
+ "image": "co_amarilo_valle-verde_C.jpg",
+ "note": "Amarilo, Valle Verde type C (public marketing image). Evaluation only, never training. Dashed kitchen fixtures labelled.",
+ "items": [
+  {
+   "type": "sofa",
+   "box": [
+    232,
+    350,
+    537,
+    795
+   ],
+   "facing": "E"
+  },
+  {
+   "type": "coffee_table",
+   "box": [
+    501,
+    548,
+    632,
+    707
+   ],
+   "facing": null
+  },
+  {
+   "type": "dining_table",
+   "box": [
+    842,
+    540,
+    1168,
+    748
+   ],
+   "facing": null
+  },
+  {
+   "type": "chair",
+   "box": [
+    875,
+    462,
+    978,
+    540
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "chair",
+   "box": [
+    1037,
+    462,
+    1144,
+    540
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "chair",
+   "box": [
+    875,
+    748,
+    978,
+    833
+   ],
+   "facing": "N"
+  },
+  {
+   "type": "chair",
+   "box": [
+    1037,
+    748,
+    1144,
+    833
+   ],
+   "facing": "N"
+  },
+  {
+   "type": "bed",
+   "box": [
+    1573,
+    160,
+    1811,
+    652
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "nightstand",
+   "box": [
+    1430,
+    160,
+    1561,
+    262
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "bed",
+   "box": [
+    1890,
+    1129,
+    2351,
+    1552
+   ],
+   "facing": "W"
+  },
+  {
+   "type": "nightstand",
+   "box": [
+    2306,
+    1017,
+    2394,
+    1124
+   ],
+   "facing": "W"
+  },
+  {
+   "type": "nightstand",
+   "box": [
+    2306,
+    1557,
+    2394,
+    1667
+   ],
+   "facing": "W"
+  },
+  {
+   "type": "washer",
+   "box": [
+    1185,
+    1119,
+    1347,
+    1314
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "lavatory",
+   "box": [
+    1406,
+    1143,
+    1485,
+    1267
+   ],
+   "facing": "E"
+  },
+  {
+   "type": "toilet",
+   "box": [
+    1399,
+    1302,
+    1556,
+    1429
+   ],
+   "facing": "E"
+  },
+  {
+   "type": "fridge",
+   "box": [
+    613,
+    1500,
+    804,
+    1683
+   ],
+   "facing": "N"
+  },
+  {
+   "type": "sink",
+   "box": [
+    823,
+    1540,
+    966,
+    1676
+   ],
+   "facing": "N"
+  },
+  {
+   "type": "cooktop",
+   "box": [
+    1049,
+    1540,
+    1192,
+    1676
+   ],
+   "facing": "N"
+  }
+ ]
+}

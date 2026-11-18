@@ -1,0 +1,216 @@
+{
+ "image": "co_amarilo_valle-verde_A_52m2.jpg",
+ "note": "Amarilo, Valle Verde type A (public marketing image). Evaluation only, never training. Dashed kitchen fixtures labelled; dashed bar stools and balcony plants not.",
+ "items": [
+  {
+   "type": "bed",
+   "box": [
+    247,
+    1279,
+    461,
+    1743
+   ],
+   "facing": "N"
+  },
+  {
+   "type": "bed",
+   "box": [
+    604,
+    1279,
+    804,
+    1743
+   ],
+   "facing": "N"
+  },
+  {
+   "type": "side_table",
+   "box": [
+    485,
+    1626,
+    585,
+    1721
+   ],
+   "facing": null
+  },
+  {
+   "type": "dining_table",
+   "box": [
+    842,
+    1202,
+    1168,
+    1393
+   ],
+   "facing": null
+  },
+  {
+   "type": "chair",
+   "box": [
+    866,
+    1126,
+    994,
+    1202
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "chair",
+   "box": [
+    1013,
+    1126,
+    1144,
+    1202
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "chair",
+   "box": [
+    866,
+    1388,
+    994,
+    1469
+   ],
+   "facing": "N"
+  },
+  {
+   "type": "chair",
+   "box": [
+    1013,
+    1388,
+    1144,
+    1469
+   ],
+   "facing": "N"
+  },
+  {
+   "type": "sofa",
+   "box": [
+    1561,
+    1095,
+    1728,
+    1500
+   ],
+   "facing": "W"
+  },
+  {
+   "type": "coffee_table",
+   "box": [
+    1370,
+    1221,
+    1490,
+    1417
+   ],
+   "facing": null
+  },
+  {
+   "type": "bed",
+   "box": [
+    1937,
+    1174,
+    2406,
+    1555
+   ],
+   "facing": "W"
+  },
+  {
+   "type": "nightstand",
+   "box": [
+    2323,
+    1071,
+    2406,
+    1167
+   ],
+   "facing": "W"
+  },
+  {
+   "type": "nightstand",
+   "box": [
+    2323,
+    1564,
+    2406,
+    1660
+   ],
+   "facing": "W"
+  },
+  {
+   "type": "fridge",
+   "box": [
+    1144,
+    345,
+    1311,
+    548
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "sink",
+   "box": [
+    1359,
+    381,
+    1478,
+    500
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "cooktop",
+   "box": [
+    1573,
+    381,
+    1716,
+    500
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "washer",
+   "box": [
+    566,
+    660,
+    709,
+    798
+   ],
+   "facing": "E"
+  },
+  {
+   "type": "toilet",
+   "box": [
+    247,
+    750,
+    399,
+    850
+   ],
+   "facing": "E"
+  },
+  {
+   "type": "lavatory",
+   "box": [
+    247,
+    905,
+    328,
+    1007
+   ],
+   "facing": "E"
+  },
+  {
+   "type": "lavatory",
+   "box": [
+    1913,
+    536,
+    2025,
+    643
+   ],
+   "facing": "S"
+  },
+  {
+   "type": "toilet",
+   "box": [
+    2085,
+    548,
+    2180,
+    690
+   ],
+   "facing": "S"
+  }
+ ]
+}
