@@ -1096,6 +1096,13 @@ def scale_texts(model, P):
             sx, sy = fit['aniso_before']
             a1 += f"; the image was stretched {100 * (sy / sx - 1):+.1f} % in height and was corrected"
         a1 += '.'
+        adj = model.get('adjust_info') or {}
+        if adj.get('n'):
+            a1 += (f" Walls then moved (up to {100 * adj['shift_px'] * s:.0f} cm) so that {adj['n']} of those dimensions "
+                   f"are drawn as printed")
+            if adj.get('dropped'):
+                a1 += f"; {len(adj['dropped'])} did not agree with the drawing and were not forced"
+            a1 += '.'
         if chk.get('area'):
             dev = chk.get('dev', 0.0)
             what = 'private area (net spaces + half of the partitions)' if kind == 'private' else 'built area (gross, with walls)'

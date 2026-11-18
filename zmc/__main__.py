@@ -42,6 +42,10 @@ def _plan(argv):
         print(f"  scale from {fit['n']} of {fit['n_values']} dimensions printed on the plan "
               f"({fit['n_rooms']} spaces, 90 % within ±{100 * (fit['spread'] or 0):.1f} %)"
               + (f"; stretched image corrected ({100 * (info['stretch_corrected'] - 1):+.1f} % in height)" if info.get("stretch_corrected") else ""))
+        adj = mod.get("adjust_info") or {}
+        if adj.get("n"):
+            print(f"  walls fitted to {adj['n']} printed dimensions (largest move {100 * adj['shift_px'] * mod['m_per_px']:.0f} cm"
+                  + (f"; {len(adj['dropped'])} did not agree and were not forced" if adj.get("dropped") else "") + ")")
     else:
         print(f"  scale from the declared area ({(mod.get('area_check') or {}).get('kind') or 'private'})")
     for c in info.get("area_check") or []:

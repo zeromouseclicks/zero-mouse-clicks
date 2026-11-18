@@ -106,5 +106,6 @@ async def run(data, area, project, unit, js, area_kind=None, lean=False):
                    area_read=area is None, rooms=rooms, net=net,
                    scale=dict(src='dims' if fit else 'area', n=int(fit.get('n', 0)), of=int(fit.get('n_values', 0)),
                               spread=round(float(fit.get('spread') or 0), 4), stretch=info.get('stretch_corrected'),
-                              area_kind=chk.get('kind'), area_dev=round(float(chk.get('dev', 0.0)), 4)))
+                              area_kind=chk.get('kind'), area_dev=round(float(chk.get('dev', 0.0)), 4),
+                              adj=int((mod.get('adjust_info') or {}).get('n', 0))))
     return to_js(pdf), json.dumps(summary)

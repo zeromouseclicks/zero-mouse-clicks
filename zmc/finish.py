@@ -223,20 +223,49 @@ def classify(model, objs, image=None):
         ks = [t for t in r.get('texts', []) if t['type'] == 'kitchen']
         ls = [t for t in r.get('texts', []) if t['type'] == 'living']
         if r.get('open_kitchen'):
-            if ks:
-                ax, ay = ks[0]['mx'], ks[0]['my']
-            else:
-                cws = [o for o in inroom if _dims(o)[1] >= 1.2 and _dims(o)[0] <= 0.9]
-                if not cws:
-                    continue
-                b = max(cws, key=lambda o: _dims(o)[1]); ax, ay = (b['x0'] + b['x1']) / 2, (b['y0'] + b['y1']) / 2
             def dist(o, px, py):
                 return float(np.hypot(max(o['x0'] - px, 0, px - o['x1']), max(o['y0'] - py, 0, py - o['y1']))) * s
+
+            def gap(a, b):
+                return float(np.hypot(max(a['x0'] - b['x1'], b['x0'] - a['x1'], 0), max(a['y0'] - b['y1'], b['y0'] - a['y1'], 0))) * s
+            # v0.4: la cocina es el grupo de mesones más largo (mesones en L, isla y barra juntos), no la pieza
+            # alargada más larga, que a veces es el sofá; una isla leída como una sola mancha grande también vale
+            cws = [o for o in inroom if o['kind'] == 'casework' and _dims(o)[1] >= 0.6]
+            groups = []
+            for o in cws:
+                near = [g for g in groups if any(gap(o, q) <= 0.35 for q in g)]
+                merged = [o] + [q for g in near for q in g]
+                groups = [g for g in groups if g not in near] + [merged]
+            fx = [o for o in inroom if o['kind'] == 'fixture']
+
+            def kscore(g):
+                # largo de mesón + aparatos encima o al lado (estufa, lavaplatos, nevera): un escritorio en L o un
+                # mueble de TV largo no tienen aparatos
+                n = sum(1 for f in fx if any(gap(f, q) <= 0.3 for q in g))
+                return sum(_dims(q)[1] for q in g) + 1.5 * min(n, 3)
+            best = max(groups, key=kscore) if groups else []
+            if best and sum(_dims(q)[1] for q in best) < 1.2:
+                best = []
+            if ks:
+                ax, ay = ks[0]['mx'], ks[0]['my']
+                if best and min(dist(q, ax, ay) for q in best) > 1.5:
+                    best = []                             # el grupo de mesones no está junto al rótulo de cocina
+            elif best:
+                bq = max(best, key=lambda o: _dims(o)[1])
+                ax, ay = (bq['x0'] + bq['x1']) / 2, (bq['y0'] + bq['y1']) / 2
+            else:
+                continue
+            if best:
+                r['kitchen_group'] = [(q['x0'], q['y0'], q['x1'], q['y1']) for q in best]
             for o in inroom:
-                dk = dist(o, ax, ay)
+                if any(o is q for q in best):
+                    continue
+                dk = min(gap(o, q) for q in best) if best else dist(o, ax, ay)
                 dl = min([dist(o, t['mx'], t['my']) for t in ls] or [1e9])
-                if dk > 2.6 or dl < dk:
+                if dk > (1.25 if best else 2.6) or dl < dist(o, ax, ay):
                     o['kind'] = 'furniture'
+                elif best and o['kind'] == 'casework' and dk > 0.35 and not _against_wall(model, o, r, 0.15):
+                    o['kind'] = 'furniture'               # mueble exento lejos de los mesones: mesa, no mesón
             r['kitchen_anchor'] = (ax, ay)
         # mesón que el modelo leyó como un solo «aparato» alargado (mesón + estufa + lavaplatos)
         for o in [o for o in objs if o['room'] == r['id'] and o['kind'] == 'fixture']:
@@ -275,6 +304,11 @@ def classify(model, objs, image=None):
         elif rt == 'laundry':
             k = 'washer'
         elif rt == 'kitchen' or rooms.get(o['room'], {}).get('open_kitchen'):
+            # v0.4: nevera / lavadora solo contra un muro o al lado del mesón; suelta en medio de la sala es un
+            # mueble mal leído (la mesa del comedor, una silla, un puf)
+            if not _kitchen_spot(model, o, objs, rooms.get(o['room'], {})):
+                o['kind'] = 'furniture'
+                continue
             k = 'fridge' if a >= 0.62 else 'washer'
         else:          # aparato suelto en sala, alcoba o estudio: casi siempre un mueble mal leído
             o['kind'] = 'furniture'
@@ -324,6 +358,41 @@ def classify(model, objs, image=None):
                 ('vanity' if rt == 'bath' else ('island / bar' if min(o['w_m'], o['h_m']) >= 0.8 else 'counter'))
     objs.extend(extra)
     return rooms
+
+
+def _kitchen_spot(model, o, objs, r):
+    """¿La caja `o` puede ser una nevera o una lavadora de la cocina? Contra un muro (≤ 0,25 m), de tamaño de
+    aparato (0,45-0,95 m) y al lado de un mesón de la cocina (≤ 0,35 m; la lavadora, ≤ 0,2 m). Una caja suelta en
+    medio de la sala o junto al sofá es un mueble mal leído (la mesa del comedor, una silla, un puf)."""
+    s = model['m_per_px']
+    a, b = sorted((o['w_m'], o['h_m']))
+    if not (0.45 <= a and b <= 0.95):
+        return False
+    if not r.get('open_kitchen'):
+        return _against_wall(model, o, r, 0.25)        # cocina cerrada o ropas: basta con estar contra un muro
+    group = r.get('kitchen_group')
+    if group:
+        boxes = group
+    else:
+        boxes = [(c['x0'], c['y0'], c['x1'], c['y1']) for c in objs if c['kind'] == 'casework' and c['room'] == o['room']]
+    g = min([float(np.hypot(max(q[0] - o['x1'], o['x0'] - q[2], 0), max(q[1] - o['y1'], o['y0'] - q[3], 0))) * s
+             for q in boxes] or [1e9])
+    lim = 0.35 if a >= 0.62 else 0.2
+    if boxes and g > lim:
+        return False
+    return _against_wall(model, o, r, 0.25)
+
+
+def _against_wall(model, o, r, m):
+    """¿Hay un muro (algo que no es el espacio) a menos de `m` metros de la caja?"""
+    lbl = r.get('label')
+    if lbl is None:
+        return True
+    lab = model['room_labels']
+    x0, y0, x1, y1 = int(o['x0']), int(o['y0']), int(o['x1']), int(o['y1'])
+    k = max(1, int(round(m / model['m_per_px'])))
+    ring = lab[max(0, y0 - k):y1 + k, max(0, x0 - k):x1 + k]
+    return bool((ring != lbl).any())
 
 
 def _counter_fixtures(image, o, s):

@@ -124,7 +124,7 @@ def fit_dims(model, mask, dims, k, room_at, like=None):
             continue
         sp = spans(model, obsA, obsB, r, x, y, like)
         w = 0.5 if r.get('exterior') else 1.0
-        obs.append(dict(a=d['a'], b=d['b'], sp=sp, room=r['id'], w=w))
+        obs.append(dict(a=d['a'], b=d['b'], sp=sp, room=r['id'], w=w, x=x, y=y))
     if not obs:
         return None
 
@@ -148,7 +148,7 @@ def fit_dims(model, mask, dims, k, room_at, like=None):
                 cur = per.get(o['room'])
                 err = sum(q[3] for q in best[1])
                 if cur is None or best[0] > cur[0] or (best[0] == cur[0] and err < cur[1]):
-                    per[o['room']] = (best[0], err, [(o['room'], o['w']) + q for q in best[1]], o['w'])
+                    per[o['room']] = (best[0], err, [(o['room'], o['w']) + q + (o['x'], o['y']) for q in best[1]], o['w'])
         tot = sum(v[0] * v[3] for v in per.values())
         used = [u for v in per.values() for u in v[2]]
         return tot, used
@@ -199,7 +199,7 @@ def fit_dims(model, mask, dims, k, room_at, like=None):
     res = [np.log(u[3] / (u[4] * (sx if u[2] == 'h' else sy))) for u in used]
     return dict(sx=sx, sy=sy, aniso=aniso, n=len(used), n_rooms=len({u[0] for u in used}), n_dims=len(obs),
                 n_values=2 * len(obs), spread=float(np.percentile(np.abs(res), 90)) if res else None,
-                used=[dict(room=u[0], axis=u[2], value=u[3], px=u[4]) for u in used])
+                used=[dict(room=u[0], axis=u[2], value=u[3], px=u[4], x=u[6], y=u[7]) for u in used])
 
 
 # ----------------------------------------------------------------- áreas

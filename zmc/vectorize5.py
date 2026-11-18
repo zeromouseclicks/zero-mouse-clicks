@@ -8,6 +8,8 @@ import cv2
 import numpy as np
 from .vectorize import BG, SP, WL, DR, WN, main_envelope, footprint, wall_thickness, bars, snap, _cc_boxes
 
+UNIFORM_LINES = True     # v0.4: un solo grosor por línea de muro (ver _uniform_lines)
+
 
 def _walls(mask, t):
     wl = (mask == WL).astype(np.uint8)
@@ -42,7 +44,34 @@ def _walls(mask, t):
         else:
             th = max(2, c - a); x = mx.get(int(round((a + c) / 2)), int(round((a + c) / 2)))
             out.append([o, x - th // 2, my.get(b, b), x - th // 2 + th, my.get(d, d)])
-    return [w for w in out if w[3] > w[1] and w[4] > w[2]]
+    out = [w for w in out if w[3] > w[1] and w[4] > w[2]]
+    return _uniform_lines(out) if UNIFORM_LINES else out
+
+
+def _uniform_lines(walls):
+    """v0.4: tramos de una misma línea de muro (misma orientación y eje) con el mismo grosor: el de la mediana
+    ponderada por largo. Antes cada tramo traía su grosor medido y la cara del muro saltaba 1-2 px entre tramos,
+    de modo que la luz de un espacio cambiaba según dónde se midiera. Grosores muy distintos (±40 %) no se tocan."""
+    groups = {}
+    for i, (o, a, b, c, d) in enumerate(walls):
+        ax2 = (b + d) if o == 'h' else (a + c)            # eje x2 (entero)
+        groups.setdefault((o, ax2), []).append(i)
+    for (o, ax2), idx in groups.items():
+        if len(idx) < 2:
+            continue
+        th = [(walls[i][4] - walls[i][2]) if o == 'h' else (walls[i][3] - walls[i][1]) for i in idx]
+        ln = [(walls[i][3] - walls[i][1]) if o == 'h' else (walls[i][4] - walls[i][2]) for i in idx]
+        order = np.argsort(th); cum = np.cumsum(np.array(ln, float)[order])
+        med = int(th[order[int(np.searchsorted(cum, cum[-1] / 2))]])
+        for i, t_ in zip(idx, th):
+            if t_ == med or abs(t_ - med) > 0.4 * med:
+                continue
+            lo = (ax2 - med) // 2
+            if o == 'h':
+                walls[i][2], walls[i][4] = lo, lo + med
+            else:
+                walls[i][1], walls[i][3] = lo, lo + med
+    return walls
 
 
 def _raster(walls, shape):

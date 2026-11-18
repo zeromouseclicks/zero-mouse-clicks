@@ -514,7 +514,7 @@ def _living(ctx, r, cands, items, islands):
             ql, qh = _dims(q)
             if 0.18 <= ql and qh <= 0.75 and _gap(q['box'], box, s) <= 0.55:
                 chairs.append(q['box']); used.add(id(q))
-        _chairs(ctx, t, chairs, items, rid)
+        _chairs(ctx, t, chairs, items, rid, rl)
         break
     return used
 
@@ -527,63 +527,99 @@ def _in_front(it, x, y, ctx):
     return fx * vx + fy * vy > 0
 
 
-def _chairs(ctx, t, boxes, items, rid):
-    """Sillas alrededor de la mesa: donde se leyeron; si no se leyó ninguna, las de costumbre."""
+CHAIR_W, CHAIR_D = 0.45, 0.47     # silla de comedor de catálogo
+CHAIR_OFF = 0.26                  # centro de la silla a 0,26 m del borde: el asiento queda justo al borde de la mesa
+CHAIR_PITCH = 0.60                # un puesto de comedor ocupa ~0,60 m de borde
+
+
+def _chairs(ctx, t, boxes, items, rid, rl=None):
+    """Sillas alrededor de la mesa (v0.4). Del folleto se toma cuántas sillas hay en cada lado; se ponen a la
+    distancia y el paso de un comedor real (0,60 m por puesto, el asiento al borde de la mesa), parejas en los lados
+    largos, a lo sumo una en cada cabecera, y nunca contra un muro u otro mueble."""
     s = ctx.s
     cx, cy = t['cx'], t['cy']
     hw, hh = ctx.px(t['w']) / 2, ctx.px(t['d']) / 2
-    seats = []
+    off = ctx.px(CHAIR_OFF)
+    read, widths = [], []
     for b in boxes:
         bx, by = _center(b)
-        if math.dist((bx, by), (cx, cy)) * s < 0.25:
-            continue
-        a = _ang_to(ctx, bx, by, cx, cy)
-        seats.append((bx, by, a))
-    # simetría: las mesas de folleto casi siempre tienen sillas a ambos lados
-    for bx, by, a in list(seats):
-        if t.get('round'):
-            m = (2 * cx - bx, 2 * cy - by)
-        elif t['w'] >= t['d']:
-            m = (bx, 2 * cy - by)
+        if math.dist((bx, by), (cx, cy)) * s >= 0.25:
+            read.append((bx, by)); widths.append(((b[2] - b[0]) * s, (b[3] - b[1]) * s))
+    seats = []
+    if t.get('round'):
+        dia = t['w']
+        cap = 4 if dia < 1.05 else 5 if dia < 1.2 else 6
+        n = len(read)
+        n = 4 if n == 0 else min(cap, max(2, n + (n % 2 if n < cap else 0)))
+        step = 2 * math.pi / n
+        if read:                                      # fase de las sillas leídas (diagonales o ejes)
+            z = sum(complex(math.cos(n * math.atan2(by - cy, bx - cx)), math.sin(n * math.atan2(by - cy, bx - cx)))
+                    for bx, by in read)
+            phase = math.atan2(z.imag, z.real) / n
         else:
-            m = (2 * cx - bx, by)
-        if all(math.dist(m, (q[0], q[1])) * s >= 0.38 for q in seats):
-            seats.append((m[0], m[1], None))
-    if not seats:                                  # mesa sin sillas leídas: 4 (o 6 si es larga)
-        long_ = max(t['w'], t['d'])
-        n_side = 3 if long_ >= 1.75 else 2 if long_ >= 1.15 else 1
+            phase = 0.0
+        R = hw + off
+        for k in range(n):
+            a = phase + k * step
+            seats.append((cx + R * math.cos(a), cy + R * math.sin(a)))
+    else:
         horiz = t['w'] >= t['d']
-        for sgn in (-1, 1):
-            for k in range(n_side):
-                f = (k + 0.5) / n_side - 0.5
-                if horiz:
-                    seats.append((cx + f * 2 * hw, cy + sgn * (hh + ctx.px(0.28)), None))
-                else:
-                    seats.append((cx + sgn * (hw + ctx.px(0.28)), cy + f * 2 * hh, None))
-        if t.get('round') or n_side == 1:
-            seats = [(cx + dx * (hw + ctx.px(0.28)), cy + dy * (hh + ctx.px(0.28)), None)
-                     for dx, dy in ((0, -1), (0, 1), (-1, 0), (1, 0))]
-    out = []
-    for bx, by, a in seats:
-        # la silla queda medio metida bajo la mesa: centro a 0,2 m del borde
-        if t.get('round'):
-            ang = math.atan2(by - cy, bx - cx)
-            rr = hw + ctx.px(0.20)
-            bx, by = cx + rr * math.cos(ang), cy + rr * math.sin(ang)
-        else:
-            dx, dy = bx - cx, by - cy
-            if abs(dx) / max(hw, 1) > abs(dy) / max(hh, 1):
-                bx = cx + math.copysign(hw + ctx.px(0.20), dx); by = float(np.clip(by, cy - hh + ctx.px(0.25), cy + hh - ctx.px(0.25)))
+        L, Sd = (t['w'], t['d']) if horiz else (t['d'], t['w'])
+        cnt = {'l+': 0, 'l-': 0, 's+': 0, 's-': 0}
+        for (bx, by), (bw, bh) in zip(read, widths):
+            u, v = (bx - cx) / max(hw, 1), (by - cy) / max(hh, 1)
+            if horiz:
+                side = ('l+' if v > 0 else 'l-') if abs(v) >= abs(u) else ('s+' if u > 0 else 's-')
             else:
-                by = cy + math.copysign(hh + ctx.px(0.20), dy); bx = float(np.clip(bx, cx - hw + ctx.px(0.25), cx + hw - ctx.px(0.25)))
+                side = ('l+' if u > 0 else 'l-') if abs(u) >= abs(v) else ('s+' if v > 0 else 's-')
+            # dos sillas pegadas se leen como una sola mancha: se cuentan por su ancho a lo largo del lado
+            along = (bw if horiz else bh) if side[0] == 'l' else (bh if horiz else bw)
+            cnt[side] += max(1, min(3, int(round(along / 0.5)))) if side[0] == 'l' else 1
+        cap = max(1, int((L + 0.05) // CHAIR_PITCH))
+        want = max(cnt['l+'], cnt['l-'])
+        if read and want > cap:
+            # el folleto muestra más sillas de las que caben: la mesa es más larga de lo que se leyó
+            newL = next((v for v in (1.20, 1.40, 1.60, 1.80, 2.00, 2.40) if v >= want * CHAIR_PITCH - 0.05), None)
+            if newL is not None and newL - L <= 0.45:
+                L = newL
+                if horiz:
+                    t['w'] = newL; hw = ctx.px(newL) / 2
+                else:
+                    t['d'] = newL; hh = ctx.px(newL) / 2
+                cap = want
+        if read:
+            # los folletos muestran la mesa completa: en una mesa de 1,20 m o más, los lados largos van llenos
+            n_long = cap if L >= 1.15 else min(cap, want)
+            ends = [e for e in ('s+', 's-') if cnt[e]] if Sd >= 0.7 else []
+        else:
+            n_long = cap if L >= 1.15 else 1
+            ends = []
+        if n_long == 0 and not ends:
+            n_long = 1
+        H_long = ctx.px(Sd) / 2 + off                 # distancia del centro de la mesa al centro de la silla
+        H_end = ctx.px(L) / 2 + off
+        for sg in (1, -1):
+            for k in range(n_long):
+                f = ((k + 0.5) / n_long - 0.5) * ctx.px(L)
+                seats.append((cx + f, cy + sg * H_long) if horiz else (cx + sg * H_long, cy + f))
+        for e in ends:
+            sg = 1 if e == 's+' else -1
+            seats.append((cx + sg * H_end, cy) if horiz else (cx, cy + sg * H_end))
+    others = [_rect(ctx, o) for o in items if o is not t and o['room'] == rid]
+    for bx, by in seats:
         a = _ang_to(ctx, bx, by, cx, cy)
         if not t.get('round'):
             a = _snap_ang(a)
-        if any(math.dist((bx, by), (o[0], o[1])) * s < 0.38 for o in out):
-            continue
-        out.append((bx, by, a))
-    for bx, by, a in out[:10]:
-        items.append(dict(type='chair', cx=float(bx), cy=float(by), w=0.46, d=0.46, ang=float(a), room=rid, src='rule'))
+        it = dict(type='chair', cx=float(bx), cy=float(by), w=CHAIR_W, d=CHAIR_D, ang=float(a), room=rid, src='rule')
+        r_ = _rect(ctx, it)
+        if rl is not None:
+            x0, y0, x1, y1 = int(r_[0]), int(r_[1]), int(math.ceil(r_[2])), int(math.ceil(r_[3]))
+            sub = ctx.lab[max(0, y0):max(0, y1), max(0, x0):max(0, x1)]
+            if sub.size == 0 or (sub == rl).mean() < 0.85:
+                continue                              # contra un muro o fuera del espacio
+        if sum(_inter(r_, o) for o in others) > 0.15 * _area(r_):
+            continue                                  # encima de otro mueble
+        items.append(it); others.append(r_)
 
 
 # ---------------------------------------------------------------------------------------------- plantas
@@ -616,6 +652,14 @@ def _plants(ctx, rooms, items):
 
 # ---------------------------------------------------------------------------------------------- aparatos
 def _fixture_items(ctx, objs, rooms):
+    out = _fixture_items0(ctx, objs, rooms)
+    for it, o in zip(out, [o for o in objs if o['kind'] == 'fixture' and o.get('fixture') and rooms.get(o['room']) is not None]):
+        it['_box'] = _box(o)
+        it.setdefault('box_wh', (o['w_m'], o['h_m']))
+    return out
+
+
+def _fixture_items0(ctx, objs, rooms):
     out = []
     for o in objs:
         f = o.get('fixture')
@@ -679,6 +723,64 @@ def _fixture_items(ctx, objs, rooms):
                 w = d = 0.60
             out.append(_place(ctx, rl, box, back, w, d, f, o['room'], flush=0.5, dist=dd[back]))
     return out
+
+
+def _kitchen_fix(ctx, model, objs, rooms, items):
+    """v0.4: estufa y lavaplatos sobre el mesón sin encimarse (≥ 0,30 m entre ellos); nevera y lavadora contra un
+    muro, sin montarse en el mesón, en otra pieza ni en el barrido de una puerta."""
+    s = ctx.s
+    for rid, r in rooms.items():
+        kit = [it for it in items if it['room'] == rid and it['type'] in ('cooktop', 'sink', 'fridge', 'washer')]
+        if not kit:
+            continue
+        rl = r['label']
+        zones = _door_zones(ctx, model, rl, rid)
+        counters = []
+        for o in objs:
+            if o['room'] == rid and o['kind'] == 'casework':
+                b = _box(o)
+                counters.append(dict(type='counter', cx=(b[0] + b[2]) / 2, cy=(b[1] + b[3]) / 2,
+                                     w=(b[2] - b[0]) * s, d=(b[3] - b[1]) * s, ang=0.0))
+        top = [it for it in kit if it['type'] in ('cooktop', 'sink')]
+        for a in top:
+            for b in top:
+                if a is b or a['type'] != 'cooktop':
+                    continue
+                ra, rb = _rect(ctx, a), _rect(ctx, b)
+                horiz = a['ang'] in (0.0, 180.0)
+                gap = (max(rb[0] - ra[2], ra[0] - rb[2]) if horiz else max(rb[1] - ra[3], ra[1] - rb[3])) * s
+                if gap >= 0.30 or abs((a['cy'] - b['cy']) if horiz else (a['cx'] - b['cx'])) * s > 0.5:
+                    continue
+                # el lavaplatos se corre a lo largo del mesón, del lado donde ya estaba
+                sgn = 1 if ((b['cx'] - a['cx']) if horiz else (b['cy'] - a['cy'])) >= 0 else -1
+                need = ctx.px(0.30 - gap) if gap > -1 else 0
+                if horiz:
+                    b['cx'] += sgn * (need + 1)
+                else:
+                    b['cy'] += sgn * (need + 1)
+        fixed = list(top)
+        for it in [it for it in kit if it['type'] in ('fridge', 'washer')]:
+            others = counters + [o for o in fixed if o is not it]
+            r_ = _rect(ctx, it)
+            hit = sum(_inter(r_, _rect(ctx, o)) for o in others) > 0.1 * _area(r_)
+            door = sum(_inter(r_, z) for z in zones) > 0.2 * _area(r_)
+            if hit or door:
+                ok = False
+                x0, y0, x1, y1 = r_
+                dd = ctx.dists(rl, (int(x0), int(y0), int(max(x1, x0 + 1)), int(max(y1, y0 + 1))))
+                for sd in sorted('NSEW', key=lambda q: dd[q]):
+                    t = dict(it)
+                    if _seat(ctx, t, sd, rl, others, zones, strict=True):
+                        rr = _rect(ctx, t)
+                        if math.dist((t['cx'], t['cy']), (it['cx'], it['cy'])) * s <= 1.5 and \
+                                sum(_inter(rr, z) for z in zones) <= 0.2 * _area(rr):
+                            t.pop('span', None)
+                            it.update(t); ok = True
+                            break
+                if not ok and r.get('open_kitchen'):
+                    items.remove(it)                      # en una sala abierta y sin sitio creíble: no se dibuja
+                    continue
+            fixed.append(it)
 
 
 def _kitchen_retype(ctx, objs, rooms):
@@ -759,8 +861,10 @@ def _face(ctx, rl, cx, cy, back, half):
     return float(np.median(out))
 
 
-def _seat(ctx, it, back, rl, room_items, zones, along=None):
-    """Pone la pieza con el respaldo pegado al muro `back`, dentro del tramo libre y fuera de puertas y otras piezas."""
+def _seat(ctx, it, back, rl, room_items, zones, along=None, strict=False):
+    """Pone la pieza con el respaldo pegado al muro `back`, dentro del tramo libre y fuera de puertas y otras piezas.
+    strict: no se acepta ninguna posición que choque con otra pieza (con 6 cm de holgura a los lados y, para inodoro
+    y lavamanos, 0,45 m libres al frente); devuelve False en vez de encimarla."""
     s = ctx.s
     w, d = ctx.px(it['w']), ctx.px(it['d'])
     face = _face(ctx, rl, it['cx'], it['cy'], back, w / 3)
@@ -774,22 +878,40 @@ def _seat(ctx, it, back, rl, room_items, zones, along=None):
         return False
     sgn = 1 if back in 'NW' else -1
     depth_c = face + sgn * d / 2
+    pad = ctx.px(0.06) if strict else 0.0
+    fd = ctx.px(0.45)
+    others = [_rect(ctx, o) for o in room_items if o is not it]
 
     def rect_at(cc):
         if back in 'NS':
             return (cc - w / 2, depth_c - d / 2, cc + w / 2, depth_c + d / 2)
         return (depth_c - d / 2, cc - w / 2, depth_c + d / 2, cc + w / 2)
 
+    def front(r):
+        if back == 'N':
+            return (r[0], r[3], r[2], r[3] + fd)
+        if back == 'S':
+            return (r[0], r[1] - fd, r[2], r[1])
+        if back == 'W':
+            return (r[2], r[1], r[2] + fd, r[3])
+        return (r[0] - fd, r[1], r[0], r[3])
+
     def bad(cc):
         """(choca con otra pieza, invade el barrido de una puerta). El barrido real es un cuarto de círculo:
         se tolera rozar la esquina del cuadrado."""
         r = rect_at(cc)
-        items_hit = sum(_inter(r, _rect(ctx, o)) for o in room_items if o is not it) > 0.02 * w * d
+        rr = (r[0] - pad, r[1], r[2] + pad, r[3]) if back in 'NS' else (r[0], r[1] - pad, r[2], r[3] + pad)
+        items_hit = sum(_inter(rr, o) for o in others) > 0.02 * w * d
+        if strict and not items_hit and it['type'] in ('toilet', 'lavatory'):
+            fr = front(r)
+            items_hit = sum(_inter(fr, o) for o in others) > 0.2 * _area(fr)
         door_hit = sum(_inter(r, z) for z in zones) > 0.25 * w * d
         return items_hit, door_hit
     lo, hi = a + w / 2, b - w / 2
     best = min(np.linspace(lo, hi, max(2, int((hi - lo) / max(1.0, ctx.px(0.05))) + 1)),
                key=lambda cc: (*bad(cc), abs(cc - c)))
+    if strict and bad(best)[0]:
+        return False
     if back in 'NS':
         it['cx'], it['cy'] = float(best), float(depth_c)
     else:
@@ -799,9 +921,331 @@ def _seat(ctx, it, back, rl, room_items, zones, along=None):
     return True
 
 
-def _wet_fixtures(ctx, model, rooms, items):
-    """Aparatos sanitarios y de ropas: el respaldo (tanque del inodoro, poceta del lavamanos) siempre contra el muro."""
+def _room_box(ctx, rl):
+    ys, xs = np.nonzero(ctx.lab == rl)
+    if xs.size == 0:
+        return None
+    return int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1
+
+
+def _shower_marks(ctx, rl, avoid=()):
+    """Señales de ducha en la imagen del baño, fuera de las piezas que el modelo vio:
+    - sifón: mancha redonda de 4-20 cm, aislada, que contrasta con el piso (oscura sobre piso claro o clara sobre
+      piso oscuro), a más de 10 cm del muro; peso 1,5;
+    - regadera vista desde arriba: disco claro de 20-30 cm a menos de 0,5 m de un muro; peso 2.
+    -> [(x, y, peso)]"""
+    bb = _room_box(ctx, rl)
+    if bb is None:
+        return []
+    x0, y0, x1, y1 = bb
     s = ctx.s
+    room = np.ascontiguousarray(ctx.lab[y0:y1, x0:x1] == rl)
+    if room.sum() < 20:
+        return []
+    sub = ctx.im[y0:y1, x0:x1]
+    hsv = cv2.cvtColor(sub, cv2.COLOR_BGR2HSV)
+    v, sat = hsv[..., 2].astype(int), hsv[..., 1].astype(int)
+    med = int(np.median(v[room]))
+    inner = cv2.erode(room.astype(np.uint8), np.ones((3, 3), np.uint8)) > 0
+    dist = cv2.distanceTransform(np.ascontiguousarray(room.astype(np.uint8)), cv2.DIST_L2, 5) * s
+    ring = max(3, int(round(ctx.px(0.12))))
+    out = []
+    for pol in (-1, 1):
+        msk = inner & ((v <= med - 30) if pol < 0 else ((v >= med + 30) & (sat <= 60)))
+        n, lab_, st, cen = cv2.connectedComponentsWithStats(msk.astype(np.uint8), 8)
+        for i in range(1, n):
+            x, y, w, h, a = st[i]
+            dia = 2 * math.sqrt(a / math.pi) * s
+            if not (0.04 <= dia <= 0.30) or max(w, h) / max(1, min(w, h)) > 1.5 or a / float(w * h) < 0.5:
+                continue
+            cx, cy = float(cen[i][0]), float(cen[i][1])
+            X, Y = x0 + cx, y0 + cy
+            if any(q[0] <= X <= q[2] and q[1] <= Y <= q[3] for q in avoid):
+                continue
+            ya, yb, xa, xb = max(0, int(cy) - ring), int(cy) + ring + 1, max(0, int(cx) - ring), int(cx) + ring + 1
+            around = int(msk[ya:yb, xa:xb].sum()) - int((lab_[ya:yb, xa:xb] == i).sum())
+            if around > 3:
+                continue                                # parte de un texto, un patrón o una pieza
+            dw = float(dist[int(cy), int(cx)])
+            if pol > 0 and dia >= 0.20 and dw <= 0.5:
+                out.append((X, Y, 2.0))                 # regadera
+            elif dia <= 0.20 and dw >= 0.10:
+                out.append((X, Y, 1.5))                 # sifón
+    return out
+
+
+def _wet_zone(ctx, r, zones, pieces, extra=()):
+    """Ducha del baño cuando el modelo no la marcó, como lista de opciones de la más a la menos probable.
+    Convención de folleto y de obra: un rectángulo de muro a muro en un extremo del baño (0,90 m de fondo; 1,00 m
+    en baños largos). Se elige por señales en la imagen (regadera, sifón); sin señales, en un baño completo, el
+    extremo más lejano de la puerta (supuesta). Si con ella no caben inodoro y lavamanos, la siguiente opción es
+    un cuadrado de 0,90 m en la esquina de las señales. Nunca sobre las piezas que el modelo vio ni sobre el
+    barrido de la puerta. -> [pieza 'shower', ...]"""
+    rl, rid, s = r['label'], r['id'], ctx.s
+    bb = _room_box(ctx, rl)
+    if bb is None:
+        return []
+    bx0, by0, bx1, by1 = bb
+    Wm, Hm = (bx1 - bx0) * s, (by1 - by0) * s
+    prects = [_rect(ctx, p) for p in pieces]
+    avoid = [(a[0] - ctx.px(0.05), a[1] - ctx.px(0.05), a[2] + ctx.px(0.05), a[3] + ctx.px(0.05)) for a in prects]
+    marks = _shower_marks(ctx, rl, avoid) + list(extra)
+    D = ctx.px(1.0 if max(Wm, Hm) >= 2.6 else 0.9)
+    Q = ctx.px(0.9)
+    strips, corners = [], []
+    if Wm <= 2.2 and Hm - D * s >= 0.9:
+        strips += [(bx0, by0, bx1, by0 + D), (bx0, by1 - D, bx1, by1)]
+    if Hm <= 2.2 and Wm - D * s >= 0.9:
+        strips += [(bx0, by0, bx0 + D, by1), (bx1 - D, by0, bx1, by1)]
+    if min(Wm, Hm) >= 1.4:
+        corners = [(bx0, by0, bx0 + Q, by0 + Q), (bx1 - Q, by0, bx1, by0 + Q),
+                   (bx0, by1 - Q, bx0 + Q, by1), (bx1 - Q, by1 - Q, bx1, by1)]
+    dc = [((z[0] + z[2]) / 2, (z[1] + z[3]) / 2) for z in zones]
+    diag = math.hypot(bx1 - bx0, by1 - by0)
+
+    hsv = cv2.cvtColor(ctx.im, cv2.COLOR_BGR2HSV)
+    rv = hsv[..., 2][ctx.lab == rl]
+    med = int(np.median(rv)) if rv.size else 200
+
+    def rate(z):
+        zi = (int(z[0]), int(z[1]), int(math.ceil(z[2])), int(math.ceil(z[3])))
+        sub = ctx.lab[max(0, zi[1]):zi[3], max(0, zi[0]):zi[2]]
+        cover = float((sub == rl).mean()) if sub.size else 0.0
+        hv = hsv[max(0, zi[1]):zi[3], max(0, zi[0]):zi[2]]
+        white = float(((hv[..., 2] >= max(med + 10, 235)) & (hv[..., 1] <= 25) & (sub == rl)).mean()) if sub.size else 0.0
+        L = max(z[2] - z[0], z[3] - z[1]) * s
+        tub = white >= 0.45 and 1.5 <= L <= 2.2         # tina: porcelana blanca de muro a muro
+        g = ctx.px(0.1)
+        ev = sum(wt for x, y, wt in marks if z[0] - g <= x <= z[2] + g and z[1] - g <= y <= z[3] + g)
+        hit = sum(_inter(z, p) / max(_area(p), 1.0) for p in prects)
+        door = sum(_inter(z, q) for q in zones) / max(_area(z), 1.0)
+        far = min((math.dist(((z[0] + z[2]) / 2, (z[1] + z[3]) / 2), c) for c in dc), default=diag / 2) / max(diag, 1.0)
+        if tub:
+            ev += 3.0; hit = 0.0                         # lo que el modelo vio dentro de la tina es la tina
+        return dict(z=z, cover=cover, ev=ev, hit=hit, door=door, tub=tub, score=3 * ev - 4 * hit - 6 * door + far)
+    out = []
+    full = r['area'] >= 2.3 and max(Wm, Hm) >= 1.7
+    for kind, zs in (('strip', strips), ('corner', corners)):
+        rs = sorted((rate(z) for z in zs), key=lambda q: -q['score'])
+        for q in rs:
+            if q['cover'] < 0.75 or q['door'] >= 0.2 or q['hit'] >= 0.5:
+                continue
+            if q['ev'] >= 1.0:
+                src = 'image'
+            elif kind == 'strip' and not marks and full and q['hit'] < 0.3 and q['door'] < 0.15:
+                src = 'assumed'
+            else:
+                continue
+            z = q['z']
+            if kind == 'strip' and q['tub']:
+                # tina de 0,75 m de fondo pegada al muro del extremo
+                dz = ctx.px(0.75)
+                if (z[2] - z[0]) >= (z[3] - z[1]):
+                    z = (z[0], z[1], z[2], z[1] + dz) if z[1] <= by0 + 1 else (z[0], z[3] - dz, z[2], z[3])
+                else:
+                    z = (z[0], z[1], z[0] + dz, z[3]) if z[0] <= bx0 + 1 else (z[2] - dz, z[1], z[2], z[3])
+                L = max(z[2] - z[0], z[3] - z[1]) * s
+                horiz = (z[2] - z[0]) >= (z[3] - z[1])
+                out.append(dict(type='bathtub', cx=(z[0] + z[2]) / 2, cy=(z[1] + z[3]) / 2, w=round(L, 2), d=0.75,
+                                ang=0.0 if horiz else 90.0, room=rid, src='image'))
+                continue
+            out.append(dict(type='shower', cx=(z[0] + z[2]) / 2, cy=(z[1] + z[3]) / 2, w=round((z[2] - z[0]) * s, 2),
+                            d=round((z[3] - z[1]) * s, 2), ang=0.0, room=rid, src=src))
+            if src == 'assumed' or kind == 'corner':
+                break                                    # una sola opción supuesta / de esquina
+    return out
+
+
+def _seat_wet(ctx, it, rl, placed, zones, strict):
+    """Respaldo de la pieza húmeda contra el muro más cercano (tanque del inodoro, poceta del lavamanos)."""
+    s = ctx.s
+    x0, y0, x1, y1 = _rect(ctx, it)
+    box = (int(x0), int(y0), int(max(x1, x0 + 1)), int(max(y1, y0 + 1)))
+    dd = ctx.dists(rl, box)
+    bw, bh = it.get('box_wh', ((x1 - x0) * s, (y1 - y0) * s))
+    if it['type'] == 'bathtub':                       # la tina va de lado contra el muro
+        sides = 'NS' if bw >= bh else 'EW'
+    else:
+        sides = 'NSEW'
+    back = min(sides, key=lambda sd: dd[sd])
+    if it['type'] == 'toilet' and max(bw, bh) / max(min(bw, bh), 1e-3) >= 1.25:
+        # inodoro leído alargado: el tanque va en un extremo corto, si hay muro cerca
+        ends = 'NS' if bh > bw else 'EW'
+        e = min(ends, key=lambda sd: dd[sd])
+        if dd[e] <= 0.6:
+            back = e
+    order = [back] + [sd for sd in sorted(sides, key=lambda sd: dd[sd]) if sd != back]
+    if strict:
+        order = [sd for sd in order if dd[sd] <= 0.9] or order[:1]
+    for sd in order:
+        if _seat(ctx, it, sd, rl, placed, zones, strict=strict):
+            return True
+    return False
+
+
+def _bath_pair(ctx, model, r, zones, placed, small, items):
+    """Inodoro y lavamanos adosados a la misma pared, fuera de la ducha y del barrido de la puerta (lo usual en
+    obra: un solo muro húmedo). El inodoro del lado de la ducha, el lavamanos del lado de la puerta, salvo que el
+    modelo los haya visto en el otro orden. Si los dos caben en un muro, se ubican ahí (los que faltan, supuestos)
+    y se devuelven las piezas que quedan por ubicar; si no, se devuelven todas para ubicarlas una a una."""
+    rl, rid, s = r['label'], r['id'], ctx.s
+    toil = [o for o in small if o['type'] == 'toilet']
+    lavs = [o for o in small if o['type'] == 'lavatory']
+    rest = [o for o in small if o['type'] not in ('toilet', 'lavatory')]
+    if len(toil) > 1 or len(lavs) > 1 or r['area'] < 1.4:
+        return small
+    t0 = toil[0] if toil else dict(type='toilet', cx=0.0, cy=0.0, w=STD['toilet'][0], d=STD['toilet'][1], ang=0.0,
+                                   room=rid, src='assumed')
+    l0 = lavs[0] if lavs else dict(type='lavatory', cx=0.0, cy=0.0, w=STD['lavatory'][0], d=STD['lavatory'][1], ang=0.0,
+                                   room=rid, src='assumed')
+    t0['w'], t0['d'] = STD['toilet']
+    if toil and lavs:
+        t1, l1 = dict(t0), dict(l0)
+        if _seat_wet(ctx, t1, rl, list(placed), zones, strict=True) and \
+                _seat_wet(ctx, l1, rl, list(placed) + [t1], zones, strict=True) and \
+                math.dist((t1['cx'], t1['cy']), (t0['cx'], t0['cy'])) * s <= 0.35 and \
+                math.dist((l1['cx'], l1['cy']), (l0['cx'], l0['cy'])) * s <= 0.35:
+            return small                                  # el modelo los vio bien puestos: se respetan
+    bb = _room_box(ctx, rl)
+    if bb is None:
+        return small
+    bx0, by0, bx1, by1 = bb
+    sh = next((o for o in placed if o['type'] in ('shower', 'bathtub')), None)
+    shr = _rect(ctx, sh) if sh else None
+    # sin piezas vistas: lo que el modelo marcó como aparato o mueble en el baño (fuera de la ducha) indica el muro
+    ev = np.isin(ctx.mask, (AP, MS, MU)) & (ctx.lab == rl)
+    if shr is not None:
+        ev[max(0, int(shr[1])):int(math.ceil(shr[3])), max(0, int(shr[0])):int(math.ceil(shr[2]))] = False
+    ey, ex = np.nonzero(ev)
+    ev_c = (float(ex.mean()), float(ey.mean())) if ex.size > 15 else None
+    dc = [((z[0] + z[2]) / 2, (z[1] + z[3]) / 2) for z in zones]
+    seen = [o for o in (toil + lavs)]
+    best = None
+    for sd in 'NSEW':
+        along_lo, along_hi = (bx0, bx1) if sd in 'NS' else (by0, by1)
+        # extremo «ducha» y extremo «puerta» a lo largo de este muro
+        if shr is not None:
+            sc = (shr[0] + shr[2]) / 2 if sd in 'NS' else (shr[1] + shr[3]) / 2
+            if sd in 'NS' and (shr[2] - shr[0]) > 0.8 * (bx1 - bx0) or sd in 'EW' and (shr[3] - shr[1]) > 0.8 * (by1 - by0):
+                continue                                   # la ducha ocupa todo este muro
+        else:
+            sc = None
+        if sc is None and dc:
+            dmid = dc[0][0] if sd in 'NS' else dc[0][1]
+            sc = along_hi if dmid - along_lo < along_hi - dmid else along_lo
+        if sc is None:
+            sc = along_lo
+        toward = 1 if sc > (along_lo + along_hi) / 2 else -1   # dirección hacia la ducha
+        if shr is not None:
+            edge = (shr[0] if toward > 0 else shr[2]) if sd in 'NS' else (shr[1] if toward > 0 else shr[3])
+        else:
+            edge = along_hi if toward > 0 else along_lo
+        for first in ('toilet', 'lavatory'):
+            # la primera pieza junto a la ducha (o al fondo), la segunda a continuación hacia la puerta
+            p1 = edge - toward * ctx.px(0.30)
+            p2 = p1 - toward * ctx.px(0.62)
+            t_al, l_al = (p1, p2) if first == 'toilet' else (p2, p1)
+            if toil and lavs:                             # orden visto por el modelo en este muro: se respeta
+                a_t = toil[0]['cx'] if sd in 'NS' else toil[0]['cy']
+                a_l = lavs[0]['cx'] if sd in 'NS' else lavs[0]['cy']
+                if (a_l - a_t) * (l_al - t_al) < 0:
+                    continue
+            t = dict(t0); l_ = dict(l0)
+            for q in (t, l_):
+                if sd == 'N':
+                    q['cy'] = by0 + ctx.px(q['d']) / 2
+                elif sd == 'S':
+                    q['cy'] = by1 - ctx.px(q['d']) / 2
+                elif sd == 'W':
+                    q['cx'] = bx0 + ctx.px(q['d']) / 2
+                else:
+                    q['cx'] = bx1 - ctx.px(q['d']) / 2
+                if sd in 'NS':
+                    q['cy'] = float(np.clip(q['cy'], by0 + 1, by1 - 2))
+                    q['cx'] = float((bx0 + bx1) / 2)
+                else:
+                    q['cx'] = float(np.clip(q['cx'], bx0 + 1, bx1 - 2))
+                    q['cy'] = float((by0 + by1) / 2)
+            base = list(placed)
+            q1, a1, q2, a2 = (t, t_al, l_, l_al) if first == 'toilet' else (l_, l_al, t, t_al)
+            if not _seat(ctx, q1, sd, rl, base, zones, along=float(a1), strict=True):
+                continue
+            if not _seat(ctx, q2, sd, rl, base + [q1], zones, along=float(a2), strict=True):
+                continue
+            door = sum(_inter(_rect(ctx, q), z) for q in (t, l_) for z in zones)
+            if door > 0.1 * (_area(_rect(ctx, t)) + _area(_rect(ctx, l_))):
+                continue
+            # preferir el muro donde el modelo vio las piezas, el inodoro junto a la ducha y lo que el modelo marcó
+            moved = sum(math.dist((q['cx'], q['cy']), (o['cx'], o['cy'])) * s + (0.5 if q['ang'] != o['ang'] else 0.0)
+                        for q, o in ((t, t0), (l_, l0)) if o in seen)
+            score = -moved - 0.3 * (first != 'toilet') - 0.5 * abs(((q1['cx'] if sd in 'NS' else q1['cy']) - a1)) * s
+            if not seen and ev_c is not None:
+                score -= math.dist(((t['cx'] + l_['cx']) / 2, (t['cy'] + l_['cy']) / 2), ev_c) * s
+            if best is None or score > best[0]:
+                best = (score, t, l_)
+    if best is None:
+        return small
+    _, t, l_ = best
+    for q, o in ((t, t0), (l_, l0)):
+        q.pop('span', None); q.pop('box_wh', None)
+        o.clear(); o.update(q)
+        if o not in items:
+            items.append(o)
+        placed.append(o)
+    return rest
+
+
+def _place_small(ctx, model, r, rl, zones, placed, small, items):
+    """Inodoro y lavamanos (juntos en un muro si se puede) y lavadoras; devuelve cuántas piezas leídas no cupieron."""
+    dropped = 0
+    rest = _bath_pair(ctx, model, r, zones, placed, list(small), items) if r.get('type') == 'bath' else list(small)
+    for it in rest:
+        if it['type'] == 'toilet':
+            it['w'], it['d'] = STD['toilet']
+        ok = _seat_wet(ctx, it, rl, placed, zones, strict=True)
+        if not ok:                                       # no cabe donde se leyó: el sitio libre más cercano
+            alt = _assume(ctx, model, r, it['type'], placed, zones, target=(it['cx'], it['cy']), w=it['w'])
+            if alt is not None:
+                it.update(cx=alt['cx'], cy=alt['cy'], ang=alt['ang']); ok = True
+        if not ok:
+            _seat_wet(ctx, it, rl, placed, zones, strict=False)
+            r_ = _rect(ctx, it)
+            if any(_inter(r_, _rect(ctx, o)) > 0.3 * _area(r_) for o in placed):
+                if it in items:
+                    items.remove(it)                     # sin sitio: mejor no dibujarla encima de otra
+                it.pop('span', None)
+                dropped += 1
+                continue
+        it.pop('span', None)
+        placed.append(it)
+    return dropped
+
+
+def _missing(ctx, model, r, placed, zones, need):
+    """Piezas supuestas que faltan (inodoro, lavamanos), ubicadas una tras otra para que quepan juntas.
+    -> lista (vacía si no falta nada) o None si no caben."""
+    have = {o['type'] for o in placed}
+    todo = [t for t in ('toilet', 'lavatory') if t in need and t not in have]
+    if not todo:
+        return []
+    for seq in (todo, todo[::-1]):
+        p2, out = list(placed), []
+        for t in seq:
+            it = _assume(ctx, model, r, t, p2, zones)
+            if it is None:
+                break
+            p2.append(it); out.append(it)
+        else:
+            return out
+    return None
+
+
+def _wet_fixtures(ctx, model, rooms, items):
+    """Aparatos sanitarios y de ropas: el respaldo (tanque del inodoro, poceta del lavamanos) siempre contra el muro.
+    v0.4: primero la tina o la ducha (si el modelo no la vio, se busca en la imagen o se supone lejos de la puerta);
+    después inodoro y lavamanos sin montarse en ella, en la puerta ni entre sí."""
+    s = ctx.s
+    order = {'bathtub': 0, 'shower': 1, 'toilet': 2, 'lavatory': 3, 'washer': 4}
     for rid, r in rooms.items():
         rl = r['label']
         wet = [it for it in items if it['room'] == rid and it['type'] in WET]
@@ -809,30 +1253,9 @@ def _wet_fixtures(ctx, model, rooms, items):
             continue
         zones = _door_zones(ctx, model, rl, rid)
         placed = []
-        order = {'bathtub': 0, 'shower': 1, 'toilet': 2, 'lavatory': 3, 'washer': 4}
-        for it in sorted(wet, key=lambda o: order[o['type']]):
-            sw, sd = STD[it['type']]
-            if it['type'] == 'toilet':
-                it['w'], it['d'] = sw, sd
-            x0, y0, x1, y1 = _rect(ctx, it)
-            box = (int(x0), int(y0), int(max(x1, x0 + 1)), int(max(y1, y0 + 1)))
-            dd = ctx.dists(rl, box)
-            bw, bh = it.get('box_wh', ((x1 - x0) * s, (y1 - y0) * s))
-            if it['type'] == 'bathtub':                       # la tina va de lado contra el muro
-                sides = 'NS' if bw >= bh else 'EW'
-            else:
-                sides = 'NSEW'
-            back = min(sides, key=lambda sd: dd[sd])
-            if it['type'] == 'toilet' and max(bw, bh) / max(min(bw, bh), 1e-3) >= 1.25:
-                # inodoro leído alargado: el tanque va en un extremo corto, si hay muro cerca
-                ends = 'NS' if bh > bw else 'EW'
-                e = min(ends, key=lambda sd: dd[sd])
-                if dd[e] <= 0.6:
-                    back = e
-            if not _seat(ctx, it, back, rl, placed, zones):
-                for alt in sorted(sides, key=lambda sd: dd[sd])[1:]:
-                    if _seat(ctx, it, alt, rl, placed, zones):
-                        break
+        for it in sorted([o for o in wet if o['type'] in ('bathtub', 'shower')], key=lambda o: order[o['type']]):
+            if not _seat_wet(ctx, it, rl, placed, zones, strict=False):
+                pass
             if it['type'] == 'bathtub' and 'span' in it:     # de muro a muro si el tramo se parece al largo
                 a, b = it['span']
                 L = (b - a) * s
@@ -856,48 +1279,95 @@ def _wet_fixtures(ctx, model, rooms, items):
                     it['cy'] = c
             it.pop('span', None); it.pop('box_wh', None)
             placed.append(it)
+        small = sorted([o for o in wet if o['type'] not in ('bathtub', 'shower')], key=lambda o: order[o['type']])
+        heads = []
+        if r.get('type') == 'bath':
+            # un disco pequeño y redondo junto al muro que el modelo llamó lavamanos o inodoro es la regadera
+            for it in list(small):
+                bw, bh = it.get('box_wh', (it['w'], it['d']))
+                twin = [o for o in small if o['type'] == it['type'] and o is not it]
+                if it['type'] in ('toilet', 'lavatory') and max(bw, bh) <= 0.36 and max(bw, bh) / max(min(bw, bh), 1e-3) <= 1.4 \
+                        and '_box' in it and any(max(o.get('box_wh', (o['w'], o['d']))) >= 0.45 for o in twin):
+                    b = it['_box']
+                    heads.append(((b[0] + b[2]) / 2, (b[1] + b[3]) / 2, 2.0))
+                    small.remove(it); items.remove(it)
+        options = [None]
+        if r.get('type') == 'bath' and not placed:
+            for it in small:                                 # posición leída, antes de moverla
+                if it['type'] == 'toilet':
+                    it['w'], it['d'] = STD['toilet']
+            options = _wet_zone(ctx, r, zones, small, heads) + [None]
+        snap = [dict(o) for o in small]
+        base0 = list(placed)
+        before = set(id(o) for o in items)
+        need = {'toilet', 'lavatory'} if r.get('type') == 'bath' else set()
+        for k, sh in enumerate(options):
+            if k:                                            # deshacer el intento anterior
+                items[:] = [o for o in items if id(o) in before or any(o is q for q in small)]
+                for o, o0 in zip(small, snap):
+                    o.clear(); o.update(o0)
+                    if o not in items:
+                        items.append(o)
+            placed = list(base0)
+            if sh is not None:
+                items.append(sh); placed.append(sh)
+                if sh['type'] == 'bathtub':
+                    tr = _rect(ctx, sh)
+                    for o in [o for o in small if tr[0] <= o['cx'] <= tr[2] and tr[1] <= o['cy'] <= tr[3]]:
+                        small.remove(o)
+                        if o in items:
+                            items.remove(o)
+            dropped = _place_small(ctx, model, r, rl, zones, placed, small, items)
+            fits = _missing(ctx, model, r, placed, zones, need) is not None
+            if sh is None or (not dropped and fits):
+                break
         # todo baño tiene inodoro y lavamanos: si el modelo no los vio, se ponen contra un muro libre (supuestos)
         if r.get('type') == 'bath' and r['area'] >= 1.4:
-            for typ in ('toilet', 'lavatory'):
-                if any(o['type'] == typ for o in placed):
-                    continue
-                it = _assume(ctx, model, r, typ, placed, zones)
-                if it:
-                    items.append(it); placed.append(it)
+            add = _missing(ctx, model, r, placed, zones, need) or []
+            for it in add:
+                items.append(it); placed.append(it)
 
 
-def _assume(ctx, model, r, typ, placed, zones):
-    """Pieza supuesta: recorre los muros del espacio y elige el sitio libre más cercano a lo que el modelo marcó."""
+def _assume(ctx, model, r, typ, placed, zones, target=None, w=None):
+    """Pieza supuesta: recorre los muros del espacio y elige el sitio libre más cercano a `target` (por defecto, lo
+    que el modelo marcó). No se acepta un sitio que choque con otra pieza ni que tape una puerta."""
     rl, rid = r['label'], r['id']
     sw, sd = STD[typ]
+    if w is not None:
+        sw = w
     ys, xs = np.nonzero(ctx.lab == rl)
     if xs.size == 0:
         return None
-    ev = np.isin(ctx.mask, (AP, MS, MU)) & (ctx.lab == rl)
-    ey, ex = np.nonzero(ev)
-    target = (float(ex.mean()), float(ey.mean())) if ex.size > 20 else (float(xs.mean()), float(ys.mean()))
+    if target is None:
+        ev = np.isin(ctx.mask, (AP, MS, MU)) & (ctx.lab == rl)
+        ey, ex = np.nonzero(ev)
+        target = (float(ex.mean()), float(ey.mean())) if ex.size > 20 else (float(xs.mean()), float(ys.mean()))
     best = None
     for back in 'NSEW':
-        it = dict(type=typ, cx=float(xs.mean()), cy=float(ys.mean()), w=sw, d=sd, ang=ANG[back], room=rid, src='assumed')
-        # arranca pegado a ese muro, en línea con el centro del espacio
-        if back == 'N':
-            it['cy'] = float(ys.min()) + ctx.px(sd) / 2
-        elif back == 'S':
-            it['cy'] = float(ys.max()) - ctx.px(sd) / 2
-        elif back == 'W':
-            it['cx'] = float(xs.min()) + ctx.px(sd) / 2
-        else:
-            it['cx'] = float(xs.max()) - ctx.px(sd) / 2
-        along = target[0] if back in 'NS' else target[1]
-        if not _seat(ctx, it, back, rl, placed, zones, along=along):
-            continue
-        r_ = _rect(ctx, it)
-        if sum(_inter(r_, _rect(ctx, o)) for o in placed) > 0.02 * _area(r_) or \
-                sum(_inter(r_, z) for z in zones) > 0.25 * _area(r_):
-            continue
-        dist = math.dist((it['cx'], it['cy']), target)
-        if best is None or dist < best[0]:
-            best = (dist, it)
+        for along in (None, 0.25, 0.75):
+            it = dict(type=typ, cx=float(xs.mean()), cy=float(ys.mean()), w=sw, d=sd, ang=ANG[back], room=rid, src='assumed')
+            # arranca pegado a ese muro, en línea con el objetivo (o a un cuarto / tres cuartos del muro)
+            if back == 'N':
+                it['cy'] = float(ys.min()) + ctx.px(sd) / 2
+            elif back == 'S':
+                it['cy'] = float(ys.max()) - ctx.px(sd) / 2
+            elif back == 'W':
+                it['cx'] = float(xs.min()) + ctx.px(sd) / 2
+            else:
+                it['cx'] = float(xs.max()) - ctx.px(sd) / 2
+            if along is None:
+                al = target[0] if back in 'NS' else target[1]
+            else:
+                al = (xs.min() + along * (xs.max() - xs.min())) if back in 'NS' else (ys.min() + along * (ys.max() - ys.min()))
+            if not _seat(ctx, it, back, rl, placed, zones, along=float(al), strict=True):
+                continue
+            r_ = _rect(ctx, it)
+            if sum(_inter(r_, z) for z in zones) > 0.25 * _area(r_):
+                continue
+            it.pop('span', None)
+            dist = math.dist((it['cx'], it['cy']), target)
+            if best is None or dist < best[0]:
+                best = (dist, it)
     return best[1] if best else None
 
 
@@ -975,6 +1445,7 @@ def layout(image, mask, model, objs, rooms):
     _prune_vanities(objs)
     _stray_counters(ctx, objs, rooms)
     items = _fixture_items(ctx, objs, rooms)
+    _kitchen_fix(ctx, model, objs, rooms, items)
     islands = [o for o in objs if o['kind'] == 'casework' and o.get('casework') in ('island / bar', 'counter')
                and _dims(o)[1] >= 0.9]
     for rid, r in rooms.items():
@@ -1017,4 +1488,6 @@ def layout(image, mask, model, objs, rooms):
     out = keep + plants
     _fit_beds(ctx, out)
     _wet_fixtures(ctx, model, rooms, out)
+    for it in out:
+        it.pop('_box', None); it.pop('box_wh', None); it.pop('span', None)
     return out

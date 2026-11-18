@@ -8,7 +8,9 @@ import os
 import cv2, numpy as np
 from .vectorize import vectorize, SP, DR, WN, MS, AP, MU
 from .vectorize5 import vectorize5
-from . import finish, drawing, refine, debug as dbg, texts, calib
+from . import finish, drawing, refine, debug as dbg, texts, calib, adjust
+
+ADJUST = True        # v0.4: las cotas impresas mandan también en el sitio (zmc/adjust.py)
 
 MODELS = {'v4': ('unet_v4.onnx', 768), 'v2': ('unet_v2.onnx', 640), 'v3': ('unet_v3.onnx', 768)}
 
@@ -221,6 +223,17 @@ def _scaled_model(im, m, labs, dims, kk, cands, like=None, typed=False):
         mod['scale_from'] = f"{fit['n']} room dimensions printed on the plan"
         mod['scale_fit'] = fit
         out['dims_fit'] = dict(n=fit['n'], rooms=fit['n_rooms'], of=fit['n_values'], spread=fit['spread'], aniso=fit['aniso'])
+        if ADJUST:
+            h_old, w_old = m.shape
+            res = adjust.apply(mod, im, m, fit, like)
+            if res is not None:
+                mod, im, m, like, wx, wy, ainfo = res
+                ainfo['residual_cm'] = adjust.check(mod, m, fit, wx, wy)
+                mod['adjust_info'] = ainfo
+                xo, yo = np.arange(w_old + 1.0), np.arange(h_old + 1.0)        # para llevar puntos al plano ajustado
+                mod['warp'] = dict(x_old=xo.tolist(), x_new=wx.fwd(xo).tolist(), y_old=yo.tolist(), y_new=wy.fwd(yo).tolist())
+                out['adjust'] = dict(n=ainfo['n'], dropped=len(ainfo['dropped']), shift_cm=round(ainfo['shift_px'] * s * 100, 1),
+                                     residual_cm=ainfo['residual_cm'])
     mod['net_px'] = calib.regrow(mod)
     terms = calib.area_terms(mod, im)
     mod['area_terms_px'] = terms
