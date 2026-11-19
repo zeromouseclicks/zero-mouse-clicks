@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it works: from a floor plan image to a plan set — Zero Mouse Clicks</title>
+<meta name="description" content="Three tiny segmentation models read walls, doors, windows, fixtures and furniture from a brochure floor plan; explicit rules draw the architectural plan set. All in your browser.">
+<link rel="canonical" href="https://zeromouseclicks.com/how-it-works">
+<link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/how-it-works">
+<link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/como-funciona">
+<link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/how-it-works">
+<meta name="theme-color" content="#000000">
+<meta property="og:site_name" content="Zero Mouse Clicks">
+<meta property="og:title" content="How it works: from a floor plan image to a plan set — Zero Mouse Clicks">
+<meta property="og:description" content="Three tiny segmentation models read walls, doors, windows, fixtures and furniture from a brochure floor plan; explicit rules draw the architectural plan set. All in your browser.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://zeromouseclicks.com/how-it-works">
+<meta property="og:image" content="https://zeromouseclicks.com/img/plan_set_8_sheets.jpg">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Cpath d='M8 8h16v16H8zM8 17h9M17 8v9' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/pages.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "@id": "https://zeromouseclicks.com/how-it-works#article",
+   "headline": "How it works.Read, then draw.",
+   "name": "How it works: from a floor plan image to a plan set — Zero Mouse Clicks",
+   "description": "Three tiny segmentation models read walls, doors, windows, fixtures and furniture from a brochure floor plan; explicit rules draw the architectural plan set. All in your browser.",
+   "inLanguage": "en",
+   "url": "https://zeromouseclicks.com/how-it-works",
+   "image": "https://zeromouseclicks.com/img/plan_set_8_sheets.jpg",
+   "datePublished": "2026-11-19",
+   "dateModified": "2026-11-19",
+   "author": {
+    "@id": "https://zeromouseclicks.com/#org"
+   },
+   "publisher": {
+    "@id": "https://zeromouseclicks.com/#org"
+   },
+   "about": {
+    "@id": "https://zeromouseclicks.com/#app"
+   },
+   "isPartOf": {
+    "@id": "https://zeromouseclicks.com/#website"
+   }
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Zero Mouse Clicks",
+     "item": "https://zeromouseclicks.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "How it works",
+     "item": "https://zeromouseclicks.com/how-it-works"
+    }
+   ]
+  }
+ ]
+}
+</script>
+</head>
+<body>
+<header>
+  <a class="brand" href="/" aria-label="Zero Mouse Clicks, home">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 5h22v22H5zM5 17h12M17 5v12" fill="none" stroke="currentColor" stroke-width="2.6"/></svg>
+    Zero Mouse Clicks
+  </a>
+  <nav aria-label="Main">
+    <a href="/how-it-works" class="opt" aria-current="page">How it works</a>
+    <a href="/plan-set" class="opt">The plan set</a>
+    <a href="/faq">FAQ</a>
+    <a href="/como-funciona" hreflang="es" lang="es">Español</a>
+    <a href="https://github.com/zeromouseclicks/zero-mouse-clicks" class="opt">GitHub</a>
+  </nav>
+</header>
+<main class="doc">
+<nav class="crumb mono" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true"> / </span><span>How it works</span></nav>
+<h1>How it works.<br><em>Read, then draw.</em></h1>
+<p class="lead">Zero Mouse Clicks turns the floor plan image from a developer's brochure or a real-estate listing into an architectural plan set: eight A3 drawing sheets in one PDF. Three tiny AI models read the image, explicit rules draw it, and all of it runs in your browser. The image is never uploaded.</p>
+<ol class="steps">
+  <li><b>01</b><span>Drop the plan</span></li>
+  <li><b>02</b><span>Tiny models read it</span></li>
+  <li><b>03</b><span>Rules draw it</span></li>
+  <li><b>04</b><span>One PDF, eight sheets</span></li>
+</ol>
+
+<h2 id="input">1. Drop the plan</h2>
+<p>Start from the floor plan image a developer or a listing publishes: the colourful one with furniture, wood floors,
+room names and a few dimensions. A screenshot or a saved JPG or PNG works best. Images narrower than about
+800&nbsp;px lose walls, so use the largest version you can find. You can also photograph a printed brochure, as long as
+the photo is sharp and taken straight on: perspective is not corrected yet.</p>
+<p>Typing the area is optional. If the plan prints room dimensions, the scale comes from them. If it doesn't,
+type the private (net interior) area in m², or the gross area in sq&nbsp;ft for a US listing.</p>
+
+<h2 id="read">2. Tiny models read it</h2>
+<p>Three small U-Net segmentation models, of 190&nbsp;k to 330&nbsp;k parameters and 0.8 to 1.3&nbsp;MB each, label every
+pixel of the image: background, interior space, wall, door, window, counter or closet, fixed fixture, and loose
+furniture. The pipeline crops the image to the plan and averages the three models at three resolutions.</p>
+<figure>
+  <img src="/img/how_it_reads.jpg" width="1500" height="465" loading="lazy"
+       alt="A brochure floor plan, the eight classes the models see in it, and the resulting vector model">
+  <figcaption>Left: the input image. Middle: what the models see. Right: the vector model after the rules.</figcaption>
+</figure>
+<p>The models were trained <strong>only on synthetic plans</strong>. Code in the repository builds random apartments
+with rules and draws them in brochure styles (textured floors, furniture, coloured backgrounds, labels, logos), so
+every pixel comes with its exact label. No real floor plan and no third-party dataset was used for training.</p>
+<p>A text reader (OCR) picks up room names in English and Spanish, the declared area and printed room dimensions
+such as <code>2.69 x 2.20</code> or <code>12'4" x 11'0"</code>.</p>
+
+<h2 id="scale">3. Scale from the printed dimensions</h2>
+<p>Marketing plans are not drawn to scale, so the scale has to be inferred. Every printed dimension is compared with
+the clear spans measured on the image, face to face of walls, in X and Y separately. The scale that explains most of
+them within ±3.5&nbsp;% wins. A wrong declared area cannot spoil it, and a stretched image gets corrected.</p>
+<p>Then the dimensions that agree also fix their own room: each wall line moves a few pixels, both faces together,
+so the clear span matches what is printed. Dimensions that contradict the drawing are reported, not forced. On the
+measurement bench, rooms come out within about 1&nbsp;cm of the printed values and room areas within about 0.6&nbsp;%
+(median).</p>
+<p>Without printed dimensions, the declared area is used with its definition: a private area is about the net spaces
+plus half of the partitions; a built, gross or sq&nbsp;ft area is about the footprint with walls.</p>
+
+<h2 id="draw">4. Rules draw it</h2>
+<p>From the masks, explicit rules build a vector model in metres:</p>
+<ul>
+  <li>walls become orthogonal bars, and openings are the gaps between them;</li>
+  <li>room types come from the text read on the plan, or from rules when there is none;</li>
+  <li>counters, closets and fixtures are drawn as standard blocks;</li>
+  <li>bathrooms follow the usual layout: a wall-to-wall shower at one end, toilet and lavatory on one wall;</li>
+  <li>kitchen appliances sit against a wall next to the counters; dining chairs get 0.60&nbsp;m per seat;</li>
+  <li>each piece of furniture gets a type, a catalogue size and the direction it faces.</li>
+</ul>
+<p>Every decision is code you can read and change. That is deliberate: a wrong result can be traced to one rule.</p>
+
+<h2 id="pdf">5. One PDF, eight sheets</h2>
+<p>The vector model is drawn as one A3 PDF with eight sheets: cover, floor plan with dimensions, schedules, floor
+finishes, schematic electrical, furniture layout, and kitchen and bathroom sections. Each sheet has an ISO&nbsp;5457
+frame, a title block and the largest standard scale that fits.
+<a href="/plan-set">See what each sheet contains</a>.</p>
+
+<h2 id="browser">Why it runs in your browser</h2>
+<p>The page runs the same Python package as the command line (through Pyodide), the three models (through
+onnxruntime-web) and the text reader (tesseract.js) on your own device. There is no server, no upload, no account and
+no AI tokens to pay for, which is why the tool can be free.</p>
+<p>A plan takes about a minute on a recent computer; the first run also loads the engine. It runs on Android phones.
+On iPhone it needs iOS&nbsp;16.4 or later and may run out of memory with large images, so a computer is the safest choice.</p>
+
+<h2 id="code">Open source</h2>
+<p>The code, the model weights and the training recipe are on
+<a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a> under the Apache-2.0 licence, also for
+commercial use. From Python:</p>
+<pre><code>pip install -e .            # inside the cloned repository
+zmc my_plan.jpg --area 47 -o plan-set.pdf</code></pre>
+
+<h2 id="limits">Known limitations</h2>
+<ul>
+  <li>Tested on nine real brochures from Latin American developers and on synthetic plans. US listings,
+      black-and-white drawings and photos of paper plans are largely untested.</li>
+  <li>Some rooms get the wrong type, and floor finishes are guessed from texture.</li>
+  <li>Furniture is drawn only where the models saw something; on real plans about 30&nbsp;% of the pieces get the right type.</li>
+  <li>Sections and the electrical layout are schematic: heights (2.45&nbsp;m clear, 0.15&nbsp;m slab, 2.10&nbsp;m doors)
+      and electrical points are assumptions, not information read from the image.</li>
+  <li>The text reader catches about half of the printed dimensions, and feet-and-inches rarely.</li>
+  <li>No stairs, multi-level units or curved walls.</li>
+</ul>
+<p>Every sheet carries the note <em>“Drawn from marketing plan — verify dimensions on site”</em>, and it means it.</p>
+<div class="cta">
+  <a class="btn" href="/#request">Make a plan set</a>
+  <p class="mono">Free. Runs in your browser, nothing is uploaded.</p>
+</div>
+</main>
+<footer>
+  <span>&copy; 2026 Zero Mouse Clicks &middot; open source, Apache-2.0</span>
+  <nav aria-label="Footer">
+    <a href="/how-it-works">How it works</a>
+    <a href="/plan-set">The plan set</a>
+    <a href="/faq">FAQ</a>
+    <a href="/es">Español</a>
+    <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>
+    <a href="/#contact">Contact</a>
+  </nav>
+</footer>
+</body>
+</html>

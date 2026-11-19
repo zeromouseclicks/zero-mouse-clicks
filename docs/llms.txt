@@ -1,0 +1,24 @@
+# Zero Mouse Clicks
+
+> Free, open-source web tool that turns the floor plan image from a developer's brochure or a real-estate listing into an architectural plan set: eight A3 drawing sheets in one PDF. Three tiny segmentation models read the image and explicit rules draw it, entirely in the visitor's browser (no upload, no LLM, no tokens).
+
+The plan set contains: G-001 cover and index, A-101 floor plan with dimensions and room areas, A-102 area, finish, door and window schedules, A-103 floor finishes, A-104 schematic electrical layout, A-105 furniture layout, A-201 kitchen section and A-202 bathroom section. Scale comes from the room dimensions printed on the plan or from the declared area (m² or sq ft). It is an early prototype: marketing plans are not to scale, sections and electrical points are assumptions, and every sheet says to verify dimensions on site. Licence: Apache-2.0 (code and model weights).
+
+## Pages
+
+- [Tool](https://zeromouseclicks.com/): drop a floor plan image, get the plan set PDF
+- [How it works](https://zeromouseclicks.com/how-it-works): models, scale from printed dimensions, rules, limitations
+- [The plan set](https://zeromouseclicks.com/plan-set): what each of the eight sheets contains
+- [FAQ](https://zeromouseclicks.com/faq): price, privacy, accuracy, file formats, devices
+
+## Español
+
+- [Zero Mouse Clicks en español](https://zeromouseclicks.com/es)
+- [Cómo funciona](https://zeromouseclicks.com/como-funciona)
+- [El juego de planos](https://zeromouseclicks.com/juego-de-planos)
+- [Preguntas frecuentes](https://zeromouseclicks.com/preguntas-frecuentes)
+
+## Optional
+
+- [Source code, models and training recipe](https://github.com/zeromouseclicks/zero-mouse-clicks)
+- [Model card](https://github.com/zeromouseclicks/zero-mouse-clicks/blob/main/MODEL_CARD.md)

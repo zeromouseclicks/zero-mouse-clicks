@@ -1,0 +1,5 @@
+# Zero Mouse Clicks: search engines and AI search assistants are welcome.
+User-agent: *
+Allow: /
+
+Sitemap: https://zeromouseclicks.com/sitemap.xml

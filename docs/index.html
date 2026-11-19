@@ -3,14 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Zero Mouse Clicks — a brochure in, a plan set out</title>
-<meta name="description" content="Drop the floor plan from a developer's brochure, or photograph it. Get an architectural plan set, eight A3 sheets in one PDF, made in your browser.">
+<title>Zero Mouse Clicks — brochure floor plan to architectural plan set</title>
+<meta name="description" content="Turn the floor plan image from a brochure or listing into an architectural plan set: eight A3 sheets in one PDF. Free, open source, runs in your browser.">
+<link rel="canonical" href="https://zeromouseclicks.com/">
+<link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/">
+<link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/es">
+<link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/">
 <meta name="theme-color" content="#000000">
-<meta property="og:title" content="Zero Mouse Clicks">
-<meta property="og:description" content="A brochure in. A plan set out.">
+<meta property="og:site_name" content="Zero Mouse Clicks">
+<meta property="og:title" content="Zero Mouse Clicks — a brochure in, a plan set out">
+<meta property="og:description" content="Drop a floor plan image from a brochure or listing. Get an architectural plan set, eight A3 sheets in one PDF. Free, in your browser.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://zeromouseclicks.com/">
 <meta property="og:image" content="https://zeromouseclicks.com/img/A-101_floor_plan.png">
+<meta property="og:image:alt" content="Sheet A-101: an architectural floor plan with dimensions drawn from a brochure image">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://zeromouseclicks.com/#org", "name": "Zero Mouse Clicks", "url": "https://zeromouseclicks.com/", "logo": {"@type": "ImageObject", "url": "https://zeromouseclicks.com/logo.png", "width": 512, "height": 512}, "sameAs": ["https://github.com/zeromouseclicks/zero-mouse-clicks"], "email": "zeromouseclicks@agentmail.to"}, {"@type": "WebSite", "@id": "https://zeromouseclicks.com/#website", "url": "https://zeromouseclicks.com/", "name": "Zero Mouse Clicks", "inLanguage": ["en", "es"], "publisher": {"@id": "https://zeromouseclicks.com/#org"}}, {"@type": "WebApplication", "@id": "https://zeromouseclicks.com/#app", "name": "Zero Mouse Clicks", "url": "https://zeromouseclicks.com/", "description": "Turns the floor plan image from a developer's brochure or a real-estate listing into an architectural plan set: eight A3 drawing sheets in one PDF (floor plan with dimensions, schedules, floor finishes, schematic electrical, furniture layout, kitchen and bathroom sections). Runs entirely in the browser; nothing is uploaded.", "applicationCategory": "DesignApplication", "applicationSubCategory": "Floor plan to CAD drawings", "operatingSystem": "Any (web browser with WebAssembly)", "browserRequirements": "Requires JavaScript and WebAssembly", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "image": "https://zeromouseclicks.com/img/A-101_floor_plan.png", "screenshot": "https://zeromouseclicks.com/img/plan_set_8_sheets.jpg", "license": "https://www.apache.org/licenses/LICENSE-2.0", "softwareVersion": "0.4", "featureList": ["Reads walls, doors, windows, counters, fixtures and furniture from a floor plan image", "Scale from printed room dimensions or the declared area (m² or sq ft)", "Eight A3 sheets in one PDF", "Runs in the browser, no upload, no LLM tokens", "Open source under Apache-2.0"], "publisher": {"@id": "https://zeromouseclicks.com/#org"}, "inLanguage": "en"}, {"@type": "SoftwareSourceCode", "@id": "https://zeromouseclicks.com/#code", "name": "zero-mouse-clicks", "codeRepository": "https://github.com/zeromouseclicks/zero-mouse-clicks", "programmingLanguage": "Python", "license": "https://www.apache.org/licenses/LICENSE-2.0", "targetProduct": {"@id": "https://zeromouseclicks.com/#app"}, "publisher": {"@id": "https://zeromouseclicks.com/#org"}}]}
+</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Cpath d='M8 8h16v16H8zM8 17h9M17 8v9' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -269,6 +279,7 @@
   .tile .cm { transform-box:fill-box; transform-origin:center; }
   @media (max-width:760px) { .tiles { grid-template-columns:1fr; max-width:420px; } }
   @media (max-width:560px) { header nav a[href="#why"] { display:none; } }
+  @media (max-width:700px) { header nav a.hx { display:none; } }
   @media (prefers-reduced-motion:reduce) { .tiles.play * { animation:none !important; } }
 
   /* contact card */
@@ -323,7 +334,7 @@
 
   footer { position:relative; z-index:1; border-top:1px solid var(--line); padding:26px 28px 34px; font-size:13px; color:var(--mute);
            display:flex; flex-wrap:wrap; gap:10px 24px; justify-content:space-between; }
-  footer a { text-decoration:none; } footer a:hover { color:var(--fg); } footer nav { display:flex; gap:22px; }
+  footer a { text-decoration:none; } footer a:hover { color:var(--fg); } footer nav { display:flex; flex-wrap:wrap; gap:8px 22px; }
   #clicks { position:fixed; left:20px; bottom:18px; z-index:7; padding:6px 11px; border:1px solid var(--line); border-radius:999px;
             background:rgba(0,0,0,.7); backdrop-filter:blur(8px); text-decoration:none; transition:border-color .25s, color .25s; }
   #clicks b { color:var(--fg); font-weight:500; } #clicks:hover { border-color:var(--ink); color:var(--fg); }
@@ -370,6 +381,7 @@
   </a>
   <nav aria-label="Main">
     <a href="#set">What you get</a>
+    <a href="/how-it-works" class="hx">How it works</a>
     <a href="#why">Why the name</a>
     <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>
   </nav>
@@ -682,7 +694,11 @@
 <footer>
   <span>&copy; 2026 Zero Mouse Clicks &middot; open source, Apache-2.0</span>
   <nav aria-label="Footer">
+    <a href="/how-it-works">How it works</a>
+    <a href="/plan-set">The plan set</a>
+    <a href="/faq">FAQ</a>
     <a href="#why">Why the name</a>
+    <a href="/es" hreflang="es" lang="es">Español</a>
     <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>
     <a href="#contact" data-topic="other">Contact</a>
   </nav>
@@ -954,7 +970,7 @@
     SHEETS.forEach(function (s, i) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'th fade';
       b.setAttribute('aria-label', 'Sheet ' + s[0] + ', ' + s[1]);
-      b.innerHTML = '<img src="img/sheets/' + s[0] + '_s.jpg" alt="" loading="lazy"><span>' + s[0] + '</span><i></i>';
+      b.innerHTML = '<img src="img/sheets/' + s[0] + '_s.jpg" alt="Sheet ' + s[0] + '" loading="lazy"><span>' + s[0] + '</span><i></i>';
       function pickIt() { stop(); show(i); }
       b.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') pickIt(); });
       b.addEventListener('click', pickIt); b.addEventListener('focus', pickIt);
