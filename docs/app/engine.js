@@ -7,7 +7,7 @@ var CDN = {
   ort: 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/'
 };
 var BASE = self.location.href.replace(/[^/]*$/, '');          // .../app/
-var VERSION = 'v6';
+var VERSION = 'v7';
 importScripts(CDN.pyodide + 'pyodide.js', CDN.ort + 'ort.wasm.min.js');
 
 ort.env.wasm.wasmPaths = CDN.ort;
