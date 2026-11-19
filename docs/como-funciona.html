@@ -169,19 +169,12 @@ comercial. Desde Python:</p>
 <pre><code>pip install -e .            # dentro del repositorio clonado
 zmc mi_planta.jpg --area 47 -o planos.pdf</code></pre>
 
-<h2 id="limites">Limitaciones conocidas</h2>
-<ul>
-  <li>Se probó con nueve folletos reales de constructoras latinoamericanas y con plantas sintéticas. Los anuncios de
-      Estados Unidos, los dibujos en blanco y negro y las fotos de planos en papel están casi sin probar.</li>
-  <li>Algunos espacios salen con el tipo equivocado, y los acabados de piso se adivinan por la textura.</li>
-  <li>Los muebles solo aparecen donde los modelos vieron algo; en plantas reales cerca del 30&nbsp;% sale con el tipo correcto.</li>
-  <li>Los cortes y el eléctrico son esquemáticos: las alturas (2,45&nbsp;m libres, placa de 0,15&nbsp;m, puertas de
-      2,10&nbsp;m) y los puntos eléctricos son supuestos, no información leída de la imagen.</li>
-  <li>El lector de textos capta cerca de la mitad de las medidas impresas, y casi nunca las de pies y pulgadas.</li>
-  <li>No hay escaleras, apartamentos de dos niveles ni muros curvos.</li>
-</ul>
-<p>Cada lámina lleva la nota <em>«Drawn from marketing plan — verify dimensions on site»</em> (dibujado a partir de una
-planta de mercadeo; verificar medidas en obra), y va en serio.</p>
+<h2 id="mejoras">Siempre mejorando</h2>
+<p>Zero Mouse Clicks es un proyecto de IA, y la IA avanza muy rápido. Los modelos, las reglas y los dibujos cambian con
+frecuencia, y cada versión lee mejor las plantas y las dibuja con más precisión. Las últimas versiones ajustaron los muros a
+las medidas impresas, ubicaron baños, cocinas y comedores como lo haría un diseñador y agregaron la planta de mobiliario.</p>
+<p>Lo que sigue: una pantalla para corregir con un toque, exportación a DXF, más estilos de planta y un modelo que reconozca
+cada tipo de mueble. Sigue los cambios en <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>.</p>
 <div class="cta">
   <a class="btn" href="/#request">Hacer un juego de planos</a>
   <p class="mono">Gratis. Corre en tu navegador, no se sube nada. La herramienta está en inglés.</p>

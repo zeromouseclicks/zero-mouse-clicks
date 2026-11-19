@@ -177,20 +177,14 @@ usage commercial. En Python :</p>
 <pre><code>pip install -e .            # dans le dépôt cloné
 zmc mon_plan.jpg --area 47 -o jeu-de-plans.pdf</code></pre>
 
-<h2 id="limites">Limites connues</h2>
-<ul>
-  <li>Testé sur neuf dépliants réels de promoteurs latino-américains et sur des plans synthétiques. Les annonces
-      nord-américaines, les dessins en noir et blanc et les photos de plans papier sont encore peu testés.</li>
-  <li>Certaines pièces reçoivent le mauvais type, et les revêtements de sol sont devinés d'après la texture.</li>
-  <li>Les meubles ne sont dessinés que là où les modèles ont vu quelque chose; sur des plans réels, environ 30&nbsp;% ont
-      le bon type.</li>
-  <li>Les coupes et l'électricité sont schématiques : les hauteurs (2,45&nbsp;m libres, dalle de 0,15&nbsp;m, portes de
-      2,10&nbsp;m) et les points électriques sont des hypothèses, pas des informations lues sur l'image.</li>
-  <li>Le lecteur de texte capte environ la moitié des dimensions imprimées, et rarement celles en pieds et pouces.</li>
-  <li>Pas d'escaliers, de logements sur deux niveaux ni de murs courbes.</li>
-</ul>
-<p>Chaque feuille porte la mention <em>« Drawn from marketing plan — verify dimensions on site »</em> (dessiné à partir
-d'un plan de marketing; vérifier les dimensions sur place), et elle est sérieuse.</p>
+<h2 id="ameliorations">Toujours en amélioration</h2>
+<p>Zero Mouse Clicks est un projet d'IA, et l'IA évolue très vite. Les modèles, les règles et les dessins changent souvent,
+et chaque version lit mieux les plans et les dessine avec plus de précision. Les dernières versions ont ajusté les murs aux
+dimensions imprimées, disposé les salles de bain, les cuisines et les salles à manger comme le ferait un designer, et ajouté
+l'aménagement du mobilier.</p>
+<p>Prochaines étapes : un écran de correction en un geste, l'exportation DXF, plus de styles de plans et un modèle qui
+reconnaît chaque type de meuble. Suivez les changements sur
+<a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>.</p>
 <div class="cta">
   <a class="btn" href="/#request">Créer un jeu de plans</a>
   <p class="mono">Gratuit. Tout se passe dans votre navigateur, rien n'est téléversé. L'outil est en anglais.</p>

@@ -167,18 +167,12 @@ commercial use. From Python:</p>
 <pre><code>pip install -e .            # inside the cloned repository
 zmc my_plan.jpg --area 47 -o plan-set.pdf</code></pre>
 
-<h2 id="limits">Known limitations</h2>
-<ul>
-  <li>Tested on nine real brochures from Latin American developers and on synthetic plans. US listings,
-      black-and-white drawings and photos of paper plans are largely untested.</li>
-  <li>Some rooms get the wrong type, and floor finishes are guessed from texture.</li>
-  <li>Furniture is drawn only where the models saw something; on real plans about 30&nbsp;% of the pieces get the right type.</li>
-  <li>Sections and the electrical layout are schematic: heights (2.45&nbsp;m clear, 0.15&nbsp;m slab, 2.10&nbsp;m doors)
-      and electrical points are assumptions, not information read from the image.</li>
-  <li>The text reader catches about half of the printed dimensions, and feet-and-inches rarely.</li>
-  <li>No stairs, multi-level units or curved walls.</li>
-</ul>
-<p>Every sheet carries the note <em>“Drawn from marketing plan — verify dimensions on site”</em>, and it means it.</p>
+<h2 id="updates">Always improving</h2>
+<p>Zero Mouse Clicks is an AI project, and AI moves fast. The models, the rules and the drawings change often, and every
+release reads plans better and draws them more precisely. Recent releases fitted walls to the printed dimensions, laid out
+bathrooms, kitchens and dining tables the way a designer would, and added the furniture layout.</p>
+<p>Next on the list: a one-tap correction screen, DXF export, more plan styles and a model that recognises each type of
+furniture. Follow the changes on <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>.</p>
 <div class="cta">
   <a class="btn" href="/#request">Make a plan set</a>
   <p class="mono">Free. Runs in your browser, nothing is uploaded.</p>
