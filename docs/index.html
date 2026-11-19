@@ -1296,7 +1296,9 @@
         if (form.requestSubmit) form.requestSubmit(); else form.dispatchEvent(new Event('submit', { cancelable: true }));
       }, 500);
     }).catch(function () {
-      say('Could not load the image from that link. Save the floor plan image and drop it here.', true);
+      say('That site does not let us load the image. Open it, save it and drop it here: ', true);
+      var ln = document.createElement('a'); ln.href = src; ln.target = '_blank'; ln.rel = 'noopener noreferrer'; ln.textContent = 'open the image';
+      msg.appendChild(ln);
     });
   })();
 
