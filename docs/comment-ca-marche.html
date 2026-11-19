@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comment ça marche : d'une image de plan d'étage à un jeu de plans — Zero Mouse Clicks</title>
+<meta name="description" content="Trois très petits modèles d&#x27;IA lisent les murs, les portes, les fenêtres, les appareils et les meubles sur le plan d&#x27;un dépliant de promoteur; des règles explicites dessinent le jeu de plans. Le tout dans votre navigateur.">
+<link rel="canonical" href="https://zeromouseclicks.com/comment-ca-marche">
+<link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/how-it-works">
+<link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/como-funciona">
+<link rel="alternate" hreflang="fr-CA" href="https://zeromouseclicks.com/comment-ca-marche">
+<link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/comment-ca-marche">
+<link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/how-it-works">
+<meta name="theme-color" content="#000000">
+<meta property="og:site_name" content="Zero Mouse Clicks">
+<meta property="og:title" content="Comment ça marche : d&#x27;une image de plan d&#x27;étage à un jeu de plans — Zero Mouse Clicks">
+<meta property="og:description" content="Trois très petits modèles d&#x27;IA lisent les murs, les portes, les fenêtres, les appareils et les meubles sur le plan d&#x27;un dépliant de promoteur; des règles explicites dessinent le jeu de plans. Le tout dans votre navigateur.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://zeromouseclicks.com/comment-ca-marche">
+<meta property="og:image" content="https://zeromouseclicks.com/img/plan_set_8_sheets.jpg">
+<meta property="og:locale" content="fr_CA">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Cpath d='M8 8h16v16H8zM8 17h9M17 8v9' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/pages.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "TechArticle",
+   "@id": "https://zeromouseclicks.com/comment-ca-marche#article",
+   "headline": "Comment ça marche.Lire, puis dessiner.",
+   "name": "Comment ça marche : d'une image de plan d'étage à un jeu de plans — Zero Mouse Clicks",
+   "description": "Trois très petits modèles d'IA lisent les murs, les portes, les fenêtres, les appareils et les meubles sur le plan d'un dépliant de promoteur; des règles explicites dessinent le jeu de plans. Le tout dans votre navigateur.",
+   "inLanguage": "fr-CA",
+   "url": "https://zeromouseclicks.com/comment-ca-marche",
+   "image": "https://zeromouseclicks.com/img/plan_set_8_sheets.jpg",
+   "datePublished": "2026-11-19",
+   "dateModified": "2026-11-19",
+   "author": {
+    "@id": "https://zeromouseclicks.com/#org"
+   },
+   "publisher": {
+    "@id": "https://zeromouseclicks.com/#org"
+   },
+   "about": {
+    "@id": "https://zeromouseclicks.com/#app"
+   },
+   "isPartOf": {
+    "@id": "https://zeromouseclicks.com/#website"
+   }
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Accueil",
+     "item": "https://zeromouseclicks.com/fr"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Comment ça marche",
+     "item": "https://zeromouseclicks.com/comment-ca-marche"
+    }
+   ]
+  }
+ ]
+}
+</script>
+</head>
+<body>
+<header>
+  <a class="brand" href="/fr" aria-label="Zero Mouse Clicks, accueil">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 5h22v22H5zM5 17h12M17 5v12" fill="none" stroke="currentColor" stroke-width="2.6"/></svg>
+    Zero Mouse Clicks
+  </a>
+  <div class="hr">
+    <nav aria-label="Principale">
+      <a href="/comment-ca-marche" class="opt" aria-current="page">Comment ça marche</a>
+      <a href="/jeu-de-plans" class="opt">Le jeu de plans</a>
+      <a href="/questions-frequentes">Questions</a>
+      <a href="https://github.com/zeromouseclicks/zero-mouse-clicks" class="opt">GitHub</a>
+    </nav>
+    <nav class="lang mono" aria-label="Langue"><a href="/how-it-works" hreflang="en" lang="en" title="English">EN</a><a href="/como-funciona" hreflang="es" lang="es" title="Español">ES</a><span aria-current="true" title="Français">FR</span></nav>
+  </div>
+</header>
+<main class="doc">
+<nav class="crumb mono" aria-label="Breadcrumb"><a href="/fr">Accueil</a><span aria-hidden="true"> / </span><span>Comment ça marche</span></nav>
+<h1>Comment ça marche.<br><em>Lire, puis dessiner.</em></h1>
+<p class="lead">Zero Mouse Clicks transforme l'image du plan d'étage d'un dépliant de promoteur ou d'une annonce immobilière en jeu de plans d'architecture : huit feuilles A3 dans un seul PDF. Trois très petits modèles d'IA lisent l'image, des règles explicites la dessinent, et tout se passe dans votre navigateur. L'image n'est jamais téléversée.</p>
+<ol class="steps">
+  <li><b>01</b><span>Déposez le plan</span></li>
+  <li><b>02</b><span>De petits modèles le lisent</span></li>
+  <li><b>03</b><span>Les règles le dessinent</span></li>
+  <li><b>04</b><span>Un PDF, huit feuilles</span></li>
+</ol>
+
+<h2 id="entree">1. Déposez le plan</h2>
+<p>Partez de l'image du plan publiée par le promoteur ou par l'annonce : celle en couleurs, avec les meubles, les
+planchers de bois, le nom des pièces et quelques dimensions. Une capture d'écran ou un fichier JPG ou PNG enregistré
+donne les meilleurs résultats. Les images de moins d'environ 800&nbsp;px de largeur perdent des murs : utilisez la plus
+grande version possible. Vous pouvez aussi photographier un dépliant imprimé, à condition que la photo soit nette et
+prise bien de face : la perspective n'est pas encore corrigée.</p>
+<p>La superficie est facultative. Si le plan indique les dimensions des pièces, l'échelle vient de celles-ci. Sinon,
+entrez la superficie privée (nette intérieure) en m², ou la superficie brute en pi² (avec les murs, comme dans les
+annonces américaines).</p>
+
+<h2 id="lecture">2. De petits modèles le lisent</h2>
+<p>Trois petits modèles de segmentation U-Net, de 190&nbsp;000 à 330&nbsp;000 paramètres et de 0,8 à 1,3&nbsp;Mo chacun,
+étiquettent chaque pixel de l'image : fond, espace intérieur, mur, porte, fenêtre, comptoir ou placard, appareil fixe
+et meuble. Le traitement recadre l'image sur le plan et fait la moyenne des trois modèles à trois résolutions.</p>
+<figure>
+  <img src="/img/how_it_reads.jpg" width="1500" height="465" loading="lazy"
+       alt="Le plan d'un dépliant, les huit classes que voient les modèles et le modèle vectoriel qui en résulte">
+  <figcaption>À gauche : l'image d'entrée. Au centre : ce que voient les modèles. À droite : le modèle vectoriel après les règles.</figcaption>
+</figure>
+<p>Les modèles ont été entraînés <strong>uniquement sur des plans synthétiques</strong>. Du code du dépôt génère des
+appartements au hasard à l'aide de règles et les dessine dans le style des dépliants (planchers texturés, meubles, fonds
+de couleur, étiquettes, logos) : chaque pixel arrive avec son étiquette exacte. Aucun plan réel ni aucune base de données
+de tiers n'a servi à l'entraînement.</p>
+<p>Un lecteur de texte (OCR) repère le nom des pièces en anglais et en espagnol, la superficie déclarée et les dimensions
+imprimées comme <code>2.69 x 2.20</code> ou <code>12'4" x 11'0"</code>. Les noms de pièces en français ne sont pas encore
+reconnus : le type de chaque pièce est alors déduit par des règles.</p>
+
+<h2 id="echelle">3. L'échelle vient des dimensions imprimées</h2>
+<p>Les plans de marketing ne sont pas à l'échelle : il faut donc la déduire. Chaque dimension imprimée est comparée aux
+portées libres mesurées sur l'image, d'une face de mur à l'autre, en X et en Y séparément. L'échelle qui explique la
+majorité d'entre elles à ±3,5&nbsp;% près l'emporte. Une superficie déclarée erronée ne peut pas la fausser, et une image
+étirée est corrigée.</p>
+<p>Ensuite, les dimensions concordantes fixent aussi leur propre pièce : chaque ligne de mur se déplace de quelques
+pixels, ses deux faces ensemble, pour que la portée libre corresponde à la cote imprimée. Les dimensions qui contredisent
+le dessin sont signalées, pas forcées. Sur le banc de mesure, les pièces arrivent à environ 1&nbsp;cm des valeurs
+imprimées et les superficies des pièces à environ 0,6&nbsp;% (médiane).</p>
+<p>Sans dimensions imprimées, la superficie déclarée est utilisée selon sa définition : la superficie privée correspond
+à peu près aux espaces nets plus la moitié des cloisons; la superficie brute, ou en pi², à peu près à l'emprise avec les
+murs.</p>
+
+<h2 id="dessin">4. Les règles le dessinent</h2>
+<p>À partir des masques, des règles explicites construisent un modèle vectoriel en mètres :</p>
+<ul>
+  <li>les murs deviennent des barres orthogonales, et les ouvertures sont les vides entre eux;</li>
+  <li>le type de chaque pièce vient du texte lu sur le plan ou, à défaut, de règles;</li>
+  <li>les comptoirs, les placards et les appareils sont dessinés comme des blocs standards;</li>
+  <li>les salles de bain suivent la disposition habituelle : une douche d'un mur à l'autre à une extrémité, la toilette
+      et le lavabo sur un même mur;</li>
+  <li>les électroménagers s'appuient contre un mur, à côté des comptoirs; les chaises de la salle à manger ont 0,60&nbsp;m
+      par place;</li>
+  <li>chaque meuble reçoit un type, une dimension de catalogue et la direction vers laquelle il fait face.</li>
+</ul>
+<p>Chaque décision est du code que l'on peut lire et modifier. C'est voulu : un résultat erroné se retrace jusqu'à une
+règle.</p>
+
+<h2 id="pdf">5. Un PDF, huit feuilles</h2>
+<p>Le modèle vectoriel est dessiné dans un PDF A3 de huit feuilles : page couverture, plan d'étage coté, tableaux, revêtements
+de sol, électricité schématique, aménagement du mobilier, et coupes de la cuisine et de la salle de bain. Chaque feuille a
+un cadre ISO&nbsp;5457, un cartouche et la plus grande échelle normalisée qui convient.
+<a href="/jeu-de-plans">Voir le contenu de chaque feuille</a>.</p>
+
+<h2 id="navigateur">Pourquoi tout se passe dans votre navigateur</h2>
+<p>La page exécute sur votre propre appareil le même paquet Python que la ligne de commande (avec Pyodide), les trois
+modèles (avec onnxruntime-web) et le lecteur de texte (tesseract.js). Il n'y a ni serveur, ni téléversement, ni compte, ni
+jetons d'IA à payer : c'est pourquoi l'outil peut être gratuit.</p>
+<p>Un plan prend environ une minute sur un ordinateur récent; la première fois, le moteur se charge aussi. L'outil
+fonctionne sur les téléphones Android. Sur iPhone, il faut iOS&nbsp;16.4 ou plus récent et la mémoire peut manquer avec
+de grandes images : un ordinateur reste le choix le plus sûr.</p>
+
+<h2 id="code">Code source ouvert</h2>
+<p>Le code, les poids des modèles et la recette d'entraînement sont sur
+<a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a> sous licence Apache-2.0, y compris pour un
+usage commercial. En Python :</p>
+<pre><code>pip install -e .            # dans le dépôt cloné
+zmc mon_plan.jpg --area 47 -o jeu-de-plans.pdf</code></pre>
+
+<h2 id="limites">Limites connues</h2>
+<ul>
+  <li>Testé sur neuf dépliants réels de promoteurs latino-américains et sur des plans synthétiques. Les annonces
+      nord-américaines, les dessins en noir et blanc et les photos de plans papier sont encore peu testés.</li>
+  <li>Certaines pièces reçoivent le mauvais type, et les revêtements de sol sont devinés d'après la texture.</li>
+  <li>Les meubles ne sont dessinés que là où les modèles ont vu quelque chose; sur des plans réels, environ 30&nbsp;% ont
+      le bon type.</li>
+  <li>Les coupes et l'électricité sont schématiques : les hauteurs (2,45&nbsp;m libres, dalle de 0,15&nbsp;m, portes de
+      2,10&nbsp;m) et les points électriques sont des hypothèses, pas des informations lues sur l'image.</li>
+  <li>Le lecteur de texte capte environ la moitié des dimensions imprimées, et rarement celles en pieds et pouces.</li>
+  <li>Pas d'escaliers, de logements sur deux niveaux ni de murs courbes.</li>
+</ul>
+<p>Chaque feuille porte la mention <em>« Drawn from marketing plan — verify dimensions on site »</em> (dessiné à partir
+d'un plan de marketing; vérifier les dimensions sur place), et elle est sérieuse.</p>
+<div class="cta">
+  <a class="btn" href="/#request">Créer un jeu de plans</a>
+  <p class="mono">Gratuit. Tout se passe dans votre navigateur, rien n'est téléversé. L'outil est en anglais.</p>
+</div>
+</main>
+<footer>
+  <span>&copy; 2026 Zero Mouse Clicks &middot; open source, Apache-2.0</span>
+  <nav aria-label="Pied de page">
+    <a href="/comment-ca-marche">Comment ça marche</a>
+    <a href="/jeu-de-plans">Le jeu de plans</a>
+    <a href="/questions-frequentes">Questions fréquentes</a>
+    <a href="/">English</a>
+    <a href="/es">Español</a>
+    <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>
+    <a href="/#contact">Contact</a>
+  </nav>
+</footer>
+</body>
+</html>

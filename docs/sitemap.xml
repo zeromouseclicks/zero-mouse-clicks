@@ -6,6 +6,28 @@
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/es"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://zeromouseclicks.com/fr"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/fr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/"/>
+  </url>
+  <url>
+    <loc>https://zeromouseclicks.com/es</loc>
+    <lastmod>2026-11-19</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/es"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://zeromouseclicks.com/fr"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/fr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/"/>
+  </url>
+  <url>
+    <loc>https://zeromouseclicks.com/fr</loc>
+    <lastmod>2026-11-19</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/es"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://zeromouseclicks.com/fr"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/fr"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/"/>
   </url>
   <url>
@@ -14,6 +36,28 @@
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/how-it-works"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/como-funciona"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://zeromouseclicks.com/comment-ca-marche"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/comment-ca-marche"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/how-it-works"/>
+  </url>
+  <url>
+    <loc>https://zeromouseclicks.com/como-funciona</loc>
+    <lastmod>2026-11-19</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/how-it-works"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/como-funciona"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://zeromouseclicks.com/comment-ca-marche"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/comment-ca-marche"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/how-it-works"/>
+  </url>
+  <url>
+    <loc>https://zeromouseclicks.com/comment-ca-marche</loc>
+    <lastmod>2026-11-19</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/how-it-works"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/como-funciona"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://zeromouseclicks.com/comment-ca-marche"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/comment-ca-marche"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/how-it-works"/>
   </url>
   <url>
@@ -22,6 +66,28 @@
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/plan-set"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/juego-de-planos"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://zeromouseclicks.com/jeu-de-plans"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/jeu-de-plans"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/plan-set"/>
+  </url>
+  <url>
+    <loc>https://zeromouseclicks.com/juego-de-planos</loc>
+    <lastmod>2026-11-19</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/plan-set"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/juego-de-planos"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://zeromouseclicks.com/jeu-de-plans"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/jeu-de-plans"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/plan-set"/>
+  </url>
+  <url>
+    <loc>https://zeromouseclicks.com/jeu-de-plans</loc>
+    <lastmod>2026-11-19</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/plan-set"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/juego-de-planos"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://zeromouseclicks.com/jeu-de-plans"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/jeu-de-plans"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/plan-set"/>
   </url>
   <url>
@@ -30,31 +96,9 @@
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/faq"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/preguntas-frecuentes"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://zeromouseclicks.com/questions-frequentes"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/questions-frequentes"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/faq"/>
-  </url>
-  <url>
-    <loc>https://zeromouseclicks.com/es</loc>
-    <lastmod>2026-11-19</lastmod>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/es"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/"/>
-  </url>
-  <url>
-    <loc>https://zeromouseclicks.com/como-funciona</loc>
-    <lastmod>2026-11-19</lastmod>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/how-it-works"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/como-funciona"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/how-it-works"/>
-  </url>
-  <url>
-    <loc>https://zeromouseclicks.com/juego-de-planos</loc>
-    <lastmod>2026-11-19</lastmod>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/plan-set"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/juego-de-planos"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/plan-set"/>
   </url>
   <url>
     <loc>https://zeromouseclicks.com/preguntas-frecuentes</loc>
@@ -62,6 +106,18 @@
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/faq"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/preguntas-frecuentes"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://zeromouseclicks.com/questions-frequentes"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/questions-frequentes"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/faq"/>
+  </url>
+  <url>
+    <loc>https://zeromouseclicks.com/questions-frequentes</loc>
+    <lastmod>2026-11-19</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/faq"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/preguntas-frecuentes"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://zeromouseclicks.com/questions-frequentes"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/questions-frequentes"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/faq"/>
   </url>
 </urlset>

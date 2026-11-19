@@ -18,6 +18,13 @@ The plan set contains: G-001 cover and index, A-101 floor plan with dimensions a
 - [El juego de planos](https://zeromouseclicks.com/juego-de-planos)
 - [Preguntas frecuentes](https://zeromouseclicks.com/preguntas-frecuentes)
 
+## Français (Canada)
+
+- [Zero Mouse Clicks en français](https://zeromouseclicks.com/fr)
+- [Comment ça marche](https://zeromouseclicks.com/comment-ca-marche)
+- [Le jeu de plans](https://zeromouseclicks.com/jeu-de-plans)
+- [Questions fréquentes](https://zeromouseclicks.com/questions-frequentes)
+
 ## Optional
 
 - [Source code, models and training recipe](https://github.com/zeromouseclicks/zero-mouse-clicks)

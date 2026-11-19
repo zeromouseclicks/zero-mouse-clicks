@@ -14,7 +14,12 @@ header { position:sticky; top:0; z-index:6; display:flex; align-items:center; ju
 header nav { display:flex; gap:22px; font-size:14px; color:var(--mute); }
 header nav a { text-decoration:none; transition:color .2s; white-space:nowrap; }
 header nav a:hover, header nav a[aria-current] { color:var(--fg); }
-@media (max-width:720px) { header { padding:0 18px; } header nav { gap:16px; } header nav a.opt { display:none; } }
+header .hr { display:flex; align-items:center; gap:22px; }
+header nav.lang { display:flex; gap:2px; font-size:11px; border:1px solid var(--line); border-radius:999px; padding:3px; }
+header nav.lang a, header nav.lang span { padding:3px 8px; border-radius:999px; line-height:1.4; }
+header nav.lang span { background:#1c1c1a; color:var(--fg); }
+@media (max-width:820px) { header { padding:0 18px; } header nav { gap:16px; } header .hr { gap:14px; } header nav a.opt { display:none; } }
+@media (max-width:420px) { header nav:not(.lang) { display:none; } }
 
 .doc { max-width:760px; margin:0 auto; padding:56px 28px 40px; }
 .crumb { margin-bottom:28px; } .crumb a { text-decoration:none; } .crumb a:hover { color:var(--fg); }
