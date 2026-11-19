@@ -120,4 +120,34 @@
     <xhtml:link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/questions-frequentes"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/faq"/>
   </url>
+  <url>
+    <loc>https://zeromouseclicks.com/beta</loc>
+    <lastmod>2026-11-19</lastmod>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/beta"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/beta-es"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://zeromouseclicks.com/beta-fr"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/beta-fr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/beta"/>
+  </url>
+  <url>
+    <loc>https://zeromouseclicks.com/beta-es</loc>
+    <lastmod>2026-11-19</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/beta"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/beta-es"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://zeromouseclicks.com/beta-fr"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/beta-fr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/beta"/>
+  </url>
+  <url>
+    <loc>https://zeromouseclicks.com/beta-fr</loc>
+    <lastmod>2026-11-19</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/beta"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/beta-es"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://zeromouseclicks.com/beta-fr"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://zeromouseclicks.com/beta-fr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://zeromouseclicks.com/beta"/>
+  </url>
 </urlset>

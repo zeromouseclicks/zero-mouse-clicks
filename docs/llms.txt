@@ -4,12 +4,21 @@
 
 The plan set contains: G-001 cover and index, A-101 floor plan with dimensions and room areas, A-102 area, finish, door and window schedules, A-103 floor finishes, A-104 schematic electrical layout, A-105 furniture layout, A-201 kitchen section and A-202 bathroom section. Scale comes from the room dimensions printed on the plan or from the declared area (m² or sq ft). Under active development with frequent releases. Marketing plans are not to scale and sections and electrical points are assumptions, so every sheet says to verify dimensions on site. Licence: Apache-2.0 (code and model weights).
 
+## Use it from an AI assistant (beta)
+
+Any assistant can hand the user a link that loads a floor plan image and starts the plan set in their browser:
+https://zeromouseclicks.com/?plan=<direct image URL, URL-encoded>&area=<number, optional>&unit=<m2|sqft, optional>  (add go=0 to load without starting)
+Use the private (net interior) area in m², or the gross area in sq ft. The image must be a 2D floor plan (JPG, PNG or WEBP).
+MCP server (remote, Streamable HTTP, no authentication): https://ebqxcaelgmxofwtofrdc.supabase.co/functions/v1/zmc-ai/mcp  tools: find_floor_plans(page_url), plan_set_link(image_url, area?, unit?)
+Details: https://zeromouseclicks.com/beta
+
 ## Pages
 
 - [Tool](https://zeromouseclicks.com/): drop a floor plan image, get the plan set PDF
 - [How it works](https://zeromouseclicks.com/how-it-works): models, scale from printed dimensions, rules, what is next
 - [The plan set](https://zeromouseclicks.com/plan-set): what each of the eight sheets contains
 - [FAQ](https://zeromouseclicks.com/faq): price, privacy, accuracy, file formats, devices
+- [AI chats (beta)](https://zeromouseclicks.com/beta): use Zero Mouse Clicks from ChatGPT, Claude or Gemini
 
 ## Español
 
@@ -17,6 +26,7 @@ The plan set contains: G-001 cover and index, A-101 floor plan with dimensions a
 - [Cómo funciona](https://zeromouseclicks.com/como-funciona)
 - [El juego de planos](https://zeromouseclicks.com/juego-de-planos)
 - [Preguntas frecuentes](https://zeromouseclicks.com/preguntas-frecuentes)
+- [Chats de IA (beta)](https://zeromouseclicks.com/beta-es)
 
 ## Français (Canada)
 
@@ -24,6 +34,7 @@ The plan set contains: G-001 cover and index, A-101 floor plan with dimensions a
 - [Comment ça marche](https://zeromouseclicks.com/comment-ca-marche)
 - [Le jeu de plans](https://zeromouseclicks.com/jeu-de-plans)
 - [Questions fréquentes](https://zeromouseclicks.com/questions-frequentes)
+- [Assistants IA (bêta)](https://zeromouseclicks.com/beta-fr)
 
 ## Optional
 

@@ -50,6 +50,7 @@
           white-space:nowrap; transition:opacity .3s, transform .3s, visibility .3s, box-shadow .3s; }
   .hbtn:hover { box-shadow:0 0 0 5px rgba(245,245,243,.08), 0 0 30px rgba(159,208,255,.35); }
   .hbtn.away { opacity:0; visibility:hidden; transform:translateY(-4px); }
+  .fine .beta, header .beta { color:#a0ffc8; font-size:9px; letter-spacing:.04em; vertical-align:super; margin-left:2px; }
   @media (max-width:980px) { header .hr { gap:14px; } header nav[aria-label="Main"] { gap:16px; } header nav a.hx { display:none; } }
   @media (max-width:700px) { header nav[aria-label="Main"] { display:none; } }
   @media (max-width:480px) { .brand .bt { display:none; } header { padding:0 18px; } }
@@ -443,7 +444,7 @@
         </div>
         <p class="msg mono" id="msg" role="status" aria-live="polite"></p>
         <p class="mono fine" id="detail" hidden></p>
-        <p class="mono fine" id="fine">Free. Runs in your browser, nothing is uploaded. <a id="mailto" href="#contact" data-topic="help">Help</a></p>
+        <p class="mono fine" id="fine">Free. Runs in your browser, nothing is uploaded. <a id="mailto" href="#contact" data-topic="help">Help</a> &middot; <a href="/beta">Use it from your AI chat <span class="beta">beta</span></a></p>
       </form>
       <div class="done" id="done" hidden>
         <svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" stroke-width="1.5"/><path id="tick" d="M15 27l7 7 15-16" fill="none" stroke="currentColor" stroke-width="2" pathLength="1"/></svg>
@@ -711,6 +712,7 @@
 <footer>
   <span>&copy; 2026 Zero Mouse Clicks &middot; open source, Apache-2.0</span>
   <nav aria-label="Footer">
+    <a href="/beta">AI chats (beta)</a>
     <a href="/how-it-works">How it works</a>
     <a href="/plan-set">The plan set</a>
     <a href="/faq">FAQ</a>
@@ -1269,6 +1271,34 @@
     begin(area === null);
     engine().then(function (Z) { return Z.generate(picked, area, progress, preview, areaKind); }).then(show, fail);
   });
+
+  /* ---------- link from an AI chat (beta): /?plan=<image url>&area=54&unit=m2 opens the plan and starts, zero clicks ---------- */
+  (function () {
+    var q; try { q = new URLSearchParams(location.search); } catch (x) { return; }
+    var src = q.get('plan');
+    if (!src || !/^https?:\/\//i.test(src)) return;
+    var RELAY = 'https://ebqxcaelgmxofwtofrdc.supabase.co/functions/v1/zmc-ai/img?url=';
+    var a = q.get('area'), un = q.get('unit');
+    if (a && /^\d{1,5}([.,]\d{1,2})?$/.test(a)) areaIn.value = a;
+    if (un === 'sqft') uFt.checked = true; else if (un === 'm2') uM2.checked = true;
+    say('Loading the floor plan from your AI chat link\u2026 (beta)');
+    function grab(u) {
+      return fetch(u).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.blob(); })
+        .then(function (b) { if (!/^image\//.test(b.type)) throw new Error('not an image'); return b; });
+    }
+    grab(src).catch(function () { return grab(RELAY + encodeURIComponent(src)); }).then(function (b) {
+      var nm = (src.split(/[?#]/)[0].split('/').pop() || 'floor-plan').slice(0, 80);
+      if (!/\.(jpe?g|png|webp|gif|avif)$/i.test(nm)) nm += '.' + ((b.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg'));
+      pick(new File([b], nm, { type: b.type }));
+      say('');
+      try { history.replaceState(null, '', location.pathname + location.hash); } catch (x) {}
+      if (q.get('go') !== '0') setTimeout(function () {
+        if (form.requestSubmit) form.requestSubmit(); else form.dispatchEvent(new Event('submit', { cancelable: true }));
+      }, 500);
+    }).catch(function () {
+      say('Could not load the image from that link. Save the floor plan image and drop it here.', true);
+    });
+  })();
 
   /* ---------- contact card: straight to zeromouseclicks@agentmail.to, no email app ---------- */
   (function () {
