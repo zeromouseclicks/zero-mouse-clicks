@@ -81,9 +81,12 @@ def classify(model, objs, image=None):
         # mueble grande tipo cama (aunque las almohadas le quiten relleno): descarta cocina y baño
         r['bedlike'] = r['bed'] or any(_dims(o)[0] >= 0.85 and o['w_m'] * o['h_m'] >= 1.6 and o['fill'] >= 0.55 for o in fu)
         # sanitario/lavamanos: ovalado (llena < 90 % de su caja); lavadora: cuadrada y llena
+        # v0.5: una lavadora o secadora (cuadrada y llena) ya no cuenta como sanitario: así un cuarto de ropas
+        # con lavadora y secadora dejaba de parecer un baño con dos aparatos
+        washer = lambda o: 0.5 <= _dims(o)[0] and _dims(o)[1] <= 0.8 and o['fill'] >= 0.9 and _dims(o)[1] <= 1.3 * _dims(o)[0]
         r['toilets'] = sum(1 for o in fx if 0.28 <= _dims(o)[0] and _dims(o)[1] <= 0.9
-                           and o['w_m'] * o['h_m'] <= 0.6)
-        r['washers'] = sum(1 for o in fx if 0.5 <= _dims(o)[0] and _dims(o)[1] <= 0.8 and o['fill'] >= 0.9)
+                           and o['w_m'] * o['h_m'] <= 0.6 and not washer(o))
+        r['washers'] = sum(1 for o in fx if washer(o))
         r['wet'] = sum(1 for o in fx if _dims(o)[0] >= 0.7)          # ducha / tina
         r['cw_len'] = sum(_dims(o)[1] for o in cw if _dims(o)[0] >= 0.35)
         r['nfx'] = len(fx)
@@ -116,13 +119,15 @@ def classify(model, objs, image=None):
                          for o in r['kinds'])
     cand = [r for r in free() if 1.6 <= r['area'] <= 9.5 and not r['bed'] and not r['bigfu']
             and (r['toilets'] or r['wet'])]
-    score = lambda r: (2 * min(r['toilets'], 2) + r['wet'] + 3 * (r['area'] < 6) - 3 * (r['area'] > 7))
+    # v0.5: lavadoras sin ducha ni tina restan: es el cuarto de ropas, no un baño
+    score = lambda r: (2 * min(r['toilets'], 2) + r['wet'] + 3 * (r['area'] < 6) - 3 * (r['area'] > 7)
+                       - 3 * (r['washers'] > 0 and r['wet'] == 0))
     cand = sorted([r for r in cand if score(r) >= 4], key=lambda r: -score(r))
     for r in cand[:n_bath]:
         r['type'] = 'bath'
     if not cand and not has('bath'):   # el modelo no vio ningún aparato sanitario: el espacio pequeño más «vacío»
         alt = [r for r in free() if 1.6 <= r['area'] <= 6 and not r['bed'] and not r['bigfu']]   # todo apartamento tiene baño
-        alt.sort(key=lambda r: (r['cw_len'] > 0.5, r['area']))
+        alt.sort(key=lambda r: (r['washers'] > 0, r['cw_len'] > 0.5, r['area']))
         for r in alt[:1]:
             r['type'] = 'bath'
     # cocina (una; dos solo en apartamentos muy grandes)
@@ -143,7 +148,7 @@ def classify(model, objs, image=None):
     cand = [r for r in free() if r['area'] < 6 and r['nfx'] and not r['bed']] if not has('laundry') else []
     if labelled >= 3:
         cand = [r for r in cand if r['area'] < 4.5 and r['cw_len'] < 1.0]   # folleto rotulado: ropas solo si es muy claro
-    cand.sort(key=lambda r: -r['nfx'])
+    cand.sort(key=lambda r: -(r['nfx'] + 2 * r['washers']))
     for r in cand[:1]:
         r['type'] = 'laundry'
     # vecinos por puerta: un espacio sin cama que reparte a varias alcobas/estudio/ropas es circulación

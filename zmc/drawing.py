@@ -1,8 +1,10 @@
 """Modelo vectorial -> juego de planos PDF (A3 horizontal), solo reglas.
 
-Lámina A-101: planta con ejes, cotas en cadena y totales, vanos, rótulos de espacio,
-escala gráfica, rótulo y nota obligatoria.
-Lámina A-102: cuadro de áreas, cuadro de puertas y ventanas, supuestos.
+v0.5 (beta simplificada): seis láminas pensadas para cotizar.
+G-001 portada e índice · A-101 planta (función y área aproximada de cada espacio en letra grande) ·
+A-102 cantidades: piso, cielo, muros netos de vanos, guardaescobas, cuadro de puertas y ventanas ·
+A-103 acabados de piso · A-104 muros y cielos · A-105 eléctrico esquemático.
+Muebles, aparatos, mesones y clósets no se dibujan (SHOW_OBJECTS = False) hasta que su lectura sea fiable.
 """
 import datetime
 import math
@@ -17,6 +19,12 @@ from . import layout as L
 from .layout import F, FB, PAGE_W, PAGE_H, FRAME, TB_W, NOTE, ACC
 
 SCALES = [20, 25, 50, 75, 100, 125, 150, 200]
+
+# v0.5: muebles, aparatos, mesones y clósets se leían con demasiados errores (ropas confundida con baño,
+# aparatos de cocina mal ubicados). Se apagan en todas las láminas hasta que la detección mejore.
+SHOW_OBJECTS = False
+# alturas supuestas para las cantidades de muros y cielos (m)
+CLEAR_H, DOOR_H, WIN_H = 2.45, 2.10, 1.20
 
 
 def _cluster(vals, tol):
@@ -100,6 +108,48 @@ def _frame(c, title, number, meta, scale_txt):
     return L.frame(c, title, number, meta, scale_txt)
 
 
+def quantities(P):
+    """Cantidades para cotizar, por espacio (v0.5).
+    Piso = área neta; cielo = piso (cielo plano supuesto); perímetro = contorno del espacio a cara interior de muro;
+    muros = perímetro × altura libre, menos los vanos de ese espacio (puertas × 2,10 m, ventanas × 1,20 m);
+    cada cara de un muro divisorio se cuenta en el espacio al que mira. Guardaescoba = perímetro − anchos de puertas."""
+    if getattr(P, '_q', None) is not None:
+        return P._q
+    rooms = {}
+    for r in P.rooms:
+        per = _perimeter(P.contours.get(r['id']))
+        rooms[r['id']] = dict(id=r['id'], name=r.get('name', f"S-{r['id']:02d}"), exterior=bool(r.get('exterior')),
+                              floor=r['area'], ceiling=0.0 if r.get('exterior') else r['area'], perim=per,
+                              gross=0.0 if r.get('exterior') else per * CLEAR_H, open=0.0, doors_w=0.0, ops=[])
+    for o in P.ops:
+        h = DOOR_H if o['kind'] == 'door' else WIN_H
+        o['height'] = h
+        o['area'] = o['width'] * h
+        sides = [rid for rid in (o.get('rooms') or []) if rid in rooms]
+        o['between'] = sides
+        for rid in set(sides):
+            q = rooms[rid]
+            q['ops'].append(o['tag'])
+            if not q['exterior']:
+                q['open'] += o['area']
+            if o['kind'] == 'door':
+                q['doors_w'] += o['width']
+    for q in rooms.values():
+        q['net'] = max(0.0, q['gross'] - q['open']) if not q['exterior'] else 0.0
+        q['skirting'] = max(0.0, q['perim'] - q['doors_w']) if not q['exterior'] else 0.0
+    inter = [q for q in rooms.values() if not q['exterior']]
+    tot = dict(floor=sum(q['floor'] for q in inter), ceiling=sum(q['ceiling'] for q in inter),
+               perim=sum(q['perim'] for q in inter), gross=sum(q['gross'] for q in inter),
+               open=sum(q['open'] for q in inter), net=sum(q['net'] for q in inter),
+               skirting=sum(q['skirting'] for q in inter),
+               ext=sum(q['floor'] for q in rooms.values() if q['exterior']),
+               doors=[o for o in P.ops if o['kind'] == 'door'], windows=[o for o in P.ops if o['kind'] == 'window'])
+    tot['door_area'] = sum(o['area'] for o in tot['doors'])
+    tot['window_area'] = sum(o['area'] for o in tot['windows'])
+    P._q = dict(rooms=rooms, tot=tot)
+    return P._q
+
+
 def plan_layout(P, comp=True):
     """Escala normalizada más grande que cabe y sitio para un panel de datos al lado o debajo."""
     dx0, dy0, dx1, dy1 = L.drawing_area()
@@ -152,6 +202,8 @@ def _plan_body(c, P, T, k, mode='plan', cuts=None, tags=True, only=None):
     """Muros, vanos, capas de la versión acabada y rótulos de espacio (sin ejes ni cotas)."""
     if mode == 'furniture' and P.fin:
         _floor_tints(c, P, T)
+    if mode == 'walls' and P.fin:
+        _ceiling_tints(c, P, T)
     # muros (poché)
     c.setFillGray(0.2); c.setStrokeGray(0); c.setLineWidth(0.5)
     for o, a, b, cc, d in P.walls:
@@ -225,38 +277,98 @@ def _plan_body(c, P, T, k, mode='plan', cuts=None, tags=True, only=None):
     if P.fin:
         if mode == 'finishes':
             _floors(c, P, T, k)
-        _objects(c, P, T, k, light=(mode not in ('plan', 'furniture')), furniture=False,
-                 style='color' if mode == 'furniture' else 'line')
+        if mode == 'walls':
+            _wall_faces(c, P, T)
+        if SHOW_OBJECTS:
+            _objects(c, P, T, k, light=(mode not in ('plan', 'furniture')), furniture=False,
+                     style='color' if mode == 'furniture' else 'line')
         if mode == 'electrical':
             _electrical(c, P, T, k)
-    if cuts and mode == 'plan':
+    if cuts and mode == 'plan' and SHOW_OBJECTS:
         from . import sections
         sections.draw_cut_marks(c, P, T, cuts, F, FB)
-    # espacios
-    if not tags:
-        return
-    def _tag(px, py, nm, sub):
-        c.setFillGray(1); c.rect(px - len(nm) * 1.3 * mm / 1.6 - 1 * mm, py - (4 * mm if sub else 1 * mm), len(nm) * 2.6 * mm / 1.6 + 2 * mm,
-                                  7.5 * mm if sub else 4.5 * mm, stroke=0, fill=1); c.setFillGray(0)
-        c.setFont(FB, 6.5); c.drawCentredString(px, py + 1 * mm, nm)
-        if sub:
-            c.setFont(F, 6); c.drawCentredString(px, py - 2.5 * mm, sub)
+    if tags:
+        _room_tags(c, P, T, k, mode, only)
+
+
+def _approx(a):
+    return f"≈ {a:.1f} m²"
+
+
+def _tag_lines(P, r, mode, main=True):
+    """Renglones del rótulo de un espacio: función en grande y, debajo, el área aproximada (y lo de cada lámina)."""
+    q = quantities(P)['rooms'].get(r['id'], {})
+    if not main:
+        return []
+    if mode == 'finishes' and r.get('floor'):
+        return [(FLOOR_CODE.get(r['floor'], '') + '   ' + _approx(r['area']), F, 0.7, 0.2)]
+    if mode == 'walls' and not r.get('exterior'):
+        return [('CEILING ' + _approx(q.get('ceiling', 0)), F, 0.62, 0.2),
+                ('WALLS ' + _approx(q.get('net', 0)), FB, 0.62, 0.05)]
+    return [(_approx(r['area']), F, 0.72, 0.2)]
+
+
+def _room_tags(c, P, T, k, mode, only=None):
+    """v0.5: la función de cada espacio en letra grande (hasta 13 pt, ajustada al espacio) y su área aproximada."""
+    def box_of(r):
+        poly = P.contours.get(r['id'])
+        if poly:
+            xs = [p_[0] for p_ in poly]; ys = [p_[1] for p_ in poly]
+            return (max(xs) - min(xs)) * k, (max(ys) - min(ys)) * k
+        return 3.0 * k, 3.0 * k
+
+    def fit(lines, w, h, smax=13.0):
+        tw = max(c.stringWidth(t, f, 1.0) * rel for t, f, rel, _ in lines)
+        th = sum(rel for _, _, rel, _ in lines) * 1.22
+        return min(smax, 0.86 * w / max(tw, 1e-6), 0.82 * h / max(th, 1e-6))
+
+    def draw(px, py, lines, w, h):
+        s_ = fit(lines, w, h)
+        rot = False
+        if s_ < 8 and h > 1.4 * w:            # espacio largo y angosto: rótulo vertical si así cabe más grande
+            s2 = fit(lines, h, w)
+            if s2 > s_ + 0.5:
+                s_, rot = s2, True
+        s_ = max(s_, 5.5)
+        sizes = [max(5.2, s_ * rel) for _, _, rel, _ in lines]
+        hts = [z * 1.22 for z in sizes]
+        tot_h = sum(hts)
+        bw = max(c.stringWidth(t, f, z) for (t, f, _, _), z in zip(lines, sizes)) + 2.4 * mm
+        c.saveState(); c.translate(px, py)
+        if rot:
+            c.rotate(90)
+        c.setFillGray(1); c.rect(-bw / 2, -tot_h / 2 - 0.6 * mm, bw, tot_h + 1.2 * mm, stroke=0, fill=1)
+        yy = tot_h / 2
+        for (t, f, _, g), z, hh in zip(lines, sizes, hts):
+            yy -= hh
+            c.setFillGray(g); c.setFont(f, z); c.drawCentredString(0, yy + 0.24 * z, t)
+        c.restoreState()
+
     for r in P.rooms:
         if only is not None and r['id'] not in only:
             continue
         nm = r.get('name', f"S-{r['id']:02d}")
-        sub = f"{r['area']:.2f} m²"
-        if mode == 'finishes' and r.get('floor'):
-            sub = FLOOR_CODE.get(r['floor'], '') + '  ·  ' + sub
+        w, h = box_of(r)
         zones = r.get('zones') or []
         if zones:                       # espacio abierto: un rótulo por zona y el área total en la zona principal
             main = max(zones, key=lambda z: 'LIVING' in z[0])
             for z in zones:
+                others = [o for o in zones if o is not z]
+                zw, zh = w, h
+                for o in others:
+                    dx, dy = abs(o[1] - z[1]) * k, abs(o[2] - z[2]) * k
+                    if dx >= dy:
+                        zw = min(zw, 1.0 * dx)
+                    else:
+                        zh = min(zh, 1.0 * dy)
+                lines = [(z[0], FB, 1.0, 0.0)] + _tag_lines(P, r, mode, main=z is main)
+                if z is main and mode not in ('walls',):
+                    lines[-1] = (lines[-1][0] + ' (open plan)',) + lines[-1][1:]
                 px, py = T(z[1], z[2])
-                _tag(px, py, z[0], (sub + ' (open plan)') if z is main else None)
+                draw(px, py, lines, zw, zh)
         else:
             px, py = T(r['X'], r['Y'])
-            _tag(px, py, nm, sub)
+            draw(px, py, [(nm, FB, 1.0, 0.0)] + _tag_lines(P, r, mode), w, h)
 
 
 def sheet_plan(c, P, meta, mode='plan', title='FLOOR PLAN', number='A-101', cuts=None):
@@ -312,9 +424,10 @@ def sheet_plan(c, P, meta, mode='plan', title='FLOOR PLAN', number='A-101', cuts
             _dim(c, T(0, a), T(0, b), l1, f'{b - a:.2f}', False, k)
     _dim(c, T(0, 0), T(0, P.H), l2, f'{P.H:.2f}', False, k)
     # título de vista, escala gráfica y panel de datos
-    sub = {'plan': 'Finished state: fixed casework and fixtures. Loose furniture on A-105.',
+    sub = {'plan': 'Each space with its function and approximate net area. Furniture and fixtures are not drawn in this beta.',
            'furniture': 'Furniture read from the marketing image, redrawn at catalogue sizes. Indicative.',
            'finishes': 'Finishes read from the image texture; confirm against the developer specification.',
+           'walls': f'Ceilings flat at {CLEAR_H:.2f} m; walls net of doors and windows. Quantities on A-102.',
            'electrical': 'Schematic proposal by rules, not in the source plan. Verify with a licensed electrician.'}[mode]
     L.view_title(c, x0 + 7 * mm, y0 + 12 * mm, 1, title, f'SCALE 1:{scale}   ·   dimensions in metres', sub)
     L.scale_bar(c, tb - 7 * mm - 5 * k - 6 * mm, y0 + 12 * mm, k)
@@ -452,6 +565,40 @@ def _floor_tints(c, P, T):
         path.close()
         c.setFillColorRGB(*col)
         c.drawPath(path, stroke=0, fill=1)
+        c.restoreState()
+
+
+CEIL_TINT = (0.90, 0.94, 0.98)
+
+
+def _poly_path(c, T, poly):
+    path = c.beginPath()
+    x, y = T(*poly[0]); path.moveTo(x, y)
+    for pt in poly[1:]:
+        x, y = T(*pt); path.lineTo(x, y)
+    path.close()
+    return path
+
+
+def _ceiling_tints(c, P, T):
+    """A-104: el cielo de cada espacio interior, en un tinte azul muy claro."""
+    for r in P.rooms:
+        poly = P.contours.get(r['id'])
+        if not poly or r.get('exterior'):
+            continue
+        c.saveState(); c.setFillColorRGB(*CEIL_TINT)
+        c.drawPath(_poly_path(c, T, poly), stroke=0, fill=1)
+        c.restoreState()
+
+
+def _wall_faces(c, P, T):
+    """A-104: la cara de muro que se mide en cada espacio (su contorno a cara interior)."""
+    for r in P.rooms:
+        poly = P.contours.get(r['id'])
+        if not poly or r.get('exterior'):
+            continue
+        c.saveState(); c.setStrokeColorRGB(*ACC); c.setLineWidth(1.1); c.setLineJoin(1)
+        c.drawPath(_poly_path(c, T, poly), stroke=1, fill=0)
         c.restoreState()
 
 
@@ -629,8 +776,8 @@ def _panel_plan(c, x, y, w, h):
         c.setFont(F, 5); c.drawCentredString(px + sw / 2, py + 1.2 * mm, '2.40')
 
     def tag(px, py):
-        c.setFont(FB, 5.4); c.drawCentredString(px + sw / 2, py + 1.4 * mm, 'BEDROOM')
-        c.setFont(F, 5); c.drawCentredString(px + sw / 2, py - 0.6 * mm, '10.6 m²')
+        c.setFont(FB, 6.6); c.drawCentredString(px + sw / 2, py + 1.3 * mm, 'BEDROOM')
+        c.setFillGray(0.2); c.setFont(F, 5.2); c.drawCentredString(px + sw / 2, py - 1.0 * mm, '≈ 10.6 m²')
 
     def cut(px, py):
         c.setLineWidth(0.5); c.setDash([5, 1.5, 1, 1.5], 0); c.line(px + 3 * mm, py + 1 * mm, px + sw, py + 1 * mm); c.setDash()
@@ -647,11 +794,16 @@ def _panel_plan(c, x, y, w, h):
     row('Window', window)
     row('Axis with reference bubble', axis)
     row('Dimension (m, to wall axes)', dim)
-    row('Space name and net area', tag)
-    row('Section cut, view direction', cut)
-    row('Fixture / casework (block)', fixture)
+    row('Space function and approx. net area', tag)
+    if SHOW_OBJECTS:
+        row('Section cut, view direction', cut)
+        row('Fixture / casework (block)', fixture)
     y -= 2 * mm
     y = L.wrap(c, 'Openings tagged D-xx (doors) and W-xx (windows) as in the schedule on A-102.', x, y, w, size=6.0)
+    if not SHOW_OBJECTS:
+        y -= 1.5 * mm
+        y = L.wrap(c, 'Beta: furniture, appliances, fixtures and casework are left out on purpose until the models '
+                      'read them reliably. The drawing keeps what a quote needs: spaces, walls and openings.', x, y, w, size=6.0)
     return y
 
 def _panel_finishes(c, x, y, w, h):
@@ -699,20 +851,21 @@ def _panel_furniture(c, x, y, w, h):
 
 def _panel_schedules(c, x, y, w, h):
     P = _CUR.get('P')
-    y = L.header(c, x, y, w, 'Area summary')
+    y = L.header(c, x, y, w, 'Totals for quoting')
     if not P:
         return
-    inter = [r for r in P.rooms if not r.get('exterior')]
-    ext = [r for r in P.rooms if r.get('exterior')]
-    net = sum(r['area'] for r in inter)
-    big = [('Net interior', f'{net:.2f} m²'), ('Exterior (patio / balcony)', f"{sum(r['area'] for r in ext):.2f} m²" if ext else '—'),
-           ('Footprint', f'{P.W:.2f} × {P.H:.2f} m'), ('Spaces', str(len(inter)))]
+    t = quantities(P)['tot']
+    big = [('Floor, net interior', f"{t['floor']:.2f} m²"), ('Ceilings (flat)', f"{t['ceiling']:.2f} m²"),
+           ('Walls, net of openings', f"{t['net']:.2f} m²"), ('Skirting', f"{t['skirting']:.2f} m"),
+           ('Doors / windows', f"{len(t['doors'])} / {len(t['windows'])}  ·  {t['door_area'] + t['window_area']:.2f} m²")]
+    if t['ext']:
+        big.append(('Exterior floor (patio / balcony)', f"{t['ext']:.2f} m²"))
     for lb, v in big:
         L.label(c, x, y - 2 * mm, lb)
-        c.setFont(FB, 12); c.setFillGray(0.05); c.drawString(x, y - 7.6 * mm, v)
-        y -= 11.5 * mm
+        c.setFont(FB, 11.5); c.setFillGray(0.05); c.drawString(x, y - 7.4 * mm, v)
+        y -= 10.6 * mm
     meta = _CUR.get('meta') or {}
-    y -= 1 * mm
+    y -= 4 * mm
     y = L.header(c, x, y, w, 'Scale evidence')
     y = L.wrap(c, (meta.get('assume1') or ('1. ' + meta.get('scaled_from', ''))).split('. ', 1)[-1], x, y, w, size=6.1, leading=7.4)
     return y
@@ -720,8 +873,10 @@ def _panel_schedules(c, x, y, w, h):
 def _panel_cover(c, x, y, w, h):
     y = L.header(c, x, y, w, 'About this set')
     y = L.wrap(c, 'Generated automatically from one marketing floor-plan image by Zero Mouse Clicks: three small '
-              'segmentation models read walls, openings, casework and furniture; explicit drafting rules square the '
-              'geometry, set the scale and draw every sheet. Nothing was measured on site.\n'
+              'segmentation models read walls, openings and what is inside each space (used only to name it); explicit '
+              'drafting rules square the geometry, set the scale, draw every sheet and compute the quantities for '
+              'quoting floors, walls, ceilings and openings. Nothing was measured on site.\n'
+              'Beta: furniture and fixtures are not drawn yet.\n'
               'Open source (Apache-2.0). Every rule can be read and changed.', x, y, w, size=6.3, leading=8.2)
     meta = _CUR.get('meta') or {}
     y -= 3 * mm
@@ -730,7 +885,23 @@ def _panel_cover(c, x, y, w, h):
     return y
 
 
-PANELS = {'plan': _panel_plan, 'finishes': _panel_finishes, 'electrical': _panel_electrical, 'furniture': _panel_furniture}
+def _panel_walls(c, x, y, w, h):
+    y = L.header(c, x, y, w, 'Legend')
+    c.saveState(); c.setFillColorRGB(*CEIL_TINT); c.setStrokeGray(0.6); c.setLineWidth(0.3)
+    c.rect(x, y - 5.4 * mm, 11 * mm, 5 * mm, stroke=1, fill=1); c.restoreState()
+    c.setFillGray(0.1); c.setFont(F, 6.6); c.drawString(x + 14 * mm, y - 3.6 * mm, f'Ceiling, flat at {CLEAR_H:.2f} m (assumed)')
+    y -= 8 * mm
+    c.saveState(); c.setStrokeColorRGB(*ACC); c.setLineWidth(1.1); c.line(x, y - 2.6 * mm, x + 11 * mm, y - 2.6 * mm); c.restoreState()
+    c.setFillGray(0.1); c.setFont(F, 6.6); c.drawString(x + 14 * mm, y - 3.4 * mm, 'Wall face measured in that space')
+    y -= 8 * mm
+    y = L.wrap(c, f'Walls = perimeter of the space × {CLEAR_H:.2f} m, minus its doors ({DOOR_H:.2f} m high) and windows '
+                  f'({WIN_H:.2f} m high). Each face of a partition is counted in the space it faces, '
+                  'so paint and wall finishes can be quoted space by space.', x, y, w, size=6.0)
+    return y
+
+
+PANELS = {'plan': _panel_plan, 'finishes': _panel_finishes, 'electrical': _panel_electrical, 'furniture': _panel_furniture,
+          'walls': _panel_walls}
 _CUR = {}
 
 
@@ -793,7 +964,7 @@ def _comp_finishes(c, P, x, y, w, h):
     rows = [(f"S-{r['id']:02d}", _short(r.get('name', '—'), 22), FLOOR_CODE.get(r.get('floor', ''), '—'), f"{r['area']:.2f}") for r in P.rooms]
     y = L.table(c, x, y, ['Code', 'Space', 'Floor', 'm²'], rows, _fit_widths([0.17, 0.5, 0.15, 0.18], w), align=['l', 'l', 'l', 'r'],
                 max_h=y - bottom - 8 * mm)
-    L.wrap(c, 'Perimeter = room outline, before deducting door widths; use it to estimate skirting.', x, y - 1 * mm, w, size=5.8, gray=0.4)
+    L.wrap(c, 'Perimeter = room outline at the inner face of walls. Skirting (perimeter minus doors) on A-102.', x, y - 1 * mm, w, size=5.8, gray=0.4)
 
 
 def _comp_electrical(c, P, x, y, w, h):
@@ -839,8 +1010,22 @@ def _comp_furniture(c, P, x, y, w, h):
         L.wrap(c, f'{n_as} piece(s) assumed (dashed).', x, y - 3 * mm, w, size=5.8, gray=0.4)
 
 
+def _comp_walls(c, P, x, y, w, h):
+    bottom = y - h
+    q = quantities(P)
+    y = L.header(c, x, y, w, 'Walls & ceilings by space')
+    rows = [(_short(v['name'], 18), f"{v['ceiling']:.2f}", f"{v['perim']:.2f}", f"{v['net']:.2f}")
+            for v in q['rooms'].values() if not v['exterior']]
+    t = q['tot']
+    y = L.table(c, x, y, ['Space', 'Ceiling m²', 'Perim. m', 'Walls m²'], rows, _fit_widths([0.4, 0.2, 0.2, 0.2], w),
+                align=['l', 'r', 'r', 'r'], total=('Total', f"{t['ceiling']:.2f}", f"{t['perim']:.2f}", f"{t['net']:.2f}"),
+                max_h=y - bottom - 16 * mm)
+    L.wrap(c, 'Walls net of openings. Gross walls, openings and skirting on A-102.', x, y - 1 * mm, w, size=5.8, gray=0.4)
+
+
 MUTE_G = 0.42
-COMP = {'plan': _comp_plan, 'finishes': _comp_finishes, 'electrical': _comp_electrical, 'furniture': _comp_furniture}
+COMP = {'plan': _comp_plan, 'finishes': _comp_finishes, 'electrical': _comp_electrical, 'furniture': _comp_furniture,
+        'walls': _comp_walls}
 
 
 # ------------------------------------------------------------------------------------------ A-102 cuadros
@@ -897,97 +1082,133 @@ def _elev(c, t, x, y, k):
     c.restoreState()
 
 
+def _kind(o):
+    return ('Sliding door' if o.get('style') == 'sliding' else 'Opening' if o.get('style') == 'opening'
+            else 'Entry door' if o.get('entry') else 'Door') if o['kind'] == 'door' else 'Window'
+
+
 def sheet_schedules(c, P, meta, scale):
+    """A-102 (v0.5): cantidades para cotizar por espacio y cuadro de puertas y ventanas con su área."""
     x0, y0, x1, y1 = FRAME
     meta['panel'] = _panel_schedules
     meta['keyplan'] = {}
     _CUR['P'] = P
-    tb = _frame(c, 'AREAS & OPENINGS SCHEDULES', 'A-102', meta, 'as noted')
+    tb = _frame(c, 'QUANTITY TAKEOFF & OPENINGS', 'A-102', meta, 'as noted')
     dx0, dy0, dx1, dy1 = L.drawing_area()
-    gut = 7 * mm
+    gut = 8 * mm
     W = dx1 - dx0
-    c1w, c2w = W * 0.35, W * 0.36
-    c3w = W - c1w - c2w - 2 * gut
-    cx1, cx2, cx3 = dx0, dx0 + c1w + gut, dx0 + c1w + c2w + 2 * gut
+    c1w = W * 0.6
+    c2w = W - c1w - gut
+    cx1, cx2 = dx0, dx0 + c1w + gut
     top = dy1 - 2 * mm
+    q = quantities(P)
+    t = q['tot']
+    code = lambda rid: f"S-{rid:02d}"
 
-    # columna 1: cuadro de áreas y diagrama de áreas
-    inter = [r for r in P.rooms if not r.get('exterior')]
-    exter = [r for r in P.rooms if r.get('exterior')]
-    tot = sum(r['area'] for r in inter) or 1.0
-    y = L.header(c, cx1, top, c1w, 'Area & finish schedule (m²)')
-    rows = [(f"S-{r['id']:02d}", _short(r.get('name', '—'), 22), FLOOR_CODE.get(r.get('floor', ''), '—'), f"{r['area']:.2f}",
-             (r['area'] / tot, f"{100 * r['area'] / tot:.1f} %")) for r in inter]
-    y = L.table(c, cx1, y, ['Code', 'Space', 'Floor', 'Area', 'Share'], rows, _fit_widths([0.13, 0.4, 0.11, 0.14, 0.22], c1w),
-                align=['l', 'l', 'l', 'r', 'r'], total=('', 'Net interior', '', f'{tot:.2f}', '100 %'), bars=4,
-                max_h=(top - dy0) * 0.62, more='')
+    # columna 1: cantidades por espacio, totales y diagrama de áreas
+    y = L.header(c, cx1, top, c1w, 'Quantities by space  (m² and m)')
+    inter = [v for v in q['rooms'].values() if not v['exterior']]
+    rows = [(code(v['id']), _short(v['name'], 24), f"{v['floor']:.2f}", f"{v['ceiling']:.2f}", f"{v['perim']:.2f}",
+             f"{v['gross']:.2f}", f"{v['open']:.2f}", f"{v['net']:.2f}", f"{v['skirting']:.2f}") for v in inter]
+    fr = [0.075, 0.245, 0.085, 0.09, 0.085, 0.09, 0.105, 0.11, 0.115]
+    y = L.table(c, cx1, y, ['Code', 'Space', 'Floor', 'Ceiling', 'Perim.', 'Walls', 'Openings', 'Walls net', 'Skirting'], rows,
+                _fit_widths(fr, c1w), align=['l', 'l'] + ['r'] * 7, size=6.4, rh=4.5 * mm,
+                total=('', 'Net interior', f"{t['floor']:.2f}", f"{t['ceiling']:.2f}", f"{t['perim']:.2f}", f"{t['gross']:.2f}",
+                       f"{t['open']:.2f}", f"{t['net']:.2f}", f"{t['skirting']:.2f}"),
+                max_h=(top - dy0) * 0.5, more='')
+    exter = [v for v in q['rooms'].values() if v['exterior']]
     if exter:
-        y = L.table(c, cx1, y - 1 * mm, ['Code', 'Exterior', 'Floor', 'Area', ''],
-                    [(f"S-{r['id']:02d}", r.get('name', '—'), FLOOR_CODE.get(r.get('floor', ''), '—'), f"{r['area']:.2f}", '') for r in exter],
-                    _fit_widths([0.13, 0.4, 0.11, 0.14, 0.22], c1w), align=['l', 'l', 'l', 'r', 'r'])
+        y = L.table(c, cx1, y - 1 * mm, ['Code', 'Exterior', 'Floor'], [(code(v['id']), _short(v['name'], 24), f"{v['floor']:.2f}") for v in exter],
+                    _fit_widths(fr[:3], c1w * sum(fr[:3])), align=['l', 'l', 'r'], size=6.4, rh=4.5 * mm)
+    y = L.wrap(c, f"Floor = net area to the inner face of walls. Ceiling = floor (flat ceiling assumed). Walls = perimeter × "
+                  f"{CLEAR_H:.2f} m clear height; Walls net = minus the doors and windows of that space. Skirting = perimeter "
+                  f"minus door widths. Partitions are counted once per face, in each space they face.",
+               cx1, y - 1 * mm, c1w, size=5.9, leading=7.1, gray=0.35)
+    # cifras grandes
     y -= 4 * mm
-    y = L.header(c, cx1, y, c1w, 'Area diagram')
-    pal = [(0.86, 0.91, 0.96), (0.93, 0.89, 0.82), (0.88, 0.93, 0.87), (0.95, 0.88, 0.88), (0.91, 0.88, 0.95), (0.95, 0.93, 0.84)]
-    fills = {r['id']: pal[i % len(pal)] for i, r in enumerate(P.rooms)}
-    L.key_plan(c, P, cx1, dy0 + 2 * mm, c1w, max(20 * mm, y - dy0 - 6 * mm), codes=True, fills=fills)
+    tiles = [('Floor', f"{t['floor']:.1f} m²"), ('Ceilings', f"{t['ceiling']:.1f} m²"), ('Walls net', f"{t['net']:.1f} m²"),
+             ('Skirting', f"{t['skirting']:.1f} m"), ('Doors + windows', f"{t['door_area'] + t['window_area']:.1f} m²")]
+    tw = c1w / len(tiles)
+    c.setStrokeGray(0.05); c.setLineWidth(0.9); c.line(cx1, y, cx1 + c1w, y)
+    for i, (lb, v) in enumerate(tiles):
+        tx = cx1 + i * tw
+        L.label(c, tx, y - 4.6 * mm, lb, size=5.6)
+        c.setFont(FB, 13); c.setFillGray(0.04); c.drawString(tx, y - 11 * mm, v)
+        if i:
+            c.setStrokeGray(0.75); c.setLineWidth(0.4); c.line(tx - 3 * mm, y - 2 * mm, tx - 3 * mm, y - 12.5 * mm)
+    y -= 15 * mm
+    c.setStrokeGray(0.75); c.setLineWidth(0.4); c.line(cx1, y, cx1 + c1w, y)
+    y -= 5 * mm
+    if y - dy0 > 40 * mm:
+        y = L.header(c, cx1, y, c1w, 'Area diagram')
+        pal = [(0.86, 0.91, 0.96), (0.93, 0.89, 0.82), (0.88, 0.93, 0.87), (0.95, 0.88, 0.88), (0.91, 0.88, 0.95), (0.95, 0.93, 0.84)]
+        fills = {r['id']: pal[i % len(pal)] for i, r in enumerate(P.rooms)}
+        L.key_plan(c, P, cx1, dy0 + 2 * mm, c1w, max(20 * mm, y - dy0 - 6 * mm), codes=True, fills=fills)
 
-    # columna 2: cuadro de puertas y ventanas + tipos
+    # columna 2: cuadro de puertas y ventanas, tipos y supuestos
     types = _types(P)
     y = L.header(c, cx2, top, c2w, 'Door & window schedule')
-    ops = [(o['tag'], o.get('type_code', ''), ('Sliding door' if o.get('style') == 'sliding' else 'Opening' if o.get('style') == 'opening'
-             else 'Entry door' if o.get('entry') else 'Door') if o['kind'] == 'door' else 'Window', f"{o['width']:.2f}",
-            '2.10' if o['kind'] == 'door' else '1.20*') for o in P.ops]
-    maxrows = int((top - dy0 - 70 * mm) / (4.3 * mm))
+    side = lambda o: ' / '.join(code(rid) for rid in o.get('between', [])) + (' / ext.' if len(o.get('between', [])) < 2 else '')
+    ops = [(o['tag'], o.get('type_code', ''), _kind(o), f"{o['width']:.2f}", f"{o['height']:.2f}", f"{o['area']:.2f}", side(o))
+           for o in P.ops]
+    maxrows = int((top - dy0) * 0.5 / (4.1 * mm))
     shown = ops[:max(6, maxrows)]
-    y = L.table(c, cx2, y, ['Tag', 'Type', 'Kind', 'Width', 'Height'], shown, _fit_widths([0.15, 0.13, 0.36, 0.17, 0.19], c2w),
-                align=['l', 'l', 'l', 'r', 'r'], size=6.2, rh=4.1 * mm)
+    y = L.table(c, cx2, y, ['Tag', 'Type', 'Kind', 'Width', 'Height', 'm²', 'Between'], shown,
+                _fit_widths([0.1, 0.09, 0.22, 0.12, 0.12, 0.11, 0.24], c2w), align=['l', 'l', 'l', 'r', 'r', 'r', 'l'], size=6.0, rh=4.1 * mm,
+                total=('', '', 'Total', '', '', f"{t['door_area'] + t['window_area']:.2f}", ''))
     if len(shown) < len(ops):
         L.wrap(c, f'… and {len(ops) - len(shown)} more (same types).', cx2, y, c2w, size=5.8, gray=0.4); y -= 4 * mm
-    L.wrap(c, 'Widths measured on the image; heights assumed (* window head 2.20, sill 1.00).', cx2, y, c2w, size=5.8, gray=0.4)
-    y -= 6 * mm
-    y = L.header(c, cx2, y, c2w, 'Types (elevations, schematic)')
-    avail_h = y - dy0 - 8 * mm
-    ke = min(14 * mm / 1.0, avail_h / 2.6)          # escala de los alzados
-    xx, yy = cx2 + 6 * mm, y - 3 * mm - 2.35 * ke
-    row_h = 2.35 * ke + 13 * mm
-    for t in types:
-        wpt = t['width'] * ke
-        if xx + wpt > cx2 + c2w:
-            xx = cx2 + 6 * mm; yy -= row_h
-        if yy < dy0 + 8 * mm:
-            break
-        _elev(c, t, xx, yy, ke)
-        c.setFont(FB, 6.4); c.setFillGray(0.05); c.drawString(xx, yy - 8.2 * mm, f"{t['code']}  ×{t['n']}")
-        c.setFont(F, 5.6); c.setFillGray(0.35); c.drawString(xx, yy - 10.8 * mm, t['kind'])
-        xx += max(wpt, 16 * mm) + 9 * mm
-
-    # columna 3: aparatos, mobiliario y supuestos
-    y = L.header(c, cx3, top, c3w, 'Fixtures & casework')
-    from collections import Counter
-    cnt = Counter((o.get('fixture') or o.get('casework') or o['kind']) for o in P.objs if o['kind'] != 'furniture' and o['kind'] != 'fixture')
-    cnt.update(it['type'] for it in P.items if it['type'] in ('fridge', 'cooktop', 'sink', 'washer', 'toilet', 'lavatory', 'shower', 'bathtub'))
-    rows2 = [(k_.replace('_', ' ').upper(), v) for k_, v in sorted(cnt.items())]
-    y = L.table(c, cx3, y, ['Item', 'Qty'], rows2, _fit_widths([0.78, 0.22], c3w), align=['l', 'r'], max_h=(top - dy0) * 0.3, more='')
-    y -= 3 * mm
-    y = L.header(c, cx3, y, c3w, 'Furniture (indicative)')
-    from .furnish import NAMES, FURNITURE
-    fc = Counter(it['type'] for it in P.items if it['type'] in FURNITURE)
-    y = L.table(c, cx3, y, ['Item', 'Qty'], [(NAMES.get(k_, k_), v) for k_, v in sorted(fc.items())] or [('—', '')],
-                _fit_widths([0.78, 0.22], c3w), align=['l', 'r'], max_h=(top - dy0) * 0.3, more='on A-105')
-    y -= 3 * mm
-    y = L.header(c, cx3, y, c3w, 'Assumptions')
-    for i, s_ in enumerate([
+    for lb, os_, ar in (('Doors', t['doors'], t['door_area']), ('Windows', t['windows'], t['window_area'])):
+        L.label(c, cx2, y - 1 * mm, lb); c.setFont(F, 6.4); c.setFillGray(0.1)
+        c.drawString(cx2 + 16 * mm, y - 1 * mm, f"{len(os_)}  ·  total width {sum(o['width'] for o in os_):.2f} m  ·  {ar:.2f} m²")
+        y -= 4.4 * mm
+    y = L.wrap(c, f'Widths measured on the image; heights assumed: doors {DOOR_H:.2f} m, windows {WIN_H:.2f} m '
+                  f'(sill 1.00, head 2.20). "ext." = exterior side.', cx2, y - 0.5 * mm, c2w, size=5.8, gray=0.4)
+    y -= 4 * mm
+    # supuestos (abajo) y tipos en el espacio que quede
+    assume = [
         meta.get('assume1') or (f"1. Scale derived from {P.m.get('scale_from', 'declared area')}."),
         '2. Walls, doors and windows read from the image by small on-device models and squared by rules.',
-        '3. Door height 2.10 m, window head 2.20 m, clear height 2.45 m: assumed.',
-        '4. Room names read from the labels printed on the plan when present; otherwise inferred by rules.',
-        '5. Electrical points (A-104) and furniture (A-105) are proposals by rules, not data from the source.',
-        '6. ' + NOTE + '.']):
-        y = L.wrap(c, s_, cx3, y, c3w, size=5.9, leading=7.1) - 1.2
+        f'3. Clear height {CLEAR_H:.2f} m with flat ceilings, door height {DOOR_H:.2f} m, window height {WIN_H:.2f} m: assumed. '
+        'Recompute walls and ceilings if the developer states other heights.',
+        '4. Space functions read from the labels printed on the plan when present; otherwise inferred by rules.',
+        '5. Beta: furniture, appliances, fixtures and casework are not drawn; the electrical sheet (A-105) is a proposal by rules.',
+        '6. ' + NOTE + '.']
+    def _nlines(txt):
+        n_, line = 0, ''
+        for wd in txt.split():
+            t_ = (line + ' ' + wd).strip()
+            if c.stringWidth(t_, F, 5.9) <= c2w:
+                line = t_
+            else:
+                n_ += 1; line = wd
+        return n_ + (1 if line else 0)
+    est = sum(_nlines(a_) * 7.1 + 1.2 for a_ in assume) + 10 * mm
+    ty = y
+    if ty - dy0 - est > 34 * mm:
+        y = L.header(c, cx2, y, c2w, 'Types (elevations, schematic)')
+        avail_h = y - dy0 - est - 8 * mm
+        ke = min(12 * mm / 1.0, avail_h / 2.6)
+        xx, yy = cx2 + 6 * mm, y - 3 * mm - 2.35 * ke
+        row_h = 2.35 * ke + 13 * mm
+        for tp in types:
+            wpt = tp['width'] * ke
+            if xx + wpt > cx2 + c2w:
+                xx = cx2 + 6 * mm; yy -= row_h
+            if yy - 11 * mm < dy0 + est:
+                break
+            _elev(c, tp, xx, yy, ke)
+            c.setFont(FB, 6.4); c.setFillGray(0.05); c.drawString(xx, yy - 8.2 * mm, f"{tp['code']}  ×{tp['n']}")
+            c.setFont(F, 5.6); c.setFillGray(0.35); c.drawString(xx, yy - 10.8 * mm, tp['kind'])
+            xx += max(wpt, 16 * mm) + 9 * mm
+    y = dy0 + est
+    y = L.header(c, cx2, y, c2w, 'Assumptions')
+    for s_ in assume:
+        y = L.wrap(c, s_, cx2, y, c2w, size=5.9, leading=7.1) - 1.2
         if y < dy0:
             break
-    L.view_title(c, x0 + 7 * mm, y0 + 12 * mm, 2, 'AREAS & OPENINGS SCHEDULES', 'Areas in m², net to the inner face of walls',
-                 'Elevations of types are schematic, not to a stated scale.')
+    L.view_title(c, x0 + 7 * mm, y0 + 12 * mm, 2, 'QUANTITY TAKEOFF & OPENINGS', 'Areas in m², lengths in m, net to the inner face of walls',
+                 'Approximate quantities from a marketing plan, for budgeting. Verify on site before ordering material.')
     c.showPage()
 
 
@@ -1024,11 +1245,11 @@ def sheet_cover(c, P, meta, index, image=None):
     c.setStrokeGray(0.05); c.setLineWidth(1.2); c.line(dx0, y, dx1, y)
     # cifras
     inter = [r for r in P.rooms if not r.get('exterior')]
-    net = sum(r['area'] for r in inter)
-    ext = sum(r['area'] for r in P.rooms if r.get('exterior'))
-    nd = sum(1 for o in P.ops if o['kind'] == 'door'); nw = sum(1 for o in P.ops if o['kind'] == 'window')
-    tiles = [('Net interior area', f'{net:.1f} m²'), ('Exterior', f'{ext:.1f} m²' if ext else '—'),
-             ('Footprint', f'{P.W:.2f} × {P.H:.2f} m'), ('Spaces', str(len(inter))), ('Doors / windows', f'{nd} / {nw}')]
+    t = quantities(P)['tot']
+    nd, nw = len(t['doors']), len(t['windows'])
+    tiles = [('Floor, net interior', f"{t['floor']:.1f} m²"), ('Ceilings', f"{t['ceiling']:.1f} m²"),
+             ('Walls, net of openings', f"{t['net']:.1f} m²"), ('Doors / windows', f'{nd} / {nw}'),
+             ('Exterior' if t['ext'] else 'Footprint', f"{t['ext']:.1f} m²" if t['ext'] else f'{P.W:.2f} × {P.H:.2f} m')]
     tw = W / len(tiles)
     for i, (lb, v) in enumerate(tiles):
         tx = dx0 + i * tw
@@ -1059,19 +1280,20 @@ def sheet_cover(c, P, meta, index, image=None):
     yy = L.table(c, rx, yy, ['Sheet', 'Title', 'Scale'], index, _fit_widths([0.2, 0.58, 0.22], rw), align=['l', 'l', 'l'], size=6.6, rh=5.0 * mm)
     yy -= 4 * mm
     yy = L.header(c, rx, yy, rw, 'Spaces')
-    rows = [(f"S-{r['id']:02d}", _short(r.get('name', '—'), 30), FLOOR_CODE.get(r.get('floor', ''), '—'), f"{r['area']:.2f}")
-            for r in P.rooms]
+    qr = quantities(P)['rooms']
+    rows = [(f"S-{r['id']:02d}", _short(r.get('name', '—'), 30), f"{r['area']:.1f}",
+             f"{qr[r['id']]['net']:.1f}" if not r.get('exterior') else '—') for r in P.rooms]
     if len(rows) > 12:
         rows = rows[:11] + [('…', f'{len(rows) - 11} more on A-102', '', '')]
-    yy = L.table(c, rx, yy, ['Code', 'Space', 'Floor', 'm²'], rows, _fit_widths([0.16, 0.56, 0.12, 0.16], rw),
-                 align=['l', 'l', 'l', 'r'], size=6.4, rh=4.5 * mm)
+    yy = L.table(c, rx, yy, ['Code', 'Space', 'Floor m²', 'Walls m²'], rows, _fit_widths([0.15, 0.51, 0.17, 0.17], rw),
+                 align=['l', 'l', 'r', 'r'], size=6.4, rh=4.5 * mm)
     yy -= 4 * mm
     yy = L.header(c, rx, yy, rw, 'What was read and what was assumed')
-    for s_ in ('READ FROM THE IMAGE: walls, doors and windows, room names and printed dimensions, casework and fixtures, '
-               'floor textures, furniture.',
+    for s_ in ('READ FROM THE IMAGE: walls, doors and windows, room names and printed dimensions, floor textures.',
                'MEASURED: the scale (' + meta.get('scaled_from', 'declared area.').rstrip('.') + '), every length and area.',
-               'ASSUMED: heights (clear 2.45 m, doors 2.10 m), the electrical proposal, catalogue sizes of furniture and '
-               'any fixture not visible in the image.',
+               f'ASSUMED: clear height {CLEAR_H:.2f} m with flat ceilings, doors {DOOR_H:.2f} m, windows {WIN_H:.2f} m high, '
+               'and the electrical proposal.',
+               'LEFT OUT IN THIS BETA: furniture, appliances, fixtures and casework, until they can be read reliably.',
                NOTE.upper() + '.'):
         yy = L.wrap(c, s_, rx, yy, rw, size=6.3, leading=7.9) - 2
     c.showPage()
@@ -1123,20 +1345,28 @@ def scale_texts(model, P):
 def make_pdf(model, out_pdf, project='Marketing floor plan', unit='Unit', area=None, fin=None, area_kind=None, image=None):
     P = Plan(model, fin)
     from . import sections
-    cuts = sections.pick_cuts(P) if fin else []
+    cuts = sections.pick_cuts(P) if (fin and SHOW_OBJECTS) else []
     net = sum(r['area'] for r in P.rooms if not r.get('exterior'))
     lay = plan_layout(P)
+    quantities(P)
+    # v0.5: G-001, A-101, A-102 y, con la versión acabada, A-103 pisos, A-104 muros y cielos, A-105 eléctrico
+    extra = [('A-103', 'Floor finishes plan', 'finishes', 'FLOOR FINISHES PLAN'),
+             ('A-104', 'Walls & ceilings plan', 'walls', 'WALLS & CEILINGS PLAN'),
+             ('A-105', 'Electrical layout (schematic)', 'electrical', 'ELECTRICAL LAYOUT (SCHEMATIC)')]
+    if SHOW_OBJECTS:
+        extra.append(('A-106', 'Furniture layout', 'furniture', 'FURNITURE LAYOUT'))
+    n = 3 + ((len(extra) + len(cuts)) if fin else 0)
     meta = dict(project=project, unit=unit, area=area or model.get('area_m2'), net=net, P=P, plan_layout=lay,
-                date=datetime.date.today().isoformat(), sheet_n=(6 + len(cuts)) if fin else 3)
+                date=datetime.date.today().isoformat(), sheet_n=n)
     meta.update(scale_texts(model, P))
     _CUR['meta'] = meta; _CUR['P'] = P
     c = canvas.Canvas(out_pdf, pagesize=(PAGE_W, PAGE_H))
     c.setTitle(f'{project} — {unit} — architectural plan set')
     c.setAuthor('Zero Mouse Clicks')
     sc = f"1:{lay['scale']}"
-    index = [('G-001', 'Cover sheet & index', 'n.t.s.'), ('A-101', 'Floor plan', sc), ('A-102', 'Areas & openings schedules', 'as noted')]
+    index = [('G-001', 'Cover sheet & index', 'n.t.s.'), ('A-101', 'Floor plan', sc), ('A-102', 'Quantity takeoff & openings', 'as noted')]
     if fin:
-        index += [('A-103', 'Floor finishes plan', sc), ('A-104', 'Electrical layout (schematic)', sc), ('A-105', 'Furniture layout', sc)]
+        index += [(num, ttl, sc) for num, ttl, _, _ in extra]
         index += [(f'A-20{i + 1}', cut['title'].title().replace('  ', ' '), f"1:{sections.section_scale(P, cut, SCALES)}") for i, cut in enumerate(cuts)]
     meta['sheet_i'] = 1
     sheet_cover(c, P, meta, index, image)
@@ -1145,14 +1375,11 @@ def make_pdf(model, out_pdf, project='Marketing floor plan', unit='Unit', area=N
     meta['sheet_i'] = 3
     sheet_schedules(c, P, meta, lay['scale'])
     if fin:
-        meta['sheet_i'] = 4
-        sheet_plan(c, P, meta, mode='finishes', title='FLOOR FINISHES PLAN', number='A-103')
-        meta['sheet_i'] = 5
-        sheet_plan(c, P, meta, mode='electrical', title='ELECTRICAL LAYOUT (SCHEMATIC)', number='A-104')
-        meta['sheet_i'] = 6
-        sheet_plan(c, P, meta, mode='furniture', title='FURNITURE LAYOUT', number='A-105')
+        for i, (num, _, mode, title) in enumerate(extra):
+            meta['sheet_i'] = 4 + i
+            sheet_plan(c, P, meta, mode=mode, title=title, number=num)
         for i, cut in enumerate(cuts):
-            meta['sheet_i'] = 7 + i
+            meta['sheet_i'] = 4 + len(extra) + i
             meta['panel'] = None
             meta['keyplan'] = dict(cut=cut, cuts=[q for q in cuts if q is not cut])
             sections.sheet_section(c, P, meta, cut, f'A-20{i + 1}', _frame, F, FB, FRAME, TB_W, SCALES, _dim)
