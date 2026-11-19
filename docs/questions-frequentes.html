@@ -17,7 +17,7 @@
 <meta property="og:description" content="Est-ce gratuit? Mon plan est-il téléversé? Les dimensions sont-elles précises? Puis-je obtenir un DWG ou un DXF? Réponses sur la transformation du plan d&#x27;un dépliant en jeu de plans avec Zero Mouse Clicks.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://zeromouseclicks.com/questions-frequentes">
-<meta property="og:image" content="https://zeromouseclicks.com/img/plan_set_8_sheets.jpg">
+<meta property="og:image" content="https://zeromouseclicks.com/img/plan_set_6_sheets.jpg">
 <meta property="og:locale" content="fr_CA">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Cpath d='M8 8h16v16H8zM8 17h9M17 8v9' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3C/svg%3E">
@@ -49,7 +49,7 @@
      "name": "Qu'est-ce que Zero Mouse Clicks?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Un outil gratuit et à code source ouvert qui transforme l'image du plan d'étage d'un dépliant de promoteur ou d'une annonce immobilière en jeu de plans d'architecture : huit feuilles A3 dans un seul PDF, avec murs, portes, fenêtres, cotes, superficies, tableaux, revêtements, électricité schématique, aménagement du mobilier et deux coupes. Il fonctionne dans votre navigateur."
+      "text": "Un outil gratuit et à code source ouvert qui transforme l'image du plan d'étage d'un dépliant de promoteur ou d'une annonce immobilière en jeu de plans d'architecture : six feuilles A3 dans un seul PDF, avec murs, portes, fenêtres, cotes, la fonction et la superficie de chaque pièce, et les quantités pour estimer : superficies de planchers, de murs et de plafonds, plinthes, portes et fenêtres. Il fonctionne dans votre navigateur."
      }
     },
     {
@@ -121,7 +121,7 @@
      "name": "Qu'est-ce que je reçois exactement?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Un PDF A3 de huit feuilles : G-001 page couverture et index, A-101 plan d'étage, A-102 tableaux, A-103 revêtements de sol, A-104 électricité schématique, A-105 aménagement du mobilier, A-201 coupe de la cuisine et A-202 coupe de la salle de bain. Les feuilles sont en anglais. Voir chaque feuille."
+      "text": "Un PDF A3 de six feuilles : G-001 page couverture et index, A-101 plan d'étage, A-102 métré et ouvertures, A-103 revêtements de sol, A-104 murs et plafonds, A-105 électricité schématique. Les feuilles sont en anglais. Voir chaque feuille."
      }
     },
     {
@@ -142,10 +142,18 @@
     },
     {
      "@type": "Question",
-     "name": "Les coupes et le plan électrique sont-ils réels?",
+     "name": "D'où viennent les superficies de murs et de plafonds?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Non. Un plan d'étage ne contient ni hauteurs ni câblage : les coupes utilisent des hauteurs supposées (2,45 m libres, dalle de 0,15 m, portes de 2,10 m) et l'électricité est une proposition établie par des règles. Les deux sont indiqués comme schématiques."
+      "text": "Un plan d'étage ne contient pas de hauteurs : les murs utilisent une hauteur libre supposée de 2,45 m (portes de 2,10 m, fenêtres de 1,20 m) et le plafond est considéré plat, égal à la superficie du plancher. Les murs sont comptés déduction faite de leurs portes et fenêtres, chaque face dans la pièce qu'elle regarde. L'électricité est une proposition établie par des règles, indiquée comme schématique."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Pourquoi n'y a-t-il ni meubles ni appareils sur les plans?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Dans cette bêta, ils sont laissés de côté exprès. Les modèles en lisaient mal un trop grand nombre (une salle de lavage pouvait ressembler à une salle de bain), alors les plans gardent ce qu'il faut pour une soumission : pièces, murs, ouvertures et superficies. Ils reviendront quand ils pourront être lus de façon fiable."
      }
     },
     {
@@ -242,7 +250,7 @@
 <h1>Questions.<br><em>Réponses directes.</em></h1>
 <p class="lead">Tout ce qu'on nous demande sur la transformation d'une image de plan d'étage en jeu de plans avec Zero Mouse Clicks.</p>
 <div class="qa"><h2>Qu&#x27;est-ce que Zero Mouse Clicks?</h2>
-<p>Un outil gratuit et à code source ouvert qui transforme l'image du plan d'étage d'un dépliant de promoteur ou d'une annonce immobilière en jeu de plans d'architecture : huit feuilles A3 dans un seul PDF, avec murs, portes, fenêtres, cotes, superficies, tableaux, revêtements, électricité schématique, aménagement du mobilier et deux coupes. Il fonctionne dans votre navigateur.</p></div>
+<p>Un outil gratuit et à code source ouvert qui transforme l'image du plan d'étage d'un dépliant de promoteur ou d'une annonce immobilière en jeu de plans d'architecture : six feuilles A3 dans un seul PDF, avec murs, portes, fenêtres, cotes, la fonction et la superficie de chaque pièce, et les quantités pour estimer : superficies de planchers, de murs et de plafonds, plinthes, portes et fenêtres. Il fonctionne dans votre navigateur.</p></div>
 <div class="qa"><h2>Est-ce gratuit?</h2>
 <p>Oui. Pas de compte, pas d'inscription, pas de paiement. C'est possible parce que le travail se fait sur votre propre appareil : il n'y a ni serveur ni service d'IA à payer.</p></div>
 <div class="qa"><h2>Mon plan est-il téléversé quelque part?</h2>
@@ -260,13 +268,15 @@
 <div class="qa"><h2>Ça fonctionne avec les plans en français et en pieds-pouces?</h2>
 <p>En partie. Le lecteur de texte reconnaît le nom des pièces en anglais et en espagnol, pas encore en français : le type des pièces est alors déduit par des règles. Les dimensions en pieds et pouces sont rarement lues; entrer la superficie aide.</p></div>
 <div class="qa"><h2>Qu&#x27;est-ce que je reçois exactement?</h2>
-<p>Un PDF A3 de huit feuilles : G-001 page couverture et index, A-101 plan d'étage, A-102 tableaux, A-103 revêtements de sol, A-104 électricité schématique, A-105 aménagement du mobilier, A-201 coupe de la cuisine et A-202 coupe de la salle de bain. Les feuilles sont en anglais. <a href="/jeu-de-plans">Voir chaque feuille</a>.</p></div>
+<p>Un PDF A3 de six feuilles : G-001 page couverture et index, A-101 plan d'étage, A-102 métré et ouvertures, A-103 revêtements de sol, A-104 murs et plafonds, A-105 électricité schématique. Les feuilles sont en anglais. <a href="/jeu-de-plans">Voir chaque feuille</a>.</p></div>
 <div class="qa"><h2>Le site est-il en français?</h2>
 <p>Ces pages d'information le sont. L'outil lui-même et les feuilles sont en anglais pour l'instant.</p></div>
 <div class="qa"><h2>Puis-je obtenir des fichiers DWG, DXF ou Revit?</h2>
 <p>Pas encore à partir du site; l'exportation DXF est prévue. Pour un fichier DAO modifiable, <a href="/#contact">écrivez-nous</a>.</p></div>
-<div class="qa"><h2>Les coupes et le plan électrique sont-ils réels?</h2>
-<p>Non. Un plan d'étage ne contient ni hauteurs ni câblage : les coupes utilisent des hauteurs supposées (2,45 m libres, dalle de 0,15 m, portes de 2,10 m) et l'électricité est une proposition établie par des règles. Les deux sont indiqués comme schématiques.</p></div>
+<div class="qa"><h2>D&#x27;où viennent les superficies de murs et de plafonds?</h2>
+<p>Un plan d'étage ne contient pas de hauteurs : les murs utilisent une hauteur libre supposée de 2,45 m (portes de 2,10 m, fenêtres de 1,20 m) et le plafond est considéré plat, égal à la superficie du plancher. Les murs sont comptés déduction faite de leurs portes et fenêtres, chaque face dans la pièce qu'elle regarde. L'électricité est une proposition établie par des règles, indiquée comme schématique.</p></div>
+<div class="qa"><h2>Pourquoi n&#x27;y a-t-il ni meubles ni appareils sur les plans?</h2>
+<p>Dans cette bêta, ils sont laissés de côté exprès. Les modèles en lisaient mal un trop grand nombre (une salle de lavage pouvait ressembler à une salle de bain), alors les plans gardent ce qu'il faut pour une soumission : pièces, murs, ouvertures et superficies. Ils reviendront quand ils pourront être lus de façon fiable.</p></div>
 <div class="qa"><h2>Puis-je utiliser les plans pour un permis ou pour construire?</h2>
 <p>Ils sont dessinés à partir d'une image de marketing, pas d'un relevé. Vérifiez chaque dimension sur place et faites réviser les plans par un professionnel avant de les utiliser pour un permis, la fabrication ou la construction.</p></div>
 <div class="qa"><h2>Combien de temps ça prend?</h2>

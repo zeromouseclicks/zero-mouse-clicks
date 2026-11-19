@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cómo funciona: de la imagen de una planta a un juego de planos — Zero Mouse Clicks</title>
-<meta name="description" content="Tres modelos de IA muy pequeños leen muros, puertas, ventanas, aparatos y muebles en la planta de un folleto; reglas explícitas dibujan el juego de planos. Todo en tu navegador.">
+<meta name="description" content="Tres modelos de IA muy pequeños leen muros, puertas, ventanas y los nombres de los espacios en la planta de un folleto; reglas explícitas dibujan el juego de planos y calculan las áreas para cotizar. Todo en tu navegador.">
 <link rel="canonical" href="https://zeromouseclicks.com/como-funciona">
 <link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/how-it-works">
 <link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/como-funciona">
@@ -14,10 +14,10 @@
 <meta name="theme-color" content="#000000">
 <meta property="og:site_name" content="Zero Mouse Clicks">
 <meta property="og:title" content="Cómo funciona: de la imagen de una planta a un juego de planos — Zero Mouse Clicks">
-<meta property="og:description" content="Tres modelos de IA muy pequeños leen muros, puertas, ventanas, aparatos y muebles en la planta de un folleto; reglas explícitas dibujan el juego de planos. Todo en tu navegador.">
+<meta property="og:description" content="Tres modelos de IA muy pequeños leen muros, puertas, ventanas y los nombres de los espacios en la planta de un folleto; reglas explícitas dibujan el juego de planos y calculan las áreas para cotizar. Todo en tu navegador.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://zeromouseclicks.com/como-funciona">
-<meta property="og:image" content="https://zeromouseclicks.com/img/plan_set_8_sheets.jpg">
+<meta property="og:image" content="https://zeromouseclicks.com/img/plan_set_6_sheets.jpg">
 <meta property="og:locale" content="es_CO">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Cpath d='M8 8h16v16H8zM8 17h9M17 8v9' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3C/svg%3E">
@@ -34,10 +34,10 @@
    "@id": "https://zeromouseclicks.com/como-funciona#article",
    "headline": "Cómo funciona.Leer y dibujar.",
    "name": "Cómo funciona: de la imagen de una planta a un juego de planos — Zero Mouse Clicks",
-   "description": "Tres modelos de IA muy pequeños leen muros, puertas, ventanas, aparatos y muebles en la planta de un folleto; reglas explícitas dibujan el juego de planos. Todo en tu navegador.",
+   "description": "Tres modelos de IA muy pequeños leen muros, puertas, ventanas y los nombres de los espacios en la planta de un folleto; reglas explícitas dibujan el juego de planos y calculan las áreas para cotizar. Todo en tu navegador.",
    "inLanguage": "es",
    "url": "https://zeromouseclicks.com/como-funciona",
-   "image": "https://zeromouseclicks.com/img/plan_set_8_sheets.jpg",
+   "image": "https://zeromouseclicks.com/img/plan_set_6_sheets.jpg",
    "datePublished": "2026-11-19",
    "dateModified": "2026-11-19",
    "author": {
@@ -95,12 +95,12 @@
 <main class="doc">
 <nav class="crumb mono" aria-label="Breadcrumb"><a href="/es">Inicio</a><span aria-hidden="true"> / </span><span>Cómo funciona</span></nav>
 <h1>Cómo funciona.<br><em>Leer y dibujar.</em></h1>
-<p class="lead">Zero Mouse Clicks convierte la imagen de la planta de un folleto de constructora o de un anuncio inmobiliario en un juego de planos arquitectónicos: ocho láminas A3 en un solo PDF. Tres modelos de IA muy pequeños leen la imagen, reglas explícitas la dibujan y todo corre en tu navegador. La imagen nunca se sube.</p>
+<p class="lead">Zero Mouse Clicks convierte la imagen de la planta de un folleto de constructora o de un anuncio inmobiliario en un juego de planos arquitectónicos: seis láminas A3 en un solo PDF, con las áreas de pisos, muros y cielos rasos y las puertas y ventanas que necesitas para cotizar. Tres modelos de IA muy pequeños leen la imagen, reglas explícitas la dibujan y todo corre en tu navegador. La imagen nunca se sube.</p>
 <ol class="steps">
   <li><b>01</b><span>Sueltas la planta</span></li>
   <li><b>02</b><span>Modelos pequeños la leen</span></li>
   <li><b>03</b><span>Las reglas la dibujan</span></li>
-  <li><b>04</b><span>Un PDF, ocho láminas</span></li>
+  <li><b>04</b><span>Un PDF, seis láminas</span></li>
 </ol>
 
 <h2 id="entrada">1. Sueltas la planta</h2>
@@ -142,18 +142,19 @@ más la mitad de las particiones; el área construida, bruta o en pies² es más
 <p>A partir de las máscaras, reglas explícitas arman un modelo vectorial en metros:</p>
 <ul>
   <li>los muros se vuelven barras ortogonales, y los vanos son los huecos entre ellos;</li>
-  <li>el tipo de cada espacio sale del texto leído en la planta o, si no hay, de reglas;</li>
-  <li>los mesones, clósets y aparatos se dibujan como bloques estándar;</li>
-  <li>los baños siguen la convención usual: ducha de muro a muro en un extremo, sanitario y lavamanos en un mismo muro;</li>
-  <li>los aparatos de cocina van contra un muro junto a los mesones; las sillas del comedor, a 0,60&nbsp;m por puesto;</li>
-  <li>cada mueble recibe un tipo, una medida de catálogo y la dirección hacia la que mira.</li>
+  <li>la función de cada espacio sale del texto leído en la planta o, si no hay, de reglas;</li>
+  <li>cada espacio recibe su área de piso y de cielo raso, su perímetro, su área de muros descontando puertas y ventanas,
+      y el largo de guardaescobas;</li>
+  <li>cada puerta y cada ventana recibe un código, un ancho, una altura supuesta, un área y los espacios que une;</li>
+  <li>los muebles y aparatos se leen solo para ayudar a nombrar los espacios: en esta beta no se dibujan.</li>
 </ul>
 <p>Cada decisión es código que se puede leer y cambiar. Es a propósito: un resultado equivocado se puede rastrear hasta
 una regla.</p>
 
-<h2 id="pdf">5. Un PDF, ocho láminas</h2>
-<p>El modelo vectorial se dibuja como un PDF A3 con ocho láminas: portada, planta con cotas, cuadros, acabados de piso,
-eléctrico esquemático, planta de mobiliario y cortes por la cocina y por el baño. Cada lámina lleva marco ISO&nbsp;5457,
+<h2 id="pdf">5. Un PDF, seis láminas</h2>
+<p>El modelo vectorial se dibuja como un PDF A3 con seis láminas: portada, planta con cotas, cantidades (pisos, muros,
+cielos rasos, guardaescobas, puertas y ventanas), acabados de piso, muros y cielos rasos, y un eléctrico esquemático.
+Cada lámina lleva marco ISO&nbsp;5457,
 rótulo y la escala estándar más grande que cabe. <a href="/juego-de-planos">Mira qué trae cada lámina</a>.</p>
 
 <h2 id="navegador">Por qué corre en tu navegador</h2>
@@ -174,9 +175,11 @@ zmc mi_planta.jpg --area 47 -o planos.pdf</code></pre>
 <h2 id="mejoras">Siempre mejorando</h2>
 <p>Zero Mouse Clicks es un proyecto de IA, y la IA avanza muy rápido. Los modelos, las reglas y los dibujos cambian con
 frecuencia, y cada versión lee mejor las plantas y las dibuja con más precisión. Las últimas versiones ajustaron los muros a
-las medidas impresas, ubicaron baños, cocinas y comedores como lo haría un diseñador y agregaron la planta de mobiliario.</p>
+las medidas impresas y, en esta beta, pusieron primero lo que necesita una cotización: la función y el área de cada
+espacio, y las cantidades de pisos, muros y cielos rasos. Los muebles y aparatos quedan por fuera hasta que se puedan leer
+bien.</p>
 <p>Lo que sigue: una pantalla para corregir con un toque, exportación a DXF, más estilos de planta y un modelo que reconozca
-cada tipo de mueble. Sigue los cambios en <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>.</p>
+cada tipo de mueble y aparato, para que vuelvan a los planos. Sigue los cambios en <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>.</p>
 <div class="cta">
   <a class="btn" href="/#request">Hacer un juego de planos</a>
   <p class="mono">Gratis. Corre en tu navegador, no se sube nada. La herramienta está en inglés.</p>

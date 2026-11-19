@@ -17,7 +17,7 @@
 <meta property="og:description" content="¿Es gratis? ¿Se sube mi plano? ¿Qué tan exactas son las medidas? ¿Puedo tener DWG o DXF? Respuestas sobre cómo convertir la planta de un folleto en un juego de planos con Zero Mouse Clicks.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://zeromouseclicks.com/preguntas-frecuentes">
-<meta property="og:image" content="https://zeromouseclicks.com/img/plan_set_8_sheets.jpg">
+<meta property="og:image" content="https://zeromouseclicks.com/img/plan_set_6_sheets.jpg">
 <meta property="og:locale" content="es_CO">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Cpath d='M8 8h16v16H8zM8 17h9M17 8v9' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3C/svg%3E">
@@ -49,7 +49,7 @@
      "name": "¿Qué es Zero Mouse Clicks?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Una herramienta gratuita y de código abierto que convierte la imagen de la planta de un folleto de constructora o de un anuncio inmobiliario en un juego de planos arquitectónicos: ocho láminas A3 en un solo PDF, con muros, puertas, ventanas, cotas, áreas, cuadros, acabados, eléctrico esquemático, planta de mobiliario y dos cortes. Corre en tu navegador."
+      "text": "Una herramienta gratuita y de código abierto que convierte la imagen de la planta de un folleto de constructora o de un anuncio inmobiliario en un juego de planos arquitectónicos: seis láminas A3 en un solo PDF, con muros, puertas, ventanas, cotas, la función y el área de cada espacio, y las cantidades para cotizar: áreas de pisos, muros y cielos rasos, guardaescobas, puertas y ventanas. Corre en tu navegador."
      }
     },
     {
@@ -113,7 +113,7 @@
      "name": "¿Qué recibo exactamente?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Un PDF A3 con ocho láminas: G-001 portada e índice, A-101 planta, A-102 cuadros, A-103 acabados de piso, A-104 eléctrico esquemático, A-105 planta de mobiliario, A-201 corte por la cocina y A-202 corte por el baño. Las láminas salen en inglés. Mira cada lámina."
+      "text": "Un PDF A3 con seis láminas: G-001 portada e índice, A-101 planta, A-102 cantidades y vanos, A-103 acabados de piso, A-104 muros y cielos rasos, A-105 eléctrico esquemático. Las láminas salen en inglés. Mira cada lámina."
      }
     },
     {
@@ -134,10 +134,18 @@
     },
     {
      "@type": "Question",
-     "name": "¿Los cortes y el plano eléctrico son reales?",
+     "name": "¿De dónde salen las áreas de muros y de cielos rasos?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "No. Una planta no trae alturas ni instalaciones, así que los cortes usan alturas supuestas (2,45 m libres, placa de 0,15 m, puertas de 2,10 m) y el eléctrico es una propuesta por reglas. Los dos van marcados como esquemáticos."
+      "text": "Una planta no trae alturas, así que los muros usan una altura libre supuesta de 2,45 m (puertas de 2,10 m, ventanas de 1,20 m) y el cielo raso se toma plano, igual al área de piso. Los muros se cuentan descontando sus puertas y ventanas, cada cara en el espacio al que mira. El eléctrico es una propuesta por reglas, marcada como esquemática."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "¿Por qué los planos no traen muebles ni aparatos?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "En esta beta se dejan por fuera a propósito. Los modelos leían mal demasiados (un cuarto de ropas podía parecer un baño), así que los planos se quedan con lo que necesita una cotización: espacios, muros, vanos y áreas. Volverán cuando se puedan leer bien."
      }
     },
     {
@@ -234,7 +242,7 @@
 <h1>Preguntas.<br><em>Respuestas directas.</em></h1>
 <p class="lead">Lo que más preguntan sobre convertir la imagen de una planta en un juego de planos con Zero Mouse Clicks.</p>
 <div class="qa"><h2>¿Qué es Zero Mouse Clicks?</h2>
-<p>Una herramienta gratuita y de código abierto que convierte la imagen de la planta de un folleto de constructora o de un anuncio inmobiliario en un juego de planos arquitectónicos: ocho láminas A3 en un solo PDF, con muros, puertas, ventanas, cotas, áreas, cuadros, acabados, eléctrico esquemático, planta de mobiliario y dos cortes. Corre en tu navegador.</p></div>
+<p>Una herramienta gratuita y de código abierto que convierte la imagen de la planta de un folleto de constructora o de un anuncio inmobiliario en un juego de planos arquitectónicos: seis láminas A3 en un solo PDF, con muros, puertas, ventanas, cotas, la función y el área de cada espacio, y las cantidades para cotizar: áreas de pisos, muros y cielos rasos, guardaescobas, puertas y ventanas. Corre en tu navegador.</p></div>
 <div class="qa"><h2>¿Es gratis?</h2>
 <p>Sí. No hay cuenta, ni registro, ni pago. Puede ser gratis porque el trabajo se hace en tu propio equipo: no hay servidor ni servicio de IA que pagar.</p></div>
 <div class="qa"><h2>¿Se sube mi plano a algún lado?</h2>
@@ -250,13 +258,15 @@
 <div class="qa"><h2>¿Qué área escribo?</h2>
 <p>Ninguna, si la planta trae las medidas o el área. Si no, escribe el área privada (interior neta) en m², o el área bruta en pies², como la dan los anuncios de Estados Unidos. La herramienta cambia entre m² y pies².</p></div>
 <div class="qa"><h2>¿Qué recibo exactamente?</h2>
-<p>Un PDF A3 con ocho láminas: G-001 portada e índice, A-101 planta, A-102 cuadros, A-103 acabados de piso, A-104 eléctrico esquemático, A-105 planta de mobiliario, A-201 corte por la cocina y A-202 corte por el baño. Las láminas salen en inglés. <a href="/juego-de-planos">Mira cada lámina</a>.</p></div>
+<p>Un PDF A3 con seis láminas: G-001 portada e índice, A-101 planta, A-102 cantidades y vanos, A-103 acabados de piso, A-104 muros y cielos rasos, A-105 eléctrico esquemático. Las láminas salen en inglés. <a href="/juego-de-planos">Mira cada lámina</a>.</p></div>
 <div class="qa"><h2>¿La página está en español?</h2>
 <p>La herramienta y las láminas están en inglés por ahora, pero leen los nombres de los espacios en español y en inglés, y aceptan áreas en m².</p></div>
 <div class="qa"><h2>¿Puedo tener archivos DWG, DXF o Revit?</h2>
 <p>Todavía no desde la página; la exportación a DXF está en los planes. Para un archivo CAD editable, <a href="/#contact">escríbenos</a>.</p></div>
-<div class="qa"><h2>¿Los cortes y el plano eléctrico son reales?</h2>
-<p>No. Una planta no trae alturas ni instalaciones, así que los cortes usan alturas supuestas (2,45 m libres, placa de 0,15 m, puertas de 2,10 m) y el eléctrico es una propuesta por reglas. Los dos van marcados como esquemáticos.</p></div>
+<div class="qa"><h2>¿De dónde salen las áreas de muros y de cielos rasos?</h2>
+<p>Una planta no trae alturas, así que los muros usan una altura libre supuesta de 2,45 m (puertas de 2,10 m, ventanas de 1,20 m) y el cielo raso se toma plano, igual al área de piso. Los muros se cuentan descontando sus puertas y ventanas, cada cara en el espacio al que mira. El eléctrico es una propuesta por reglas, marcada como esquemática.</p></div>
+<div class="qa"><h2>¿Por qué los planos no traen muebles ni aparatos?</h2>
+<p>En esta beta se dejan por fuera a propósito. Los modelos leían mal demasiados (un cuarto de ropas podía parecer un baño), así que los planos se quedan con lo que necesita una cotización: espacios, muros, vanos y áreas. Volverán cuando se puedan leer bien.</p></div>
 <div class="qa"><h2>¿Puedo usar los planos para una licencia o para la obra?</h2>
 <p>Están dibujados a partir de una imagen de mercadeo, no de un levantamiento. Verifica cada medida en obra y haz que un profesional revise los planos antes de usarlos para licencias, fabricación u obra.</p></div>
 <div class="qa"><h2>¿Cuánto se demora?</h2>

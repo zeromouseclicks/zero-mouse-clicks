@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>How it works: from a floor plan image to a plan set — Zero Mouse Clicks</title>
-<meta name="description" content="Three tiny segmentation models read walls, doors, windows, fixtures and furniture from a brochure floor plan; explicit rules draw the architectural plan set. All in your browser.">
+<meta name="description" content="Three tiny segmentation models read walls, doors, windows and room labels from a brochure floor plan; explicit rules draw the plan set and compute the areas to quote. All in your browser.">
 <link rel="canonical" href="https://zeromouseclicks.com/how-it-works">
 <link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/how-it-works">
 <link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/como-funciona">
@@ -14,10 +14,10 @@
 <meta name="theme-color" content="#000000">
 <meta property="og:site_name" content="Zero Mouse Clicks">
 <meta property="og:title" content="How it works: from a floor plan image to a plan set — Zero Mouse Clicks">
-<meta property="og:description" content="Three tiny segmentation models read walls, doors, windows, fixtures and furniture from a brochure floor plan; explicit rules draw the architectural plan set. All in your browser.">
+<meta property="og:description" content="Three tiny segmentation models read walls, doors, windows and room labels from a brochure floor plan; explicit rules draw the plan set and compute the areas to quote. All in your browser.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://zeromouseclicks.com/how-it-works">
-<meta property="og:image" content="https://zeromouseclicks.com/img/plan_set_8_sheets.jpg">
+<meta property="og:image" content="https://zeromouseclicks.com/img/plan_set_6_sheets.jpg">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Cpath d='M8 8h16v16H8zM8 17h9M17 8v9' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3C/svg%3E">
@@ -34,10 +34,10 @@
    "@id": "https://zeromouseclicks.com/how-it-works#article",
    "headline": "How it works.Read, then draw.",
    "name": "How it works: from a floor plan image to a plan set — Zero Mouse Clicks",
-   "description": "Three tiny segmentation models read walls, doors, windows, fixtures and furniture from a brochure floor plan; explicit rules draw the architectural plan set. All in your browser.",
+   "description": "Three tiny segmentation models read walls, doors, windows and room labels from a brochure floor plan; explicit rules draw the plan set and compute the areas to quote. All in your browser.",
    "inLanguage": "en",
    "url": "https://zeromouseclicks.com/how-it-works",
-   "image": "https://zeromouseclicks.com/img/plan_set_8_sheets.jpg",
+   "image": "https://zeromouseclicks.com/img/plan_set_6_sheets.jpg",
    "datePublished": "2026-11-19",
    "dateModified": "2026-11-19",
    "author": {
@@ -95,12 +95,12 @@
 <main class="doc">
 <nav class="crumb mono" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true"> / </span><span>How it works</span></nav>
 <h1>How it works.<br><em>Read, then draw.</em></h1>
-<p class="lead">Zero Mouse Clicks turns the floor plan image from a developer's brochure or a real-estate listing into an architectural plan set: eight A3 drawing sheets in one PDF. Three tiny AI models read the image, explicit rules draw it, and all of it runs in your browser. The image is never uploaded.</p>
+<p class="lead">Zero Mouse Clicks turns the floor plan image from a developer's brochure or a real-estate listing into an architectural plan set: six A3 drawing sheets in one PDF, with the floor, wall and ceiling areas and the doors and windows you need to quote. Three tiny AI models read the image, explicit rules draw it, and all of it runs in your browser. The image is never uploaded.</p>
 <ol class="steps">
   <li><b>01</b><span>Drop the plan</span></li>
   <li><b>02</b><span>Tiny models read it</span></li>
   <li><b>03</b><span>Rules draw it</span></li>
-  <li><b>04</b><span>One PDF, eight sheets</span></li>
+  <li><b>04</b><span>One PDF, six sheets</span></li>
 </ol>
 
 <h2 id="input">1. Drop the plan</h2>
@@ -141,17 +141,18 @@ plus half of the partitions; a built, gross or sq&nbsp;ft area is about the foot
 <p>From the masks, explicit rules build a vector model in metres:</p>
 <ul>
   <li>walls become orthogonal bars, and openings are the gaps between them;</li>
-  <li>room types come from the text read on the plan, or from rules when there is none;</li>
-  <li>counters, closets and fixtures are drawn as standard blocks;</li>
-  <li>bathrooms follow the usual layout: a wall-to-wall shower at one end, toilet and lavatory on one wall;</li>
-  <li>kitchen appliances sit against a wall next to the counters; dining chairs get 0.60&nbsp;m per seat;</li>
-  <li>each piece of furniture gets a type, a catalogue size and the direction it faces.</li>
+  <li>the function of each space comes from the text read on the plan, or from rules when there is none;</li>
+  <li>each space gets its floor and ceiling area, its perimeter, its wall area net of doors and windows, and its
+      skirting length;</li>
+  <li>every door and window gets a tag, a width, an assumed height and an area, and the spaces it joins;</li>
+  <li>furniture and fixtures are read only to help name the spaces: in this beta they are not drawn.</li>
 </ul>
 <p>Every decision is code you can read and change. That is deliberate: a wrong result can be traced to one rule.</p>
 
-<h2 id="pdf">5. One PDF, eight sheets</h2>
-<p>The vector model is drawn as one A3 PDF with eight sheets: cover, floor plan with dimensions, schedules, floor
-finishes, schematic electrical, furniture layout, and kitchen and bathroom sections. Each sheet has an ISO&nbsp;5457
+<h2 id="pdf">5. One PDF, six sheets</h2>
+<p>The vector model is drawn as one A3 PDF with six sheets: cover, floor plan with dimensions, quantity takeoff
+(floors, walls, ceilings, skirting, doors and windows), floor finishes, walls and ceilings, and a schematic electrical
+layout. Each sheet has an ISO&nbsp;5457
 frame, a title block and the largest standard scale that fits.
 <a href="/plan-set">See what each sheet contains</a>.</p>
 
@@ -171,10 +172,11 @@ zmc my_plan.jpg --area 47 -o plan-set.pdf</code></pre>
 
 <h2 id="updates">Always improving</h2>
 <p>Zero Mouse Clicks is an AI project, and AI moves fast. The models, the rules and the drawings change often, and every
-release reads plans better and draws them more precisely. Recent releases fitted walls to the printed dimensions, laid out
-bathrooms, kitchens and dining tables the way a designer would, and added the furniture layout.</p>
+release reads plans better and draws them more precisely. Recent releases fitted walls to the printed dimensions and, in
+this beta, put what a quote needs first: the function and area of each space, and the floor, wall and ceiling quantities.
+Furniture and fixtures are left out until they can be read reliably.</p>
 <p>Next on the list: a one-tap correction screen, DXF export, more plan styles and a model that recognises each type of
-furniture. Follow the changes on <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>.</p>
+furniture and fixture, so they can come back to the drawings. Follow the changes on <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>.</p>
 <div class="cta">
   <a class="btn" href="/#request">Make a plan set</a>
   <p class="mono">Free. Runs in your browser, nothing is uploaded.</p>

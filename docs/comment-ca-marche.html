@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Comment ça marche : d'une image de plan d'étage à un jeu de plans — Zero Mouse Clicks</title>
-<meta name="description" content="Trois très petits modèles d&#x27;IA lisent les murs, les portes, les fenêtres, les appareils et les meubles sur le plan d&#x27;un dépliant de promoteur; des règles explicites dessinent le jeu de plans. Le tout dans votre navigateur.">
+<meta name="description" content="Trois très petits modèles d&#x27;IA lisent les murs, les portes, les fenêtres et le nom des pièces sur le plan d&#x27;un dépliant de promoteur; des règles explicites dessinent le jeu de plans et calculent les superficies pour estimer. Le tout dans votre navigateur.">
 <link rel="canonical" href="https://zeromouseclicks.com/comment-ca-marche">
 <link rel="alternate" hreflang="en" href="https://zeromouseclicks.com/how-it-works">
 <link rel="alternate" hreflang="es" href="https://zeromouseclicks.com/como-funciona">
@@ -14,10 +14,10 @@
 <meta name="theme-color" content="#000000">
 <meta property="og:site_name" content="Zero Mouse Clicks">
 <meta property="og:title" content="Comment ça marche : d&#x27;une image de plan d&#x27;étage à un jeu de plans — Zero Mouse Clicks">
-<meta property="og:description" content="Trois très petits modèles d&#x27;IA lisent les murs, les portes, les fenêtres, les appareils et les meubles sur le plan d&#x27;un dépliant de promoteur; des règles explicites dessinent le jeu de plans. Le tout dans votre navigateur.">
+<meta property="og:description" content="Trois très petits modèles d&#x27;IA lisent les murs, les portes, les fenêtres et le nom des pièces sur le plan d&#x27;un dépliant de promoteur; des règles explicites dessinent le jeu de plans et calculent les superficies pour estimer. Le tout dans votre navigateur.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://zeromouseclicks.com/comment-ca-marche">
-<meta property="og:image" content="https://zeromouseclicks.com/img/plan_set_8_sheets.jpg">
+<meta property="og:image" content="https://zeromouseclicks.com/img/plan_set_6_sheets.jpg">
 <meta property="og:locale" content="fr_CA">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Cpath d='M8 8h16v16H8zM8 17h9M17 8v9' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3C/svg%3E">
@@ -34,10 +34,10 @@
    "@id": "https://zeromouseclicks.com/comment-ca-marche#article",
    "headline": "Comment ça marche.Lire, puis dessiner.",
    "name": "Comment ça marche : d'une image de plan d'étage à un jeu de plans — Zero Mouse Clicks",
-   "description": "Trois très petits modèles d'IA lisent les murs, les portes, les fenêtres, les appareils et les meubles sur le plan d'un dépliant de promoteur; des règles explicites dessinent le jeu de plans. Le tout dans votre navigateur.",
+   "description": "Trois très petits modèles d'IA lisent les murs, les portes, les fenêtres et le nom des pièces sur le plan d'un dépliant de promoteur; des règles explicites dessinent le jeu de plans et calculent les superficies pour estimer. Le tout dans votre navigateur.",
    "inLanguage": "fr-CA",
    "url": "https://zeromouseclicks.com/comment-ca-marche",
-   "image": "https://zeromouseclicks.com/img/plan_set_8_sheets.jpg",
+   "image": "https://zeromouseclicks.com/img/plan_set_6_sheets.jpg",
    "datePublished": "2026-11-19",
    "dateModified": "2026-11-19",
    "author": {
@@ -95,12 +95,12 @@
 <main class="doc">
 <nav class="crumb mono" aria-label="Breadcrumb"><a href="/fr">Accueil</a><span aria-hidden="true"> / </span><span>Comment ça marche</span></nav>
 <h1>Comment ça marche.<br><em>Lire, puis dessiner.</em></h1>
-<p class="lead">Zero Mouse Clicks transforme l'image du plan d'étage d'un dépliant de promoteur ou d'une annonce immobilière en jeu de plans d'architecture : huit feuilles A3 dans un seul PDF. Trois très petits modèles d'IA lisent l'image, des règles explicites la dessinent, et tout se passe dans votre navigateur. L'image n'est jamais téléversée.</p>
+<p class="lead">Zero Mouse Clicks transforme l'image du plan d'étage d'un dépliant de promoteur ou d'une annonce immobilière en jeu de plans d'architecture : six feuilles A3 dans un seul PDF, avec les superficies de planchers, de murs et de plafonds et les portes et fenêtres nécessaires pour estimer. Trois très petits modèles d'IA lisent l'image, des règles explicites la dessinent, et tout se passe dans votre navigateur. L'image n'est jamais téléversée.</p>
 <ol class="steps">
   <li><b>01</b><span>Déposez le plan</span></li>
   <li><b>02</b><span>De petits modèles le lisent</span></li>
   <li><b>03</b><span>Les règles le dessinent</span></li>
-  <li><b>04</b><span>Un PDF, huit feuilles</span></li>
+  <li><b>04</b><span>Un PDF, six feuilles</span></li>
 </ol>
 
 <h2 id="entree">1. Déposez le plan</h2>
@@ -147,20 +147,21 @@ murs.</p>
 <p>À partir des masques, des règles explicites construisent un modèle vectoriel en mètres :</p>
 <ul>
   <li>les murs deviennent des barres orthogonales, et les ouvertures sont les vides entre eux;</li>
-  <li>le type de chaque pièce vient du texte lu sur le plan ou, à défaut, de règles;</li>
-  <li>les comptoirs, les placards et les appareils sont dessinés comme des blocs standards;</li>
-  <li>les salles de bain suivent la disposition habituelle : une douche d'un mur à l'autre à une extrémité, la toilette
-      et le lavabo sur un même mur;</li>
-  <li>les électroménagers s'appuient contre un mur, à côté des comptoirs; les chaises de la salle à manger ont 0,60&nbsp;m
-      par place;</li>
-  <li>chaque meuble reçoit un type, une dimension de catalogue et la direction vers laquelle il fait face.</li>
+  <li>la fonction de chaque pièce vient du texte lu sur le plan ou, à défaut, de règles;</li>
+  <li>chaque pièce reçoit sa superficie de plancher et de plafond, son périmètre, sa superficie de murs déduction faite
+      des portes et fenêtres, et sa longueur de plinthes;</li>
+  <li>chaque porte et chaque fenêtre reçoit une étiquette, une largeur, une hauteur supposée, une superficie et les pièces
+      qu'elle relie;</li>
+  <li>les meubles et les appareils ne sont lus que pour aider à nommer les pièces : dans cette bêta, ils ne sont pas
+      dessinés.</li>
 </ul>
 <p>Chaque décision est du code que l'on peut lire et modifier. C'est voulu : un résultat erroné se retrace jusqu'à une
 règle.</p>
 
-<h2 id="pdf">5. Un PDF, huit feuilles</h2>
-<p>Le modèle vectoriel est dessiné dans un PDF A3 de huit feuilles : page couverture, plan d'étage coté, tableaux, revêtements
-de sol, électricité schématique, aménagement du mobilier, et coupes de la cuisine et de la salle de bain. Chaque feuille a
+<h2 id="pdf">5. Un PDF, six feuilles</h2>
+<p>Le modèle vectoriel est dessiné dans un PDF A3 de six feuilles : page couverture, plan d'étage coté, métré (planchers,
+murs, plafonds, plinthes, portes et fenêtres), revêtements de sol, murs et plafonds, et électricité schématique. Chaque
+feuille a
 un cadre ISO&nbsp;5457, un cartouche et la plus grande échelle normalisée qui convient.
 <a href="/jeu-de-plans">Voir le contenu de chaque feuille</a>.</p>
 
@@ -182,10 +183,11 @@ zmc mon_plan.jpg --area 47 -o jeu-de-plans.pdf</code></pre>
 <h2 id="ameliorations">Toujours en amélioration</h2>
 <p>Zero Mouse Clicks est un projet d'IA, et l'IA évolue très vite. Les modèles, les règles et les dessins changent souvent,
 et chaque version lit mieux les plans et les dessine avec plus de précision. Les dernières versions ont ajusté les murs aux
-dimensions imprimées, disposé les salles de bain, les cuisines et les salles à manger comme le ferait un designer, et ajouté
-l'aménagement du mobilier.</p>
+dimensions imprimées et, dans cette bêta, mis d'abord ce qu'il faut pour une soumission : la fonction et la superficie de
+chaque pièce, et les quantités de planchers, de murs et de plafonds. Les meubles et les appareils sont laissés de côté
+jusqu'à ce qu'ils puissent être lus de façon fiable.</p>
 <p>Prochaines étapes : un écran de correction en un geste, l'exportation DXF, plus de styles de plans et un modèle qui
-reconnaît chaque type de meuble. Suivez les changements sur
+reconnaît chaque type de meuble et d'appareil, pour qu'ils reviennent sur les plans. Suivez les changements sur
 <a href="https://github.com/zeromouseclicks/zero-mouse-clicks">GitHub</a>.</p>
 <div class="cta">
   <a class="btn" href="/#request">Créer un jeu de plans</a>
