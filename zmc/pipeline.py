@@ -128,13 +128,26 @@ def steps(im0, area, proj, unit, pdf, legacy=False, debug=None, side=None, progr
         x0, y0, x1, y1 = refine.plan_bbox(mc)
         say('found', image=imc, mask=mc, box=(x0, y0, x1, y1))
         k = im0.shape[1] / imc.shape[1]
-        crop = im0[int(y0 * k):int(np.ceil(y1 * k)), int(x0 * k):int(np.ceil(x1 * k))]
-        info['crop'] = (int(x0 * k), int(y0 * k), int(np.ceil(x1 * k)), int(np.ceil(y1 * k)))
+        box = [int(x0 * k), int(y0 * k), int(np.ceil(x1 * k)), int(np.ceil(y1 * k))]
+        crop = im0[box[1]:box[3], box[0]:box[2]]
         fixed = side is not None
         top = side_max or 640
         side = side or top
         say('read')
         im = _fit(crop, side); m = yield from predict_steps(im, tta=fixed)
+        # v0.5.1: si hay muro pegado a un borde del recorte, la planta se cortó: se abre ese lado y se vuelve a leer
+        H0, W0 = im0.shape[:2]
+        for _ in range(2):
+            cut = refine.cut_sides(m, box, im0.shape)
+            if not cut:
+                break
+            gx, gy = int(0.12 * (box[2] - box[0])) + 8, int(0.12 * (box[3] - box[1])) + 8
+            box = [max(0, box[0] - gx) if 'l' in cut else box[0], max(0, box[1] - gy) if 't' in cut else box[1],
+                   min(W0, box[2] + gx) if 'r' in cut else box[2], min(H0, box[3] + gy) if 'b' in cut else box[3]]
+            info.setdefault('crop_grown', []).append(''.join(cut))
+            crop = im0[box[1]:box[3], box[0]:box[2]]
+            im = _fit(crop, side); m = yield from predict_steps(im, tta=fixed)
+        info['crop'] = tuple(box)
         if not fixed:
             # resolución normalizada: ~55 px por metro, que es lo que el modelo vio al entrenar
             m1, _ = refine.wall_color_filter(im, m)
