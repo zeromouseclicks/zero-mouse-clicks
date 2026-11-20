@@ -27,12 +27,14 @@
              url2: 'MCP server URL', auth: 'Authentication', noauth: 'No authentication', ok: 'Add', ok2: 'Create',
              trust: 'I understand and want to continue', connected: 'Connected', newer: 'In some versions: Customize › Connectors, or Plugins › Add.' },
       copy: 'Copy', copied: 'Copied', share: 'Share…', openG: 'Open in ChatGPT', openC: 'Open in Claude',
-      kProj: 'Project and city', kProjPh: 'Rivera del Valle, Amarilo, Bogotá', kApt: 'Apartment', kAptPh: '2 bedrooms, 56 m²',
+      kFields: [['proj', 'Project', 'Rivera del Valle'], ['dev', 'Developer', 'Amarilo'], ['city', 'City', 'Bogotá'], ['apt', 'Apartment (optional)', '2 bedrooms, 56 m²']],
+      kPh: { proj: '[project]', city: '[city]' },
+      place: function (v, V) { return [["the apartment", 0]].concat(v.apt ? [[' (', 0], V('apt'), [')', 0]] : [])
+        .concat([[' in the ', 0], V('proj'), [' project', 0]]).concat(v.dev ? [[' by ', 0], V('dev')] : []).concat([[', ', 0], V('city')]); },
+      pYes: function (pl) { return [['Use Zero Mouse Clicks to make the plan set of ', 0]].concat(pl, [['. If there are several apartment types, do not ask me: give me one link per type.', 0]]); },
+      pNo: function (pl) { return [['Search the web for the floor plan of ', 0]].concat(pl, [['. I need the direct address of the apartment floor plan image (a .jpg, .png or .webp file; not a web page and not the site plan of the complex). It is usually on the developer\'s project page or on listing portals, with words like plan, floor plan or type in the file name. If there are several apartment types, do not ask me: give me one link per type. Build each link like this:\nhttps://zeromouseclicks.com/?plan=IMAGE_URL&area=PRIVATE_AREA&unit=m2\nIf you cannot see the image address, give me the link of the page where the floor plan appears.', 0]]); },
       kWith: 'I added the connector', kWithout: 'No connector',
       kNote: 'On a phone, the buttons open the app if you have it. Or copy and paste the prompt in any AI chat.',
-      pNo: function (apt, proj) { return 'Find the floor plan image of ' + apt + ' in ' + proj + " on the developer's or a listing's website. Then give me this link with the direct image address and the area filled in:\nhttps://zeromouseclicks.com/?plan=IMAGE_URL&area=AREA&unit=m2"; },
-      pYes: function (apt, proj) { return 'Use Zero Mouse Clicks to make the plan set of ' + apt + ' in ' + proj + '.'; },
-      apt: function (a) { return a ? 'the apartment (' + a + ')' : 'the apartment'; }, projPh: '[project, city]'
     },
     es: {
       tabs: 'Asistente', pause: 'Pausar', play: 'Reproducir',
@@ -50,12 +52,14 @@
              url2: 'URL del servidor MCP', auth: 'Autenticación', noauth: 'Sin autenticación', ok: 'Agregar', ok2: 'Crear',
              trust: 'Entiendo y quiero continuar', connected: 'Conectado', newer: 'En algunas versiones: Personalizar › Conectores, o Plugins › Agregar.' },
       copy: 'Copiar', copied: 'Copiado', share: 'Compartir…', openG: 'Abrir en ChatGPT', openC: 'Abrir en Claude',
-      kProj: 'Proyecto y ciudad', kProjPh: 'Rivera del Valle, Amarilo, Bogotá', kApt: 'Apartamento', kAptPh: '2 alcobas, 56 m²',
+      kFields: [['proj', 'Proyecto', 'Rivera del Valle'], ['dev', 'Constructora', 'Amarilo'], ['city', 'Ciudad', 'Bogotá'], ['apt', 'Apartamento (opcional)', '2 alcobas, 56 m²']],
+      kPh: { proj: '[proyecto]', city: '[ciudad]' },
+      place: function (v, V) { return [['apartamento', 0]].concat(v.apt ? [[' (', 0], V('apt'), [')', 0]] : [])
+        .concat([[' del proyecto ', 0], V('proj')]).concat(v.dev ? [[' de la constructora ', 0], V('dev')] : []).concat([[', en ', 0], V('city')]); },
+      pYes: function (pl) { return [['Usa Zero Mouse Clicks para hacer el juego de planos del ', 0]].concat(pl, [['. Si hay varias tipologías, no me preguntes: dame un enlace por cada una.', 0]]); },
+      pNo: function (pl) { return [['Busca en la web la planta del ', 0]].concat(pl, [['. Necesito la dirección directa de la imagen de la planta del apartamento (un archivo .jpg, .png o .webp; no una página ni la implantación del conjunto). Suele estar en la página del proyecto de la constructora o en portales inmobiliarios como Ciencuadras o Fincaraíz, con palabras como plano, planta o tipo en el nombre del archivo. Si hay varias tipologías, no me preguntes: dame un enlace por cada una. Arma cada enlace así:\nhttps://zeromouseclicks.com/?plan=URL_DE_LA_IMAGEN&area=AREA_PRIVADA&unit=m2\nSi no logras ver la dirección de la imagen, dame el enlace de la página donde aparece la planta.', 0]]); },
       kWith: 'Ya agregué el conector', kWithout: 'Sin conector',
       kNote: 'En el celular, los botones abren la app si la tienes. O copia el texto y pégalo en cualquier chat de IA.',
-      pNo: function (apt, proj) { return 'Busca la imagen de la planta del ' + apt + ' en ' + proj + ', en la página de la constructora o de un portal inmobiliario. Luego dame este enlace con la dirección directa de la imagen y el área:\nhttps://zeromouseclicks.com/?plan=URL_DE_LA_IMAGEN&area=AREA&unit=m2'; },
-      pYes: function (apt, proj) { return 'Usa Zero Mouse Clicks para hacer el juego de planos del ' + apt + ' en ' + proj + '.'; },
-      apt: function (a) { return a ? 'apartamento (' + a + ')' : 'apartamento'; }, projPh: '[proyecto, ciudad]'
     },
     fr: {
       tabs: 'Assistant', pause: 'Pause', play: 'Lecture',
@@ -73,12 +77,14 @@
              url2: 'URL du serveur MCP', auth: 'Authentification', noauth: 'Aucune authentification', ok: 'Ajouter', ok2: 'Créer',
              trust: 'Je comprends et je veux continuer', connected: 'Connecté', newer: 'Selon la version : Personnaliser › Connecteurs, ou Plugins › Ajouter.' },
       copy: 'Copier', copied: 'Copié', share: 'Partager…', openG: 'Ouvrir dans ChatGPT', openC: 'Ouvrir dans Claude',
-      kProj: 'Projet et ville', kProjPh: 'Rivera del Valle, Amarilo, Bogotá', kApt: 'Appartement', kAptPh: '2 chambres, 56 m²',
+      kFields: [['proj', 'Projet', 'Rivera del Valle'], ['dev', 'Promoteur', 'Amarilo'], ['city', 'Ville', 'Bogotá'], ['apt', 'Appartement (facultatif)', '2 chambres, 56 m²']],
+      kPh: { proj: '[projet]', city: '[ville]' },
+      place: function (v, V) { return [["l'appartement", 0]].concat(v.apt ? [[' (', 0], V('apt'), [')', 0]] : [])
+        .concat([[' du projet ', 0], V('proj')]).concat(v.dev ? [[' du promoteur ', 0], V('dev')] : []).concat([[', à ', 0], V('city')]); },
+      pYes: function (pl) { return [['Utilise Zero Mouse Clicks pour faire le jeu de plans de ', 0]].concat(pl, [[". S'il y a plusieurs types d'appartements, ne me pose pas de question : donne-moi un lien pour chacun.", 0]]); },
+      pNo: function (pl) { return [['Cherche sur le Web le plan de ', 0]].concat(pl, [[". J'ai besoin de l'adresse directe de l'image du plan de l'appartement (un fichier .jpg, .png ou .webp; pas une page ni le plan d'implantation de l'ensemble). Elle se trouve souvent sur la page du projet du promoteur ou sur des portails immobiliers, avec des mots comme plan, type ou unité dans le nom du fichier. S'il y a plusieurs types d'appartements, ne me pose pas de question : donne-moi un lien pour chacun. Construis chaque lien ainsi :\nhttps://zeromouseclicks.com/?plan=URL_IMAGE&area=SUPERFICIE_PRIVATIVE&unit=m2\nSi tu ne vois pas l'adresse de l'image, donne-moi le lien de la page où se trouve le plan.", 0]]); },
       kWith: "J'ai ajouté le connecteur", kWithout: 'Sans connecteur',
       kNote: "Sur un téléphone, les boutons ouvrent l'application si vous l'avez. Sinon, copiez le texte et collez-le dans n'importe quel assistant IA.",
-      pNo: function (apt, proj) { return "Trouve l'image du plan de " + apt + ' du projet ' + proj + ", sur le site du promoteur ou d'une annonce. Ensuite, donne-moi ce lien en y mettant l'adresse directe de l'image et la superficie :\nhttps://zeromouseclicks.com/?plan=URL_IMAGE&area=SUPERFICIE&unit=m2"; },
-      pYes: function (apt, proj) { return 'Utilise Zero Mouse Clicks pour faire le jeu de plans de ' + apt + ' du projet ' + proj + '.'; },
-      apt: function (a) { return a ? "l'appartement (" + a + ')' : "l'appartement"; }, projPh: '[projet, ville]'
     }
   };
 
@@ -164,7 +170,8 @@
     '@media (max-width:620px){.zc .zw{height:350px}.zc-side{display:none}.zc-main{padding-top:46px}}',
     /* prompt kit */
     '.zk{margin:20px 0 8px;border:1px solid var(--zl);border-radius:16px;padding:18px;background:#070706}',
-    '.zk-f{display:grid;grid-template-columns:1.4fr 1fr;gap:10px}',
+    '.zk-f{display:grid;grid-template-columns:1fr 1fr;gap:10px}',
+    '.zk code .v{color:var(--zi)}.zk code .ph{color:#ffc878}',
     '.zk-f label{font-size:12px;color:var(--zm);display:flex;flex-direction:column;gap:6px}',
     '.zk-f input{font-size:15px;line-height:1.2;font-family:inherit;color:var(--zf);background:#000;border:1px solid var(--zl);border-radius:10px;padding:11px 12px;outline:none;width:100%}',
     '.zk-f input:focus{border-color:#4a4a46}',
@@ -470,10 +477,12 @@
   function promptkit(root) {
     var L = T[lang(root)], withConn = root.getAttribute('data-mode') === 'connector';
     root.classList.add('zk');
-    var f = el('div', 'zk-f');
-    f.innerHTML = '<label>' + esc(L.kProj) + '<input type="text" autocomplete="off" enterkeyhint="done"></label>' +
-                  '<label>' + esc(L.kApt) + '<input type="text" autocomplete="off" enterkeyhint="done"></label>';
-    var ins = f.querySelectorAll('input'); ins[0].placeholder = L.kProjPh; ins[1].placeholder = L.kAptPh;
+    var f = el('div', 'zk-f'), ins = {};
+    L.kFields.forEach(function (d) {
+      var lb = el('label', '', esc(d[1])), inp = el('input');
+      inp.type = 'text'; inp.autocomplete = 'off'; inp.setAttribute('enterkeyhint', 'next'); inp.placeholder = d[2];
+      inp.setAttribute('autocapitalize', 'words'); lb.appendChild(inp); f.appendChild(lb); ins[d[0]] = inp;
+    });
     root.appendChild(f);
     var sw = tabs([['no', L.kWithout], ['yes', L.kWith]], withConn ? 'yes' : 'no', function (k) { withConn = k === 'yes'; upd(); }, L.kWith);
     root.appendChild(sw);
@@ -488,17 +497,35 @@
       go.appendChild(sh);
     }
     root.appendChild(go);
-    var note = el('p', 'zk-note', esc(L.kNote)); root.appendChild(note);
-    function text() {
-      var proj = ins[0].value.trim() || L.projPh, apt = L.apt(ins[1].value.trim());
-      return (withConn ? L.pYes : L.pNo)(apt, proj);
+    root.appendChild(el('p', 'zk-note', esc(L.kNote)));
+    // the prompt is a list of pieces: [text, 0] fixed, [text, 'v'] typed by the user, [text, 'ph'] still to fill
+    function parts() {
+      var v = {};
+      Object.keys(ins).forEach(function (k) { v[k] = ins[k].value.trim().replace(/\s+/g, ' '); });
+      var V = function (k) { return v[k] ? [v[k], 'v'] : [L.kPh[k] || '', 'ph']; };
+      var pl = L.place(v, V);
+      return (withConn ? L.pYes : L.pNo)(pl);
     }
+    function text() { return parts().map(function (p) { return p[0]; }).join(''); }
     function upd() {
-      var t = text(); code.textContent = t;
+      code.innerHTML = parts().map(function (p) { return p[1] ? '<span class="' + p[1] + '">' + esc(p[0]) + '</span>' : esc(p[0]); }).join('');
+      var t = text();
       aG.href = 'https://chatgpt.com/?' + (withConn ? '' : 'hints=search&') + 'q=' + encodeURIComponent(t);
       aC.href = 'https://claude.ai/new?q=' + encodeURIComponent(t);
     }
-    ins[0].addEventListener('input', upd); ins[1].addEventListener('input', upd);
+    // ?project=…&developer=…&city=…&apt=… fill the form (handy to share a ready link)
+    try {
+      var q = new URLSearchParams(location.search), map = { proj: 'project', dev: 'developer', city: 'city', apt: 'apt' };
+      Object.keys(map).forEach(function (k) { var x = q.get(map[k]); if (x) ins[k].value = x.slice(0, 80); });
+    } catch (e) {}
+    Object.keys(ins).forEach(function (k) {
+      ins[k].addEventListener('input', upd);
+      ins[k].addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return; e.preventDefault();
+        var ks = Object.keys(ins), n = ks.indexOf(k);
+        if (n < ks.length - 1) ins[ks[n + 1]].focus(); else ins[k].blur();
+      });
+    });
     upd();
   }
 
