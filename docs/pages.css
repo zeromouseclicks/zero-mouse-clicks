@@ -73,6 +73,13 @@ figcaption { margin-top:10px; font-family:"JetBrains Mono",ui-monospace,Menlo,mo
 .doc th { color:var(--mute); font-weight:500; font-size:13px; }
 sup { font-family:"JetBrains Mono",ui-monospace,Menlo,monospace; font-size:9px; letter-spacing:.04em; color:#a0ffc8; margin-left:3px; vertical-align:super; }
 .doc pre code { white-space:pre-wrap; overflow-wrap:anywhere; }
+.doc p.small { font-size:14px; line-height:1.6; color:var(--mute); margin-top:14px; } .doc p.small strong { color:var(--body); }
+.doc details { margin-top:36px; border-top:1px solid var(--line); padding-top:18px; }
+.doc summary { cursor:pointer; color:var(--fg); font-size:15px; list-style:none; } .doc summary::before { content:'+ '; color:var(--ink); }
+.doc details[open] summary::before { content:'– '; } .doc details p { margin-top:14px; }
+.doc h2 .mono { font-size:13px; letter-spacing:0; color:var(--mute); margin-left:6px; font-weight:400; vertical-align:middle; }
+.promo { margin:56px 0 8px; padding:28px 0 0; border-top:1px solid var(--line); }
+.promo h2 { margin-top:0 !important; } .promo .btn { margin-top:18px; }
 .doc .pill { font-size:12px; line-height:1.4; }
 .doc pre + p, .doc ul + p, .doc table + p, .doc figure + p { margin-top:14px; }
 footer { border-top:1px solid var(--line); padding:26px 28px 34px; font-size:13px; color:var(--mute);

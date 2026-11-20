@@ -95,59 +95,45 @@
 <main class="doc">
 <nav class="crumb mono" aria-label="Breadcrumb"><a href="/es">Inicio</a><span aria-hidden="true"> / </span><span>Chats de IA (beta)</span></nav>
 <h1>Pídeselo a tu chat de IA.<br><em>Recibe los planos.</em></h1>
-<p class="lead">Zero Mouse Clicks es AI-native. Desde ChatGPT, Claude, Gemini o cualquier asistente de IA, pide los planos de un apartamento: el asistente busca el proyecto y su planta, y Zero Mouse Clicks dibuja las seis láminas A3 en tu navegador. Gratis, y sin tokens de nuestro lado.</p>
+<p class="lead">Pídele a ChatGPT, a Claude o a cualquier chat de IA los planos de un apartamento. El chat encuentra la planta; Zero Mouse Clicks dibuja las seis láminas A3 en tu navegador. Gratis.</p>
 <p class="pill mono"><i></i>Beta · cambia seguido, siempre para mejorar</p>
 
-<h2 id="cualquier-chat">1. Cualquier chat de IA, sin instalar nada</h2>
-<p>Copia esto en tu chat y completa lo que está entre corchetes:</p>
-<pre><code>Busca la imagen de la planta del [tipo de apartamento] del proyecto
-[nombre del proyecto, ciudad] en la página de la constructora o del
-anuncio. Luego dame este enlace con la dirección de la imagen y el área:
-https://zeromouseclicks.com/?plan=URL_DE_LA_IMAGEN&amp;area=AREA&amp;unit=m2</code></pre>
-<p>Abre el enlace que te da el chat. La planta se carga sola y el juego de planos arranca: cero clics. El dibujo se hace
-en tu navegador y no se sube nada.</p>
-<table>
-  <thead><tr><th>Parte del enlace</th><th>Para qué sirve</th></tr></thead>
-  <tbody>
-    <tr><td><code>plan</code></td><td>Dirección directa de la imagen de la planta (JPG, PNG o WEBP). Obligatoria.</td></tr>
-    <tr><td><code>area</code></td><td>Área del apartamento, un número. Opcional: sin ella, el área se lee de la planta.</td></tr>
-    <tr><td><code>unit</code></td><td><code>m2</code> (área privada) o <code>sqft</code> (área bruta en pies²). Por defecto <code>m2</code>.</td></tr>
-    <tr><td><code>go=0</code></td><td>Carga la planta sin arrancar, para revisarla primero.</td></tr>
-  </tbody>
-</table>
+<div data-howto data-lang="es"></div>
 
-<h2 id="conector">2. Agrega el conector de Zero Mouse Clicks</h2>
-<p>Con el conector, el chat abre la página del proyecto, elige la imagen de la planta y lee el área por su cuenta.
-Agrégalo como conector personalizado (servidor MCP remoto) con esta dirección y sin autenticación:</p>
+<h2 id="probar">Pruébalo ya <span class="mono">· cualquier chat de IA, sin instalar nada</span></h2>
+<p>Escribe el proyecto, copia el texto o ábrelo directo en tu chat.</p>
+<div data-promptkit data-lang="es"></div>
+
+<h2 id="conector">Mejor aún: agrega el conector una vez</h2>
+<p>Un minuto, desde un computador. Después el chat encuentra solo la planta y el área.</p>
+<div data-connect data-lang="es"></div>
+<p>La dirección que debes pegar, sin autenticación:</p>
 <pre><code>https://ebqxcaelgmxofwtofrdc.supabase.co/functions/v1/zmc-ai/mcp</code></pre>
-<ul>
-  <li><strong>Claude</strong> (web o escritorio): Personalizar › Conectores, o Plugins › Agregar en las versiones más
-      nuevas, y luego Agregar conector personalizado; escribe un nombre y la dirección. Los planes gratuitos pueden agregar un conector personalizado.</li>
-  <li><strong>ChatGPT</strong>: activa el modo desarrollador en la configuración (planes pagos) y crea una app con la
-      dirección, sin autenticación.</li>
-  <li><strong>Gemini</strong>: en Apps conectadas, agrega una app personalizada con la dirección, donde tu plan y tu país
-      lo permitan.</li>
-</ul>
-<p>Trae dos herramientas: <code>find_floor_plans</code> abre una página de proyecto y devuelve las imágenes que parecen
-plantas y las áreas impresas; <code>plan_set_link</code> devuelve el enlace que dibuja el juego de planos.</p>
+<p class="small"><strong>Claude</strong>: los planes gratuitos pueden agregar un conector personalizado. <strong>ChatGPT</strong>: modo
+desarrollador, planes pagos, en la web. <strong>Gemini</strong>: Apps conectadas › agregar una app personalizada, donde tu plan y tu
+país lo permitan.</p>
 
-<h2 id="ejemplo">Así se ve una conversación</h2>
-<ol class="steps">
-  <li><b>Tú</b><span>«Hazme los planos del apartamento de dos alcobas de [proyecto], Bogotá.»</span></li>
-  <li><b>Chat</b><span>Busca en internet y encuentra la página del proyecto.</span></li>
-  <li><b>Conector</b><span>Encuentra la planta y el área en esa página.</span></li>
-  <li><b>Tú</b><span>Abres el enlace: seis láminas A3 en un PDF.</span></li>
-</ol>
-
-<h2 id="bueno-saber">Bueno saber</h2>
+<h2 id="beta">Bueno saber</h2>
 <ul>
-  <li>Es una beta: cambia seguido, siempre para mejorar. Cuéntanos qué funciona y qué no por el
-      <a href="/#contact">formulario de contacto</a>.</li>
-  <li>El conector abre solo la página que tú o el chat le indican, una a la vez, respeta robots.txt y no guarda imágenes.
-      Algunos portales no permiten la lectura automática; en esos casos, guarda la imagen de la planta y suéltala en la web.</li>
-  <li>Las páginas armadas con JavaScript pueden esconderle las imágenes al conector. El chat igual puede encontrar la
-      dirección de la imagen, o puedes guardarla tú.</li>
+  <li>Es una beta: cuéntanos qué funciona y qué no en el <a href="/#contact">formulario de contacto</a>.</li>
+  <li>El conector abre solo la página que tú o el chat le indican, respeta robots.txt y no guarda imágenes. Si un portal no
+      lo permite, guarda la imagen de la planta y suéltala en la página.</li>
 </ul>
+<details>
+  <summary>Para desarrolladores: el enlace y las herramientas</summary>
+  <table>
+    <thead><tr><th>Parte del enlace</th><th>Qué hace</th></tr></thead>
+    <tbody>
+      <tr><td><code>plan</code></td><td>Dirección directa de la imagen de la planta (JPG, PNG o WEBP). Obligatoria.</td></tr>
+      <tr><td><code>area</code></td><td>Área del apartamento, un número. Opcional: sin ella, el área se lee de la planta.</td></tr>
+      <tr><td><code>unit</code></td><td><code>m2</code> (área privada) o <code>sqft</code> (área bruta). Por defecto <code>m2</code>.</td></tr>
+      <tr><td><code>go=0</code></td><td>Carga la planta sin arrancar, para revisarla primero.</td></tr>
+    </tbody>
+  </table>
+  <p>El conector trae dos herramientas: <code>find_floor_plans</code> abre una página de proyecto y devuelve las imágenes que
+  parecen plantas y las áreas impresas; <code>plan_set_link</code> devuelve el enlace que dibuja el juego de planos.</p>
+</details>
+<script src="/howto.js" defer></script>
 <div class="cta">
   <a class="btn" href="/#request">Hacer un juego de planos</a>
   <p class="mono">Gratis. Corre en tu navegador, no se sube nada. La herramienta está en inglés.</p>

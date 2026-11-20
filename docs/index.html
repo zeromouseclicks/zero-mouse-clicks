@@ -78,6 +78,18 @@
           font-size:11px; background:rgba(255,255,255,.02); }
   .pill i { width:6px; height:6px; border-radius:50%; background:var(--win); box-shadow:0 0 10px var(--win); animation:blink 2.4s ease-in-out infinite; }
   @keyframes blink { 50% { opacity:.35; } }
+  /* AI chats (beta) */
+  .aip { text-decoration:none; color:var(--fg); margin-bottom:22px; transition:border-color .3s, box-shadow .3s; }
+  .aip b { font-weight:400; color:var(--ink); margin-left:2px; transition:transform .3s; display:inline-block; }
+  .aip:hover { border-color:#3a3a36; box-shadow:0 0 30px rgba(160,255,200,.12); } .aip:hover b { transform:translateX(3px); }
+  #ai { text-align:left; }
+  #ai .wrap { display:grid; grid-template-columns:minmax(0, .85fr) minmax(0, 1.15fr); gap:clamp(32px, 5vw, 72px); align-items:center; }
+  #ai .sub { margin-left:0; }
+  #ai .acts { display:flex; flex-wrap:wrap; align-items:center; gap:14px 20px; margin-top:28px; }
+  #ai .ghost { color:var(--fg); text-decoration:none; border-bottom:1px solid #3a3a36; padding-bottom:2px; font-size:12px; }
+  #ai .ghost:hover { border-color:var(--ink); }
+  #ai .aif { min-width:0; }
+  @media (max-width:900px) { #ai .wrap { grid-template-columns:1fr; } }
 
   /* the tool */
   .req { max-width:520px; margin-top:30px; text-align:left; }
@@ -395,6 +407,7 @@
   </a>
   <div class="hr">
   <nav aria-label="Main">
+    <a href="/beta">AI chats <span class="beta">beta</span></a>
     <a href="#set">What you get</a>
     <a href="/how-it-works" class="hx">How it works</a>
     <a href="#why">Why the name</a>
@@ -410,6 +423,7 @@
 <section class="hero rv" id="request">
   <div class="wrap">
     <div class="tool">
+      <a class="pill aip mono" href="#ai"><i></i>New &middot; ask ChatGPT or Claude for the plans <b aria-hidden="true">&rarr;</b></a>
       <h1 class="sp">A brochure in.<br><em>A plan set out.</em></h1>
       <p class="sub fade">Drop a developer's floor plan. Get six A3 sheets in one PDF, with the floor, wall and ceiling areas to quote.</p>
 
@@ -595,6 +609,21 @@
         <button class="step" type="button"><i></i><b>04</b><span>One PDF, six sheets</span></button>
       </div>
     </div>
+  </div>
+</section>
+
+<section class="rv" id="ai">
+  <div class="wrap">
+    <div class="ait">
+      <p class="pill mono fade"><i></i>New &middot; beta</p>
+      <h2 class="sp">Or just ask<br><em>your AI chat.</em></h2>
+      <p class="sub fade">Tell ChatGPT or Claude which apartment you want. It finds the floor plan and gives you one link: open it and the plan set is drawn.</p>
+      <div class="acts fade">
+        <a class="btn" href="/beta">Try it from your AI chat &rarr;</a>
+        <a class="ghost mono" href="/beta#connector">Add the connector in 1 minute</a>
+      </div>
+    </div>
+    <div class="aif fade" data-howto data-lang="en"></div>
   </div>
 </section>
 
@@ -1058,7 +1087,7 @@
   var client = null;
   function engine() {
     if (!client) client = new Promise(function (res, rej) {
-      var s = document.createElement('script'); s.src = 'app/client.js?v9';
+      var s = document.createElement('script'); s.src = 'app/client.js?v10';
       s.onload = function () { res(window.ZMC); }; s.onerror = function () { client = null; rej(Object.assign(new Error('step client · app/client.js did not load'), { code: 'boot' })); };
       document.head.appendChild(s);
     });
@@ -1441,5 +1470,6 @@
   });
 })();
 </script>
+<script src="/howto.js" defer></script>
 </body>
 </html>
